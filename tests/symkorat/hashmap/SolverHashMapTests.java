@@ -1,10 +1,12 @@
-package symkorat;
+package symkorat.hashmap;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public class solverHashMapTests {
+import symkorat.SymKorat;
+
+public class SolverHashMapTests {
 	
 	private SymKorat symKorat = new SymKorat("symkorat.examples.hashmap.HashMap", Integer.toString(6));
 
