@@ -52,14 +52,10 @@ public class SymKoratVector {
 	 * @param concreteVector
 	 * @param fixedIndices
 	 */
-	public SymKoratVector(int[] concreteVector, Set<Integer> fixedIndices ) {
+	public SymKoratVector(int[] concreteVector, int[] partialVector, Set<Integer> fixedIndices ) {
 		this.concreteVector = concreteVector;
 		this.fixedIndices = fixedIndices;
-		for(int i = 0; i < partialVector.length; i++) {
-			if (!fixedIndices.contains(i)) {
-				this.partialVector[i] = SymKoratVector.SYMBOLIC;
-			}
-		}
+		this.partialVector = partialVector;
 	}
 
 	/**
