@@ -16,16 +16,27 @@ public class SymKoratVector {
 
 	public static final int NULL = 0;
 
-	private int[] vector;
+	private int[] concreteVector;
+
+	private int[] partialVector;
 
 	private Set<Integer> fixedIndices = new HashSet<Integer>();
+
 
 	/**
 	 *
 	 * @return
 	 */
-	public int[] getVector() {
-		return vector;
+	public int[] getPartialVector() {
+		return this.partialVector;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public int[] getConcreteVector() {
+		return this.concreteVector;
 	}
 
 	/**
@@ -38,12 +49,17 @@ public class SymKoratVector {
 
 	/**
 	 *
-	 * @param vector
+	 * @param concreteVector
 	 * @param fixedIndices
 	 */
-	public SymKoratVector(int[] vector, Set<Integer> fixedIndices ) {
-		this.vector = vector;
+	public SymKoratVector(int[] concreteVector, Set<Integer> fixedIndices ) {
+		this.concreteVector = concreteVector;
 		this.fixedIndices = fixedIndices;
+		for(int i = 0; i < partialVector.length; i++) {
+			if (!fixedIndices.contains(i)) {
+				this.partialVector[i] = SymKoratVector.SYMBOLIC;
+			}
+		}
 	}
 
 	/**
@@ -51,20 +67,21 @@ public class SymKoratVector {
 	 * @param vector
 	 */
 	public SymKoratVector(String vector) {
-		String[] vectorElements = vector.split(",");
-		int vectorSize = vectorElements.length;
+		String[] vectorValues = vector.split(",");
+		int vectorsSize = vectorValues.length;
 
-        this.vector = new int[vectorSize];
-        for (int i = 0; i < vectorSize; i++) {
-        	int elem = Integer.parseInt(vectorElements[i]);
+        this.concreteVector = new int[vectorsSize];
+		this.partialVector = new int[vectorsSize];
+        for (int i = 0; i < vectorsSize; i++) {
+        	int elem = Integer.parseInt(vectorValues[i]);
+			this.partialVector[i] = elem;
         	if (elem == SymKoratVector.SYMBOLIC) {
-				this.vector[i] = SymKoratVector.NULL;
+				this.concreteVector[i] = SymKoratVector.NULL;
 			}
         	else {
-        		this.vector[i] = elem;
+        		this.concreteVector[i] = elem;
         		this.fixedIndices.add(i);
         	}
         }
 	}
-
 }

@@ -1,6 +1,7 @@
 
 package symkorat;
 
+import korat.finitization.impl.CVElem;
 import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
@@ -14,6 +15,15 @@ public class SymKorat {
 
 
 	private Solver solver;
+
+
+	/**
+	 *
+	 * @return
+	 */
+	public CVElem[] getVectorFormat() {
+		return solver.getStateSpace().getStructureList();
+	}
 
 
     /**
@@ -141,5 +151,4 @@ public class SymKorat {
         }
         return result;
     }
-
 }

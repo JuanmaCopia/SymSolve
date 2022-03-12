@@ -32,7 +32,7 @@ public class SolverStateSpaceExplorer {
     	Finitization fin = (Finitization)ifin;
     	stateSpace = fin.getStateSpace();
 
-    	this.candidateVector = vector.getVector();
+    	this.candidateVector = vector.getConcreteVector();
         this.fixedIndices = vector.getFixedIndices();
 
     	int totalNumberOfFields = stateSpace.getTotalNumberOfFields();
