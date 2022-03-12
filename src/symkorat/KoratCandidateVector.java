@@ -36,11 +36,11 @@ public class KoratCandidateVector {
 	int length;
 
 	public int[] candidateVector;
-	
+
 	public int[] originalVector;
 
-	public HashSet<Integer> fixedIndexes = new HashSet<Integer>();
-	
+	public HashSet<Integer> fixedIndices = new HashSet<Integer>();
+
 
 	public KoratCandidateVector(CVElem[] structureList) {
 		length = structureList.length;
@@ -65,7 +65,7 @@ public class KoratCandidateVector {
 	}
 
 	public void initialize() {
-		fixedIndexes.clear();
+		fixedIndices.clear();
 
 		for (String cls : subvectors.keySet()) {
 			ArrayList<Pair<String,Integer>> sv = subvectors.get(cls);
@@ -77,7 +77,7 @@ public class KoratCandidateVector {
 			numElems.put(cls, 0);
 		}
 	}
-	
+
 	public boolean containsField(String fieldName) {
 		return vectorFieldNames.contains(fieldName);
 	}
@@ -102,7 +102,7 @@ public class KoratCandidateVector {
 	public HashSet<String> getVectorFieldNames() {
 		return vectorFieldNames;
 	}
-	
+
 	public String getVectorDescription() {
 		String vector = "";
 		for (String cls : classOrder) {
@@ -117,7 +117,7 @@ public class KoratCandidateVector {
 	public String getStringPartialVector() {
 		return Arrays.toString(originalVector);
 	}
-	
+
 	public String getStringPartialVector2() {
 		String vector = "";
 		for (int i = 0; i < originalVector.length; i++) {
@@ -127,7 +127,7 @@ public class KoratCandidateVector {
 		}
 		return vector;
 	}
-	
+
 	public String getStringCV() {
 		return Arrays.toString(candidateVector);
 	}
@@ -145,7 +145,7 @@ public class KoratCandidateVector {
 				if (value <= -1)
 					candidateVector[index]= 0;
 				else {
-					fixedIndexes.add(index);
+					fixedIndices.add(index);
 					candidateVector[index]= value;
 				}
 				index++;

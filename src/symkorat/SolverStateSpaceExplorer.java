@@ -1,6 +1,6 @@
 package symkorat;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import korat.finitization.IFinitization;
 import korat.finitization.impl.CVElem;
@@ -24,16 +24,16 @@ public class SolverStateSpaceExplorer {
 
     protected IIntList changedFields;
 
-    protected HashSet<Integer> fixedIndexes;
-    
+    protected Set<Integer> fixedIndices;
+
     protected Class<?> rootClass;
 
-    public SolverStateSpaceExplorer(IFinitization ifin, KoratCandidateVector kcv) {
+    public SolverStateSpaceExplorer(IFinitization ifin, SymKoratVector vector) {
     	Finitization fin = (Finitization)ifin;
     	stateSpace = fin.getStateSpace();
 
-    	this.candidateVector = kcv.candidateVector;
-        this.fixedIndexes = kcv.fixedIndexes;
+    	this.candidateVector = vector.getVector();
+        this.fixedIndices = vector.getFixedIndices();
 
     	int totalNumberOfFields = stateSpace.getTotalNumberOfFields();
     	if (totalNumberOfFields != this.candidateVector.length)
@@ -57,11 +57,11 @@ public class SolverStateSpaceExplorer {
     public int[] getCandidateVector() {
         return candidateVector;
     }
-    
+
     public Object buildCandidate() {
         return candidateBuilder.buildCandidate(candidateVector);
     }
-    
+
     protected boolean firstTestCase = true;
 
     public Object nextTestCase() {
@@ -84,7 +84,7 @@ public class SolverStateSpaceExplorer {
             int lastAccessedFieldIndex = accessedFields.removeLast();
             CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
 
-            if (lastAccessedField.isExcludedFromSearch() || fixedIndexes.contains(lastAccessedFieldIndex))
+            if (lastAccessedField.isExcludedFromSearch() || fixedIndices.contains(lastAccessedFieldIndex))
             	continue;
 
             changedFields.add(lastAccessedFieldIndex);
@@ -92,7 +92,7 @@ public class SolverStateSpaceExplorer {
             FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
             int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
             int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
-            
+
             if (currentInstanceIndex >= maxInstanceIndexForFieldDomain) {
                 candidateVector[lastAccessedFieldIndex] = 0;
                 lastAccessedField.maxInstanceInVector = -1;
@@ -106,7 +106,7 @@ public class SolverStateSpaceExplorer {
 
             // Is a reference field
             if (lastAccessedField.maxInstanceInVector == -1) {
-            	
+
             	int maxInstanceIndexInVector = 0;
     			if (lastAccessedFD.getClassOfField() == rootClass)
     				maxInstanceIndexInVector = 1;
@@ -121,7 +121,7 @@ public class SolverStateSpaceExplorer {
             	}
             	lastAccessedField.maxInstanceInVector = maxInstanceIndexInVector;
             }
-            
+
     		if (currentInstanceIndex <= lastAccessedField.maxInstanceInVector) {
     			candidateVector[lastAccessedFieldIndex]++;
     			return true;
@@ -156,7 +156,7 @@ public class SolverStateSpaceExplorer {
             FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
             int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
 
-            if (lastAccessedField.isExcludedFromSearch() || fixedIndexes.contains(lastAccessedFieldIndex))
+            if (lastAccessedField.isExcludedFromSearch() || fixedIndices.contains(lastAccessedFieldIndex))
             	continue;
 
             changedFields.add(lastAccessedFieldIndex);

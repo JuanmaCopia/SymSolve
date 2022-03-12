@@ -2,6 +2,7 @@ package symkorat;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Set;
 
 import korat.finitization.IFinitization;
 import korat.finitization.impl.Finitization;
@@ -16,17 +17,17 @@ import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
 
 
-public class KSolver extends AbstractTestCaseGenerator implements ITester {
+public class Solver extends AbstractTestCaseGenerator implements ITester {
 
-    private static KSolver instance = new KSolver();
+    private static Solver instance = new Solver();
 
-    public static KSolver getInstance() {
+    public static Solver getInstance() {
         return instance;
     }
 
     protected ClassLoader classLoader;
 
-    protected KSolver() {
+    protected Solver() {
         classLoader = new InstrumentingClassLoader();
         Finitization.setClassLoader(classLoader);
     }
@@ -127,8 +128,6 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
 
     SolverStateSpaceExplorer stateSpaceExplorer;
 
-    public KoratCandidateVector kcv;
-
     public void initialize(String className, String finArgs) throws ClassNotFoundException, CannotFindFinitizationException, CannotInvokeFinitizationException, CannotFindPredicateException {
     	this.clazz = classLoader.loadClass(className);
     	this.finArgs = finArgs.split(",");
@@ -140,7 +139,6 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
     	this.fin = invokeFinMethod(clazz, this.finMethod, this.finArgs);
 		this.predicate = getPredicateMethod(fin.getFinClass(), "repOK");
         this.stateSpace = ((Finitization) fin).getStateSpace();
-        this.kcv = new KoratCandidateVector(stateSpace.getStructureList());
     }
 
     private Method getFinMethod(Class<?> cls, String finName, String[] finArgs)
@@ -203,10 +201,11 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
         }
 
     }
-    
-    public boolean runAutoHybridRepok(KoratCandidateVector kcv) throws CannotInvokePredicateException, CannotFindPredicateException {
+
+    public boolean runAutoHybridRepok(SymKoratVector kcv) throws CannotInvokePredicateException, CannotFindPredicateException {
     	stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
         accessedFields = stateSpaceExplorer.getAccessedFields();
+        Set<Integer> fixedIndices = kcv.getFixedIndices();
 
         Object candidate = stateSpaceExplorer.buildCandidate();
         if (checkPredicate(candidate, predicate))
@@ -214,14 +213,14 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
         else {
         	for (int i = 0; i < accessedFields.numberOfElements(); i++) {
         		int index = accessedFields.get(i);
-        		if (!kcv.fixedIndexes.contains(index))
+        		if (!fixedIndices.contains(index))
         			return true;
-        	}	
+        	}
         }
         return false;
     }
 
-    public boolean startSolverExploration(KoratCandidateVector kcv) throws CannotInvokePredicateException, CannotFindPredicateException {
+    public boolean startSolverExploration(SymKoratVector kcv) throws CannotInvokePredicateException, CannotFindPredicateException {
     	stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
         accessedFields = stateSpaceExplorer.getAccessedFields();
 
@@ -234,8 +233,8 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
                 return true;
         }
     }
-    
-    public boolean startSolverExplorationNoIsmBreak(KoratCandidateVector kcv) throws CannotInvokePredicateException, CannotFindPredicateException {
+
+    public boolean startSolverExplorationNoIsmBreak(SymKoratVector kcv) throws CannotInvokePredicateException, CannotFindPredicateException {
     	stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
         accessedFields = stateSpaceExplorer.getAccessedFields();
 
@@ -248,7 +247,7 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
                 return true;
         }
     }
-    
+
 
     protected Method getPredicateMethod(Class<?> testClass, String predicateName)
             throws CannotFindPredicateException {
