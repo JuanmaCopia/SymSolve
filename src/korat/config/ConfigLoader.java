@@ -136,7 +136,7 @@ public class ConfigLoader {
      */
     private void initKoratOptions() {
         try {
-            Class clz = getClass();
+        	Class<?> clz = getClass();
             for (Field f : ReflectionUtils.getAllFields(clz)) {
                 if (Option.class.isAssignableFrom(f.getType())) {
                     koratOptions.addOption((Option)f.get(null));
@@ -375,7 +375,7 @@ public class ConfigLoader {
         if (config.listeners != null) {
             for (String listenerClassName : config.listeners) {
                 try {
-                    Class clz = Class.forName(listenerClassName, true,
+                	Class<?> clz = Class.forName(listenerClassName, true,
                             testCradle.getClassLoader());
                     testCradle.attachClient((ITestCaseListener) clz.newInstance());
                 } catch (Exception e1) {
@@ -428,7 +428,7 @@ public class ConfigLoader {
             } catch (Throwable t) {
                 throw new RuntimeException("Cannot get option \"" + optName + "\" from the config manager class", t);
             }
-            Class fieldType = optField.getType();
+            Class<?> fieldType = optField.getType();
             Object val = null;
             if (fieldType == boolean.class) {
                 val = getFlagOption(opt);

@@ -24,7 +24,7 @@ public class ClassDomain implements IClassDomain {
 
     int numOfObjects;
 
-    protected Constructor constructor;
+    protected Constructor<?> constructor;
 
     protected Object[] params;
 
@@ -243,7 +243,7 @@ public class ClassDomain implements IClassDomain {
         }
     }
 
-    public void addObjects(Collection col) {
+    public void addObjects(Collection<Object> col) {
         assert (col != null);
         for (Object obj : col) {
             addObject(obj);

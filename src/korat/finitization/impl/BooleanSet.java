@@ -31,7 +31,7 @@ public class BooleanSet extends FieldDomain implements IBooleanSet {
                     + index + " for Boolean Set is not allowed");
     }
 
-    public Class getClassOfField() {
+    public Class<?> getClassOfField() {
         return boolean.class;
     }
 

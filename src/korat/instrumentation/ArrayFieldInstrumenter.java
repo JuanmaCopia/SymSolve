@@ -110,7 +110,6 @@ class ArrayFieldInstrumenter extends FieldInstrumenter {
      * <p>
      * 
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected void replaceFieldAccesses(CtClass clz) {
 

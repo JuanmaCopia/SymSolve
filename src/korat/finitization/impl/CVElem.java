@@ -4,8 +4,6 @@ import java.lang.reflect.Method;
 
 import korat.instrumentation.InstrumentationManager;
 import korat.instrumentation.Setter;
-import korat.utils.IIntList;
-import korat.utils.IntListAI;
 import korat.utils.ReflectionUtils;
 
 public class CVElem {
@@ -135,7 +133,7 @@ public class CVElem {
         this.indexInStateSpace = index;
 
         String setterMethodName = InstrumentationManager.getGetSetterName(fieldName);
-        Class[] setterMethodArgs = new Class[] { int.class };
+        Class<?>[] setterMethodArgs = new Class<?>[] { int.class };
         Object[] args = new Integer[] { index };
 
         try {

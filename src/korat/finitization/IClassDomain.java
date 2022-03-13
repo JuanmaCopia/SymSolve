@@ -31,7 +31,7 @@ public interface IClassDomain {
      * Returns the <code>Class</code> object for elements of this Domain
      * 
      */
-    Class getClassOfObjects();
+	Class<?> getClassOfObjects();
 
     /**
      * Returns the name of class type for this domain
@@ -92,6 +92,6 @@ public interface IClassDomain {
      * @param col -
      *            collection of objects, null is not allowed
      */
-    public void addObjects(Collection col);
+    public void addObjects(Collection<Object> col);
 
 }

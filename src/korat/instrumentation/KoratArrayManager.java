@@ -31,8 +31,8 @@ public final class KoratArrayManager {
      *            generated
      * @return - Generated KoratArray_<b>Type</b> Class
      */
-    public static Class createArrayClass(Class arrayClass) throws Exception {
-        Class clz = new korat.instrumentation.ArrayGenerator(arrayClass).getArrayClass();
+    public static Class<?> createArrayClass(Class<?> arrayClass) throws Exception {
+    	Class<?> clz = new korat.instrumentation.ArrayGenerator(arrayClass).getArrayClass();
 
         //COMPAT1.4
         //clz = KSolver.getInstance().getClassLoader().loadClass(
@@ -52,7 +52,7 @@ public final class KoratArrayManager {
      */
     public static IKoratArray createArray(Class<?> koratArrayClz, int size)
             throws Exception {
-        Constructor c = koratArrayClz.getConstructor(new Class[] { int.class });
+        Constructor<?> c = koratArrayClz.getConstructor(new Class[] { int.class });
         IKoratArray ret = (IKoratArray) c.newInstance(new Object[] { size });
         return ret;
     }

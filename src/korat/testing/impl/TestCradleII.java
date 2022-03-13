@@ -50,7 +50,7 @@ public class TestCradleII extends TestCradle {
             validCasesGenerated = 0;
     
             Object testCase = null;
-            Class testCaseClass = fin.getFinClass();
+            Class<?> testCaseClass = fin.getFinClass();
     
             Method predicate = getPredicateMethod(testCaseClass, config.predicate);
     

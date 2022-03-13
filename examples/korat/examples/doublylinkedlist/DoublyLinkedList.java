@@ -1,5 +1,6 @@
 package korat.examples.doublylinkedlist;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import korat.finitization.IFinitization;
@@ -17,7 +18,6 @@ public class DoublyLinkedList {
         return repOkNS();
     }
 
-    @SuppressWarnings("unchecked")
     public boolean repOkCommon() {
 
         if (header == null)
@@ -26,7 +26,7 @@ public class DoublyLinkedList {
             return size == 0 && header.next == header
                     && header.previous == header;
 
-        Set visited = new java.util.HashSet();
+        Set<Entry> visited = new HashSet<Entry>();
         visited.add(header);
         Entry current = header;
 
@@ -51,21 +51,21 @@ public class DoublyLinkedList {
         return repOkCommon();
     }
 
-    @SuppressWarnings("unchecked")
-    public boolean repOkSorted() {
-        if (!repOkCommon())
-            return false;
-        // check for sorted
-        if ((header.next != header)
-                && (!(header.next.element instanceof Comparable)))
-            return false;
-        for (Entry current = header.next; current.next != header; current = current.next) {
-            if ((!(current.next.element instanceof Comparable))
-                    || (((Comparable) current.element).compareTo((Comparable) current.next.element) > 0))
-                return false;
-        }
-        return true;
-    }
+//    @SuppressWarnings("unchecked")
+//    public boolean repOkSorted() {
+//        if (!repOkCommon())
+//            return false;
+//        // check for sorted
+//        if ((header.next != header)
+//                && (!(header.next.element instanceof Comparable)))
+//            return false;
+//        for (Entry current = header.next; current.next != header; current = current.next) {
+//            if ((!(current.next.element instanceof Comparable))
+//                    || (((Comparable) current.element).compareTo((Comparable) current.next.element) > 0))
+//                return false;
+//        }
+//        return true;
+//    }
 
     public String toString() {
         String res = "";

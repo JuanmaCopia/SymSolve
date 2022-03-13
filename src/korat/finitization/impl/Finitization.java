@@ -32,7 +32,7 @@ import korat.utils.ReflectionUtils;
  */
 public class Finitization implements IFinitization {
 
-    private Class rootClass;
+    private Class<?> rootClass;
 
     private ClassDomain rootClassDomain;
 
@@ -60,7 +60,7 @@ public class Finitization implements IFinitization {
         return classLoader;
     }
 
-    public Finitization(Class myClass) {
+    public Finitization(Class<?> myClass) {
 
         this.rootClass = myClass;
         this.rootClassDomain = new ClassDomain(myClass, 1);
@@ -74,10 +74,10 @@ public class Finitization implements IFinitization {
 
     }
 
-    private Class getClassFromName(String className) {
+    private Class<?> getClassFromName(String className) {
 
         try {
-            Class cls = null;
+        	Class<?> cls = null;
             try {
                 // first chance - treat className as full class name
                 cls = Class.forName(className, false,
@@ -149,10 +149,10 @@ public class Finitization implements IFinitization {
         for (IClassDomain icd : clsDomainsMap.keySet()) {
             ClassDomain cd = (ClassDomain) icd;
             cd.initialize();
-            Class cls = cd.getClassOfObjects();
+            Class<?> cls = cd.getClassOfObjects();
 
             // TODO: Check!
-            Class superCls = cls.getSuperclass();
+            Class<?> superCls = cls.getSuperclass();
             while (superCls != null) {
                 IClassDomain superDomain = getClassDomain(superCls);
                 if (superDomain != null) {
@@ -235,16 +235,16 @@ public class Finitization implements IFinitization {
         this.handleArraysAsObjects = handleAsObjects;
     }
 
-    public Class getFinClass() {
+    public Class<?> getFinClass() {
         return rootClass;
     }
 
     public IClassDomain createClassDomain(String className, int numOfInstances) {
-        Class cls = getClassFromName(className);
+    	Class<?> cls = getClassFromName(className);
         return createClassDomain(cls, numOfInstances);
     }
 
-    public IClassDomain createClassDomain(Class cls, int numOfInstances) {
+    public IClassDomain createClassDomain(Class<?> cls, int numOfInstances) {
 
         ClassDomain cd = getClassDomain(cls);
 
@@ -347,7 +347,7 @@ public class Finitization implements IFinitization {
         return new ShortSet(singleValue);
     }
 
-    public IObjSet createObjSet(Class fieldBaseClass, boolean includeNull) {
+    public IObjSet createObjSet(Class<?> fieldBaseClass, boolean includeNull) {
 
         IObjSet oset = null;
         if (fieldBaseClass.isPrimitive())
@@ -362,12 +362,12 @@ public class Finitization implements IFinitization {
 
     }
 
-    public IObjSet createObjSet(Class fieldBaseClass) {
+    public IObjSet createObjSet(Class<?> fieldBaseClass) {
         return createObjSet(fieldBaseClass, false);
     }
 
     public IObjSet createObjSet(String fieldBaseClassName, boolean includeNull) {
-        Class cls = getClassFromName(fieldBaseClassName);
+    	Class<?> cls = getClassFromName(fieldBaseClassName);
         return createObjSet(cls, includeNull);
     }
 
@@ -387,7 +387,7 @@ public class Finitization implements IFinitization {
         return ret;
     }
 
-    public void set(Class cls, String fieldName, IFieldDomain fieldDomain) {
+    public void set(Class<?> cls, String fieldName, IFieldDomain fieldDomain) {
 
         // getField() checks if the field exists. If not, RuntimeException is
         // thrown.
@@ -448,7 +448,7 @@ public class Finitization implements IFinitization {
 
     public void set(String className, String fieldName, IFieldDomain fieldDomain) {
 
-        Class cls = getClassFromName(className);
+    	Class<?> cls = getClassFromName(className);
         set(cls, fieldName, fieldDomain);
 
     }
@@ -477,25 +477,25 @@ public class Finitization implements IFinitization {
 
     }
 
-    public ClassDomain getClassDomain(Class cls) {
+    public ClassDomain getClassDomain(Class<?> cls) {
 
         return (ClassDomain) classDomains.get(cls);
     }
 
     public IClassDomain getClassDomain(String name) {
 
-        Class cls = getClassFromName(name);
+    	Class<?> cls = getClassFromName(name);
         return getClassDomain(cls);
 
     }
 
-    public IFieldDomain getFieldDomain(Class cls, String fieldName) {
+    public IFieldDomain getFieldDomain(Class<?> cls, String fieldName) {
 
         IClassDomain cd = classDomains.get(cls);
         if (cd == null)
             return null;
 
-        Map fieldsMap = (Map) clsDomainsMap.get(cd);
+        Map<String, IFieldDomain> fieldsMap = (Map<String, IFieldDomain>) clsDomainsMap.get(cd);
         if (fieldsMap == null)
             return null;
 
@@ -505,7 +505,7 @@ public class Finitization implements IFinitization {
 
     public IFieldDomain getFieldDomain(String className, String fieldName) {
 
-        Class cls = getClassFromName(className);
+    	Class<?> cls = getClassFromName(className);
         return getFieldDomain(cls, fieldName);
 
     }
@@ -543,7 +543,7 @@ public class Finitization implements IFinitization {
 
     }
 
-    public IArraySet createArraySet(Class clz, IIntSet array$length,
+    public IArraySet createArraySet(Class<?> clz, IIntSet array$length,
             IFieldDomain array$values, int count) {
 
         // TODO: check cls against array$values.getClassOf...
@@ -555,7 +555,7 @@ public class Finitization implements IFinitization {
         if (!clz.isArray())
             throw new IllegalArgumentException("clz must be of array type");
 
-        Class arrayClass = null;
+        Class<?> arrayClass = null;
         try {
 
             arrayClass = KoratArrayManager.createArrayClass(clz);
@@ -582,11 +582,11 @@ public class Finitization implements IFinitization {
         return createClassDomain(className, 0);
     }
 
-    public IClassDomain createClassDomain(Class cls) {
+    public IClassDomain createClassDomain(Class<?> cls) {
         return createClassDomain(cls, 0);
     }
 
-    public IObjSet createObjSet(Class fieldBaseClass, int numOfInstances,
+    public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances,
             boolean includeNull) {
 
         IObjSet ret = createObjSet(fieldBaseClass, includeNull);
@@ -597,13 +597,13 @@ public class Finitization implements IFinitization {
 
     }
 
-    public IObjSet createObjSet(Class fieldBaseClass, int numOfInstances) {
+    public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances) {
         return createObjSet(fieldBaseClass, numOfInstances, false);
     }
 
     public IObjSet createObjSet(String fieldBaseClassName, int numOfInstances,
             boolean includeNull) {
-        Class cls = getClassFromName(fieldBaseClassName);
+    	Class<?> cls = getClassFromName(fieldBaseClassName);
         return createObjSet(cls, numOfInstances, includeNull);
     }
 
@@ -622,13 +622,13 @@ public class Finitization implements IFinitization {
 
     public void addAll(String className, String fieldName, IObjSet objSet) {
 
-        Class cls = getClassFromName(className);
+    	Class<?> cls = getClassFromName(className);
         addAll(cls, fieldName, objSet);
 
     }
 
     @SuppressWarnings("unchecked")
-    public void addAll(Class cls, String fieldName, IObjSet objSet) {
+    public void addAll(Class<?> cls, String fieldName, IObjSet objSet) {
 
         // checks if the field exists. If not, RuntimeException is thrown
         Field fld = ReflectionUtils.getField(cls, fieldName);
@@ -643,7 +643,7 @@ public class Finitization implements IFinitization {
             for (Object obj : cd.getObjects()) {
                 Object fldVal = fld.get(obj);
                 if (fldVal != null) {
-                    Collection col = (Collection) fldVal;
+                    Collection<Object> col = (Collection<Object>) fldVal;
                     for (Object o : objSet.getAllObjects()) {
                         col.add(o);
                     }
@@ -715,7 +715,7 @@ public class Finitization implements IFinitization {
 
     }
 
-    public IFinitization getIncludedFinitization(Class clazz) {
+    public IFinitization getIncludedFinitization(Class<?> clazz) {
 
         for (int i = 0; i < includedFinitizations.size(); i++)
             if (includedFinitizations.get(i).getFinClass() == clazz)

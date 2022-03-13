@@ -60,7 +60,7 @@ public class CandidateBuilder {
             int index = candidateVector[i];
 
             FieldDomain fd = elem.getFieldDomain();
-            Class clsOfField = fd.getClassOfField();
+            Class<?> clsOfField = fd.getClassOfField();
             Setter setter = elem.getSetter();
             
             if (!fd.isPrimitiveType() && !fd.isArrayType()) {

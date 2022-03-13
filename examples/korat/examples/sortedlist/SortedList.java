@@ -1,6 +1,7 @@
 package korat.examples.sortedlist;
 
-import java.util.Set;
+//import java.util.HashSet;
+//import java.util.Set;
 
 import korat.finitization.IClassDomain;
 import korat.finitization.IFinitization;
@@ -8,7 +9,7 @@ import korat.finitization.IIntSet;
 import korat.finitization.IObjSet;
 import korat.finitization.impl.FinitizationFactory;
 
-@SuppressWarnings("unchecked")
+
 public class SortedList {
     
     public static class Entry {
@@ -25,45 +26,45 @@ public class SortedList {
     
     public Entry header;
 
-    private int size = 0;
+    //private int size = 0;
 
-    public boolean repOK() {
-        // check cyclicity
-        if (header == null)
-            return false;
-        if (header.element != null)
-            return false;
-        Set visited = new java.util.HashSet();
-        visited.add(header);
-        Entry current = header;
-        while (true) {
-            Entry next = current.next;
-            if (next == null)
-                return false;
-            if (next.previous != current)
-                return false;
-            current = next;
-            if (!visited.add(next))
-                break;
-        }
-        if (current != header)
-            return false; // maybe not needed
-        
-        // check size
-        if (visited.size() - 1 != size)
-            return false;
-        
-        // check ordering
-        if ((header.next != header)
-                && (!(header.next.element instanceof Comparable)))
-            return false;
-        for (current = header.next; current.next != header; current = current.next) {
-            if ((!(current.next.element instanceof Comparable))
-                    || (((Comparable) current.element).compareTo((Comparable) current.next.element) > 0))
-                return false;
-        }
-        return true;
-    }
+//    public boolean repOK() {
+//        // check cyclicity
+//        if (header == null)
+//            return false;
+//        if (header.element != null)
+//            return false;
+//        Set<Entry> visited = new HashSet<Entry>();
+//        visited.add(header);
+//        Entry current = header;
+//        while (true) {
+//            Entry next = current.next;
+//            if (next == null)
+//                return false;
+//            if (next.previous != current)
+//                return false;
+//            current = next;
+//            if (!visited.add(next))
+//                break;
+//        }
+//        if (current != header)
+//            return false; // maybe not needed
+//        
+//        // check size
+//        if (visited.size() - 1 != size)
+//            return false;
+//        
+//        // check ordering
+//        if ((header.next != header)
+//                && (!(header.next.element instanceof Comparable)))
+//            return false;
+//        for (current = header.next; current.next != header; current = current.next) {
+//            if ((!(current.next.element instanceof Comparable))
+//                    || (((Comparable) current.element).compareTo((Comparable) current.next.element) > 0))
+//                return false;
+//        }
+//        return true;
+//    }
 
     public static IFinitization finSortedList(int minSize, int maxSize,
             int numEntries, int numElems) {

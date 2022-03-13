@@ -43,7 +43,7 @@ public interface IFieldDomain {
     /**
      * @return type of the field that this domain can accept
      */
-    Class getClassOfField();
+	Class<?> getClassOfField();
 
     /**
      * Does this field domain represent primitive type.

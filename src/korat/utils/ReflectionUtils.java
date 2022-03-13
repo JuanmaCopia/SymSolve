@@ -15,13 +15,13 @@ import java.util.Map;
  */
 public class ReflectionUtils {
 
-    static Map<Class, Map<String, Field>> cache = new HashMap<Class, Map<String, Field>>();
+    static Map<Class<?>, Map<String, Field>> cache = new HashMap<Class<?>, Map<String, Field>>();
 
     public static Field getFieldWithAccess(Object obj, String fieldName) {
         return getFieldWithAccess(obj.getClass(), fieldName);
     }
 
-    public static Field getFieldWithAccess(Class cls, String fieldName) {
+    public static Field getFieldWithAccess(Class<?> cls, String fieldName) {
         Field f = getField(cls, fieldName);
         f.setAccessible(true);
         return f;
@@ -35,7 +35,7 @@ public class ReflectionUtils {
      * @param fieldName - name of the field
      * @return requested field
      */
-    public static Field getField(Class cls, String fieldName) {
+    public static Field getField(Class<?> cls, String fieldName) {
 
         Field f = null;
 
@@ -101,7 +101,7 @@ public class ReflectionUtils {
         }
     }
 
-    private static void getAllFieldsRecursive(Class clz, List<Field> fldLst) {
+    private static void getAllFieldsRecursive(Class<?> clz, List<Field> fldLst) {
 
         if (clz.isPrimitive())
             return;
@@ -118,7 +118,7 @@ public class ReflectionUtils {
 
     }
 
-    public static Field[] getAllFields(Class clz) {
+    public static Field[] getAllFields(Class<?> clz) {
 
         ArrayList<Field> fieldList = new ArrayList<Field>();
         getAllFieldsRecursive(clz, fieldList);
@@ -130,7 +130,7 @@ public class ReflectionUtils {
 
     }
 
-    public static Field[] getAllNonStaticFields(Class clz) {
+    public static Field[] getAllNonStaticFields(Class<?> clz) {
 
         List<Field> fList = new ArrayList<Field>();
         getAllFieldsRecursive(clz, fList);
@@ -149,7 +149,7 @@ public class ReflectionUtils {
 
     }
 
-    public static Field[] getDeclaredNonStaticFields(Class clz) {
+    public static Field[] getDeclaredNonStaticFields(Class<?> clz) {
 
         List<Field> nonStaticFields = new LinkedList<Field>();
         for (Field f : clz.getDeclaredFields()) {
@@ -177,7 +177,7 @@ public class ReflectionUtils {
      * @throws NoSuchMethodException
      */
     public static Method getMethod(Class<? extends Object> clz,
-            String methodName, Class[] methodArgs) throws NoSuchMethodException {
+            String methodName, Class<?>[] methodArgs) throws NoSuchMethodException {
 
         if (clz == null)
             throw new NoSuchMethodException(methodName + "(" + methodArgs
@@ -206,11 +206,11 @@ public class ReflectionUtils {
      * 
      * <p>If there is any problem with method invocation, a RuntimeException is thrown</p>
      */
-    public static Object invoke(Object obj, String method, Class[] params, Object[] args) {
+    public static Object invoke(Object obj, String method, Class<?>[] params, Object[] args) {
         try {
             Class<?> clazz = null; 
             if (obj instanceof Class) {
-                clazz = (Class) obj;
+                clazz = (Class<?>) obj;
             } else { 
                 clazz = obj.getClass();
             }

@@ -140,7 +140,7 @@ public class TestCradle extends AbstractTestCaseGenerator implements ITester {
 
         try {
         
-            Class clazz = classLoader.loadClass(className);
+        	Class<?> clazz = classLoader.loadClass(className);
             start(clazz, finArgs);
         
         } catch (ClassNotFoundException e) {
@@ -167,7 +167,7 @@ public class TestCradle extends AbstractTestCaseGenerator implements ITester {
 
     protected boolean predicateOK;
 
-    private void start(Class clazz, String[] finArgs)
+    private void start(Class<?> clazz, String[] finArgs)
             throws KoratTestException {
 
         //COMPAT1.4
@@ -179,7 +179,7 @@ public class TestCradle extends AbstractTestCaseGenerator implements ITester {
 
     }
 
-    private Method getFinMethod(Class cls, String finName, String[] finArgs)
+    private Method getFinMethod(Class<?> cls, String finName, String[] finArgs)
             throws CannotFindFinitizationException {
 
         Method finitize = null;
@@ -197,15 +197,15 @@ public class TestCradle extends AbstractTestCaseGenerator implements ITester {
         
     }
 
-    private IFinitization invokeFinMethod(Class cls, Method finitize,
+    private IFinitization invokeFinMethod(Class<?> cls, Method finitize,
             String[] finArgs) throws CannotInvokeFinitizationException {
 
         int paramNumber = finArgs.length;
-        Class[] finArgTypes = finitize.getParameterTypes();
+        Class<?>[] finArgTypes = finitize.getParameterTypes();
         Object[] finArgValues = new Object[paramNumber];
         
         for (int i = 0; i < paramNumber; i++) {
-            Class clazz = finArgTypes[i];
+        	Class<?> clazz = finArgTypes[i];
             String arg = finArgs[i].trim();
             Object val;
 
@@ -251,7 +251,7 @@ public class TestCradle extends AbstractTestCaseGenerator implements ITester {
         validCasesGenerated = 0;
 
         Object testCase = null;
-        Class testCaseClass = fin.getFinClass();
+        Class<?> testCaseClass = fin.getFinClass();
 
         Method predicate = getPredicateMethod(testCaseClass, config.predicate);
 

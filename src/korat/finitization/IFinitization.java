@@ -14,7 +14,7 @@ public interface IFinitization {
      *
      * @return <code>Class</code> object for root class that is being finitized
      */
-    Class getFinClass();
+	Class<?> getFinClass();
 
     /**
      * Helper.
@@ -56,7 +56,7 @@ public interface IFinitization {
      * @return created <code>IClassDomain</code>
      * @see #createClassDomain(String, int)
      */
-    IClassDomain createClassDomain(Class cls, int numOfInstances);
+    IClassDomain createClassDomain(Class<?> cls, int numOfInstances);
 
     /**
      * Creates new empty class domain
@@ -68,7 +68,7 @@ public interface IFinitization {
      * @return created class domain
      * @see #createClassDomain(Class, int)
      */
-    IClassDomain createClassDomain(Class cls);
+    IClassDomain createClassDomain(Class<?> cls);
 
     /**
      * Creates <code>IIntSet</code> according to the given parameters.
@@ -294,7 +294,7 @@ public interface IFinitization {
      * @see #createObjSet(String)
      * @see #createObjSet(String, boolean)
      */
-    IObjSet createObjSet(Class fieldBaseClass, boolean includeNull);
+    IObjSet createObjSet(Class<?> fieldBaseClass, boolean includeNull);
 
     /**
      * Creates <code>IObjSet</code> and automatically creates given number of
@@ -320,7 +320,7 @@ public interface IFinitization {
      *            whether to include null in the <code>IObjSet</code>
      * @return newly created <code>IObjSet</code>
      */
-    IObjSet createObjSet(Class fieldBaseClass, int numOfInstances,
+    IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances,
             boolean includeNull);
 
     /**
@@ -333,7 +333,7 @@ public interface IFinitization {
      * @see #createObjSet(String)
      * @see #createObjSet(String, boolean)
      */
-    IObjSet createObjSet(Class fieldBaseClass);
+    IObjSet createObjSet(Class<?> fieldBaseClass);
 
     /**
      * Helper.
@@ -349,7 +349,7 @@ public interface IFinitization {
      * @param numOfInstances
      * @return newly created <code>IObjSet</code>
      */
-    IObjSet createObjSet(Class fieldBaseClass, int numOfInstances);
+    IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances);
 
     /**
      * Helper.
@@ -456,7 +456,7 @@ public interface IFinitization {
      *            number of arrays to create
      * @return created IArraySet
      */
-    IArraySet createArraySet(Class clz, IIntSet array$length,
+    IArraySet createArraySet(Class<?> clz, IIntSet array$length,
             IFieldDomain array$values, int count);
 
     /**
@@ -521,7 +521,7 @@ public interface IFinitization {
      * @see #set(String, IFieldDomain)
      * @see #set(String, String, IFieldDomain)
      */
-    void set(Class cls, String fieldName, IFieldDomain fieldDomain);
+    void set(Class<?> cls, String fieldName, IFieldDomain fieldDomain);
 
 
     // ADDED
@@ -553,7 +553,7 @@ public interface IFinitization {
      *         not been created yet.
      * @see #getClassDomain(String)
      */
-    IClassDomain getClassDomain(Class cls);
+    IClassDomain getClassDomain(Class<?> cls);
 
     /**
      * @param cls
@@ -562,7 +562,7 @@ public interface IFinitization {
      * @see #getFieldDomain(String)
      * @see #getFieldDomain(String, String)
      */
-    IFieldDomain getFieldDomain(Class cls, String fieldName);
+    IFieldDomain getFieldDomain(Class<?> cls, String fieldName);
 
     /**
      * @param className
@@ -614,7 +614,7 @@ public interface IFinitization {
      * @see #addAll(String, IObjSet)
      * @see #addAll(String, String, IObjSet)
      */
-    void addAll(Class cls, String fieldName, IObjSet objSet);
+    void addAll(Class<?> cls, String fieldName, IObjSet objSet);
 
     /**
      * Includes information from finitization <code>fin</code> into current
@@ -636,7 +636,7 @@ public interface IFinitization {
      *           Otherwise returns null
      * @see #includeFinitization(IFinitization)
      */
-    IFinitization getIncludedFinitization(Class clazz);
+    IFinitization getIncludedFinitization(Class<?> clazz);
 
     /**
      * <p>If selected, arrays will be handled like other objects during Korat search.

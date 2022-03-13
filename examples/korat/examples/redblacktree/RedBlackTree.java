@@ -1,5 +1,7 @@
 package korat.examples.redblacktree;
 
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import korat.finitization.IClassDomain;
@@ -8,7 +10,7 @@ import korat.finitization.IIntSet;
 import korat.finitization.IObjSet;
 import korat.finitization.impl.FinitizationFactory;
 
-@SuppressWarnings("unchecked")
+
 public class RedBlackTree {
 
     private Node root = null;
@@ -78,9 +80,9 @@ public class RedBlackTree {
         // RootHasNoParent
         if (root.parent != null)
             return debug("RootHasNoParent");
-        Set visited = new java.util.HashSet();
+        Set<Wrapper> visited = new HashSet<Wrapper>();
         visited.add(new Wrapper(root));
-        java.util.LinkedList workList = new java.util.LinkedList();
+        LinkedList<Node> workList = new LinkedList<Node>();
         workList.add(root);
         while (!workList.isEmpty()) {
             Node current = (Node) workList.removeFirst();
@@ -115,7 +117,7 @@ public class RedBlackTree {
 
     private boolean repOkColors() {
         // RedHasOnlyBlackChildren
-        java.util.LinkedList workList = new java.util.LinkedList();
+        LinkedList<Node> workList = new LinkedList<Node>();
         workList.add(root);
         while (!workList.isEmpty()) {
             Node current = (Node) workList.removeFirst();
@@ -134,10 +136,10 @@ public class RedBlackTree {
         }
         // SimplePathsFromRootToNILHaveSameNumberOfBlackNodes
         int numberOfBlack = -1;
-        workList = new java.util.LinkedList();
-        workList.add(new Pair(root, 0));
+        LinkedList<Pair> workList2 = new LinkedList<Pair>();
+        workList2.add(new Pair(root, 0));
         while (!workList.isEmpty()) {
-            Pair p = (Pair) workList.removeFirst();
+            Pair p = (Pair) workList2.removeFirst();
             Node e = p.e;
             int n = p.n;
             if (e != null && e.color == BLACK)
@@ -148,8 +150,8 @@ public class RedBlackTree {
                 else if (numberOfBlack != n)
                     return debug("SimplePathsFromRootToNILHaveSameNumberOfBlackNodes");
             } else {
-                workList.add(new Pair(e.left, n));
-                workList.add(new Pair(e.right, n));
+                workList2.add(new Pair(e.left, n));
+                workList2.add(new Pair(e.right, n));
             }
         }
         return true;
@@ -181,7 +183,7 @@ public class RedBlackTree {
         if (!orderedKeys(root, null, null))
             return debug("BST");
         // touch values
-        java.util.LinkedList workList = new java.util.LinkedList();
+        LinkedList<Node> workList = new LinkedList<Node>();
         workList.add(root);
         while (!workList.isEmpty()) {
             Node current = (Node) workList.removeFirst();
@@ -194,11 +196,10 @@ public class RedBlackTree {
         return true;
     }
 
-    private boolean orderedKeys(Node e, Object min, Object max) {
+    private boolean orderedKeys(Node e, Integer min, Integer max) {
         if (e.key == -1)
             return false;
-        if (((min != null) && (compare(e.key, min) <= 0))
-                || ((max != null) && (compare(e.key, max) >= 0)))
+        if ((min != null && e.key <= min) || (max != null && e.key >= max))
             return false;
         if (e.left != null)
             if (!orderedKeys(e.left, min, e.key))
@@ -243,7 +244,4 @@ public class RedBlackTree {
         }
     }
 
-    private int compare(Object k1, Object k2) {
-        return ((Comparable) k1).compareTo(k2);
-    }
 }

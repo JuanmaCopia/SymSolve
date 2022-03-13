@@ -49,7 +49,7 @@ public class BytecodeInstruction {
         String instr = BytecodeUtils.OPCODE_NAMES[opcode];
         if (!BytecodeUtils.ILLEGAL.equals(instr)) {
             String visitMethodName = BytecodeUtils.getVisitMethodName(instr);
-            Class[] params = new Class[] { BytecodeInstruction.class };
+            Class<?>[] params = new Class<?>[] { BytecodeInstruction.class };
             Object[] args = new Object[] { this };
             visitor.preVisit(this);
             ReflectionUtils.invoke(visitor, visitMethodName, params, args);

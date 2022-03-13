@@ -90,7 +90,7 @@ public class ArrayGenerator {
 
     public static final String GET_ELEMENT_SETTER_METHOD_NAME = "get_element_setter";
 
-    static Map<String, Class> generatedClasses = new HashMap<String, Class>();
+    static Map<String, Class<?>> generatedClasses = new HashMap<String, Class<?>>();
 
     private boolean TRACE = false; // used for debugging the arrays!
 
@@ -134,7 +134,7 @@ public class ArrayGenerator {
          }
     }
 
-    public ArrayGenerator(Class arrayType) throws NotFoundException {
+    public ArrayGenerator(Class<?> arrayType) throws NotFoundException {
         this(ClassPool.getDefault().get(arrayType.getName()));
     }
 

@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 // Node must not implement Comparable interface...
-@SuppressWarnings("unchecked")
 public class Node {
     Node left; // left child
 
@@ -27,12 +26,12 @@ public class Node {
     }
 
     public String toString() {
-        Set visited = new HashSet();
+        Set<Node> visited = new HashSet<Node>();
         visited.add(this);
         return toString(visited);
     }
 
-    private String toString(Set visited) {
+    private String toString(Set<Node> visited) {
         StringBuffer buf = new StringBuffer();
         // buf.append(" ");
         // buf.append(System.identityHashCode(this));
