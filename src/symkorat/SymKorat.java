@@ -8,7 +8,7 @@ import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 
 /**
- * Main class for the SymKorat Solver.
+ * API for the SymKorat Solver.
  * @author Juan Manuel Copia
  */
 public class SymKorat {
@@ -27,7 +27,7 @@ public class SymKorat {
 
 
     /**
-     * Creates a Solver instance for the specified class and bounds.
+     * Creates a SymKorat instance to decide satisfiability for the specified class and bounds.
      *
      * @param className fully qualified name of the class.
      * @param finitizationArgs arguments to be passed to the finitization method.
@@ -79,12 +79,11 @@ public class SymKorat {
      * @param vector the vector representing a symbolic instance.
      * @return true if the symbolic structure is SAT, false if it is UNSAT.
      */
-    public boolean isSat(String stringVector) {
+    public boolean isSat(String vector) {
         boolean result = false;
 
         try {
-        	SymKoratVector vector = new SymKoratVector(stringVector);
-            result = solver.startSolverExploration(vector);
+            result = solver.startSolverExploration(new SymKoratVector(vector));
         } catch (CannotFindPredicateException e) {
             System.err.println("!!! Korat cannot find predicate method for the class under test:");
             System.err.println("        <class> = " + e.getCls().getName());
