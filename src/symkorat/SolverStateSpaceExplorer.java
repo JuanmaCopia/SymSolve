@@ -11,7 +11,6 @@ import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
 
-
 public class SolverStateSpaceExplorer {
 
     protected StateSpace stateSpace;
@@ -28,20 +27,16 @@ public class SolverStateSpaceExplorer {
 
     protected Class<?> rootClass;
 
-    public SolverStateSpaceExplorer(IFinitization ifin, SymKoratVector vector) {
-    	Finitization fin = (Finitization)ifin;
-    	stateSpace = fin.getStateSpace();
+    protected int vectorSize;
 
-    	this.candidateVector = vector.getConcreteVector();
-        this.fixedIndices = vector.getFixedIndices();
+    public SolverStateSpaceExplorer(IFinitization ifin) {
+        Finitization fin = (Finitization) ifin;
+        stateSpace = fin.getStateSpace();
 
-    	int totalNumberOfFields = stateSpace.getTotalNumberOfFields();
-    	if (totalNumberOfFields != this.candidateVector.length)
-    		throw new IllegalArgumentException();
-
-        accessedFields = new IntListAI(totalNumberOfFields);
-        changedFields = new IntListAI(totalNumberOfFields);
-        for (int i = 0; i < totalNumberOfFields; i++)
+        this.vectorSize = stateSpace.getTotalNumberOfFields();
+        accessedFields = new IntListAI(this.vectorSize);
+        changedFields = new IntListAI(this.vectorSize);
+        for (int i = 0; i < this.vectorSize; i++)
             changedFields.add(i);
 
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
@@ -50,28 +45,26 @@ public class SolverStateSpaceExplorer {
         resetMaxInstancesInVector();
     }
 
-    public IIntList getAccessedFields() {
+    protected IIntList getAccessedFields() {
         return accessedFields;
     }
 
-    public int[] getCandidateVector() {
+    protected int[] getCandidateVector() {
         return candidateVector;
     }
 
-    public Object buildCandidate() {
+    protected Object buildCandidate() {
         return candidateBuilder.buildCandidate(candidateVector);
     }
 
     protected boolean firstTestCase = true;
 
-    public Object nextTestCase() {
+    protected Object nextTestCase() {
         if (firstTestCase) {
             firstTestCase = false;
         } else {
-            // find next candidate vector
             boolean hasNext = getNextCandidate();
             if (!hasNext)
-                // if vector is invalid, return null
                 return null;
         }
         return candidateBuilder.buildCandidate(candidateVector);
@@ -85,7 +78,7 @@ public class SolverStateSpaceExplorer {
             CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
 
             if (lastAccessedField.isExcludedFromSearch() || fixedIndices.contains(lastAccessedFieldIndex))
-            	continue;
+                continue;
 
             changedFields.add(lastAccessedFieldIndex);
 
@@ -100,48 +93,46 @@ public class SolverStateSpaceExplorer {
             }
 
             if (lastAccessedFD.isPrimitiveType()) {
-        		candidateVector[lastAccessedFieldIndex]++;
+                candidateVector[lastAccessedFieldIndex]++;
                 return true;
             }
 
             // Is a reference field
             if (lastAccessedField.maxInstanceInVector == -1) {
 
-            	int maxInstanceIndexInVector = 0;
-    			if (lastAccessedFD.getClassOfField() == rootClass)
-    				maxInstanceIndexInVector = 1;
+                int maxInstanceIndexInVector = 0;
+                if (lastAccessedFD.getClassOfField() == rootClass)
+                    maxInstanceIndexInVector = 1;
 
-            	// Add previously visited instances to alternatives
-            	for (int i = 0; i < candidateVector.length; i++) {
-            		if (stateSpace.getFieldDomain(i) == lastAccessedFD) {
-            			int value = candidateVector[i];
-        				if (maxInstanceIndexInVector < value)
-        					maxInstanceIndexInVector = value;
-            		}
-            	}
-            	lastAccessedField.maxInstanceInVector = maxInstanceIndexInVector;
+                // Add previously visited instances to alternatives
+                for (int i = 0; i < candidateVector.length; i++) {
+                    if (stateSpace.getFieldDomain(i) == lastAccessedFD) {
+                        int value = candidateVector[i];
+                        if (maxInstanceIndexInVector < value)
+                            maxInstanceIndexInVector = value;
+                    }
+                }
+                lastAccessedField.maxInstanceInVector = maxInstanceIndexInVector;
             }
 
-    		if (currentInstanceIndex <= lastAccessedField.maxInstanceInVector) {
-    			candidateVector[lastAccessedFieldIndex]++;
-    			return true;
-    		}
+            if (currentInstanceIndex <= lastAccessedField.maxInstanceInVector) {
+                candidateVector[lastAccessedFieldIndex]++;
+                return true;
+            }
 
-    		lastAccessedField.maxInstanceInVector = -1;
-			candidateVector[lastAccessedFieldIndex] = 0;
+            lastAccessedField.maxInstanceInVector = -1;
+            candidateVector[lastAccessedFieldIndex] = 0;
         }
 
         return false;
     }
 
-    public Object nextTestCaseNoIsmBreak() {
+    protected Object nextTestCaseNoIsmBreak() {
         if (firstTestCase) {
             firstTestCase = false;
         } else {
-            // find next candidate vector
             boolean hasNext = getNextCandidateNoIsmBreak();
             if (!hasNext)
-                // if vector is invalid, return null
                 return null;
         }
         return candidateBuilder.buildCandidate(candidateVector);
@@ -157,28 +148,42 @@ public class SolverStateSpaceExplorer {
             int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
 
             if (lastAccessedField.isExcludedFromSearch() || fixedIndices.contains(lastAccessedFieldIndex))
-            	continue;
+                continue;
 
             changedFields.add(lastAccessedFieldIndex);
 
             int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
-        	if (currentInstanceIndex >= maxInstanceIndexForFieldDomain) {
-        		candidateVector[lastAccessedFieldIndex] = 0;
+            if (currentInstanceIndex >= maxInstanceIndexForFieldDomain) {
+                candidateVector[lastAccessedFieldIndex] = 0;
                 continue;
-        	}
+            }
 
-    		candidateVector[lastAccessedFieldIndex]++;
+            candidateVector[lastAccessedFieldIndex]++;
             return true;
         }
 
         return false;
     }
 
+    public void setInitialVector(SymKoratVector vector) {
+        this.candidateVector = vector.getConcreteVector();
+        this.fixedIndices = vector.getFixedIndices();
 
-    public void resetMaxInstancesInVector() {
-    	CVElem[] structureList = stateSpace.getStructureList();
-    	for (int i = 0; i < structureList.length; i++)
-    		structureList[i].maxInstanceInVector = -1;
+        if (this.vectorSize != this.candidateVector.length)
+            throw new IllegalArgumentException();
+
+        this.accessedFields.clear();
+        this.changedFields.clear();
+        for (int i = 0; i < this.vectorSize; i++)
+            this.changedFields.add(i);
+
+        resetMaxInstancesInVector();
+    }
+
+    private void resetMaxInstancesInVector() {
+        CVElem[] structureList = stateSpace.getStructureList();
+        for (int i = 0; i < structureList.length; i++)
+            structureList[i].maxInstanceInVector = -1;
     }
 
 }
