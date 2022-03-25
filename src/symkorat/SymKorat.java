@@ -18,8 +18,8 @@ public class SymKorat {
 
 
 	/**
-	 *
-	 * @return
+	 * Returns the representation format of the vector.
+	 * @return A vector describing the types and fields that represent the structure.
 	 */
 	public CVElem[] getVectorFormat() {
 		return solver.getStateSpace().getStructureList();
