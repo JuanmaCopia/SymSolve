@@ -14,6 +14,11 @@ public class SolverHashMapTests {
 	@Test
 	public void HashMapSolverTest0() {
 	    assertEquals(true, symKorat.isSat("1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,5,6,-1"));
+	    assertEquals(false, symKorat.isSat("1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,4,-1,-1"));
+	    assertEquals(false, symKorat.isSat("1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,5,4,-1"));
+	    assertEquals(true, symKorat.isSat("1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,-1,-1,-1,-1"));
+	    assertEquals(true, symKorat.isSat("1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,-1,-1,-1"));
+	    assertEquals(true, symKorat.isSat("1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,5,-1,-1"));
 	}
 	
 	@Test
