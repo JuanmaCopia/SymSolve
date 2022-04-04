@@ -18,6 +18,8 @@ public class SolverStateSpaceExplorer {
     protected CandidateBuilder candidateBuilder;
 
     protected int[] candidateVector;
+    
+    protected int[] maxInstances;
 
     protected IIntList accessedFields;
 
@@ -35,6 +37,12 @@ public class SolverStateSpaceExplorer {
 
         this.vectorSize = stateSpace.getTotalNumberOfFields();
         this.candidateVector = vector.getConcreteVector();
+        
+        this.maxInstances = new int[vectorSize];
+        for (int i = 0; i < vectorSize; i++) {
+        	maxInstances[i] = -1;
+        }
+        
         this.fixedIndices = vector.getFixedIndices();
         if (this.vectorSize != this.candidateVector.length)
             throw new IllegalArgumentException();
@@ -46,8 +54,6 @@ public class SolverStateSpaceExplorer {
 
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
         rootClass = stateSpace.getRootObject().getClass();
-
-        resetMaxInstancesInVector();
     }
 
     protected IIntList getAccessedFields() {
@@ -93,7 +99,7 @@ public class SolverStateSpaceExplorer {
 
             if (currentInstanceIndex >= maxInstanceIndexForFieldDomain) {
                 candidateVector[lastAccessedFieldIndex] = 0;
-                lastAccessedField.maxInstanceInVector = -1;
+                maxInstances[lastAccessedFieldIndex] = -1;
                 continue;
             }
 
@@ -103,7 +109,7 @@ public class SolverStateSpaceExplorer {
             }
 
             // Is a reference field
-            if (lastAccessedField.maxInstanceInVector == -1) {
+            if (maxInstances[lastAccessedFieldIndex] == -1) {
 
                 int maxInstanceIndexInVector = 0;
                 if (lastAccessedFD.getClassOfField() == rootClass)
@@ -117,15 +123,15 @@ public class SolverStateSpaceExplorer {
                             maxInstanceIndexInVector = value;
                     }
                 }
-                lastAccessedField.maxInstanceInVector = maxInstanceIndexInVector;
+                maxInstances[lastAccessedFieldIndex] = maxInstanceIndexInVector;
             }
 
-            if (currentInstanceIndex <= lastAccessedField.maxInstanceInVector) {
+            if (currentInstanceIndex <= maxInstances[lastAccessedFieldIndex]) {
                 candidateVector[lastAccessedFieldIndex]++;
                 return true;
             }
 
-            lastAccessedField.maxInstanceInVector = -1;
+            maxInstances[lastAccessedFieldIndex] = -1;
             candidateVector[lastAccessedFieldIndex] = 0;
         }
 
@@ -168,12 +174,6 @@ public class SolverStateSpaceExplorer {
         }
 
         return false;
-    }
-
-    private void resetMaxInstancesInVector() {
-        CVElem[] structureList = stateSpace.getStructureList();
-        for (int i = 0; i < structureList.length; i++)
-            structureList[i].maxInstanceInVector = -1;
     }
 
 }

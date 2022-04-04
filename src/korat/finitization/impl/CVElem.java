@@ -30,10 +30,6 @@ public class CVElem {
 
     private boolean excludeFromSearch;
 
-    // =======================================   Modification  ====================================== //
-    public int maxInstanceInVector;
-    // ============================================================================================== //
-
     protected CVElem(Object o, String fName, FieldDomain fDomain,
             StateSpace stateSpace) {
 
@@ -41,9 +37,6 @@ public class CVElem {
         this.fieldDomain = fDomain;
         this.fieldName = fName;
         this.stateSpace = stateSpace;
-        // =======================================   Modification  ====================================== //
-        this.maxInstanceInVector = -1;
-        // ============================================================================================== //
     }
 
     /**
