@@ -29,11 +29,16 @@ public class SolverStateSpaceExplorer {
 
     protected int vectorSize;
 
-    public SolverStateSpaceExplorer(IFinitization ifin) {
+    public SolverStateSpaceExplorer(IFinitization ifin, SymKoratVector vector) {
         Finitization fin = (Finitization) ifin;
         stateSpace = fin.getStateSpace();
 
         this.vectorSize = stateSpace.getTotalNumberOfFields();
+        this.candidateVector = vector.getConcreteVector();
+        this.fixedIndices = vector.getFixedIndices();
+        if (this.vectorSize != this.candidateVector.length)
+            throw new IllegalArgumentException();
+
         accessedFields = new IntListAI(this.vectorSize);
         changedFields = new IntListAI(this.vectorSize);
         for (int i = 0; i < this.vectorSize; i++)
@@ -163,21 +168,6 @@ public class SolverStateSpaceExplorer {
         }
 
         return false;
-    }
-
-    public void setInitialVector(SymKoratVector vector) {
-        this.candidateVector = vector.getConcreteVector();
-        this.fixedIndices = vector.getFixedIndices();
-
-        if (this.vectorSize != this.candidateVector.length)
-            throw new IllegalArgumentException();
-
-        this.accessedFields.clear();
-        this.changedFields.clear();
-        for (int i = 0; i < this.vectorSize; i++)
-            this.changedFields.add(i);
-
-        resetMaxInstancesInVector();
     }
 
     private void resetMaxInstancesInVector() {
