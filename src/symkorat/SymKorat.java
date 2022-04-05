@@ -98,11 +98,33 @@ public class SymKorat {
      * @param vector the vector representing a symbolic instance.
      * @return true if the symbolic structure is SAT, false if it is UNSAT.
      */
-    public boolean isSatNoIsmBreak(SymKoratVector vector) {
+    public boolean isSatNoSymmetryBreak(SymKoratVector vector) {
         boolean result = false;
 
         try {
-            result = solver.startSolverExplorationNoIsmBreak(vector);
+            result = solver.startSolverExplorationNoSymmetryBreak(vector);
+        } catch (CannotInvokePredicateException e) {
+            System.err.println("!!! Korat cannot invoke predicate method:");
+            System.err.println("      <class> = " + e.getCls().getName());
+            System.err.println("      <predicate> = " + e.getMethodName());
+            System.err.println();
+            System.err.println("    Stack trace:");
+            e.printStackTrace(System.err);
+        }
+        return result;
+    }
+
+    /**
+     * Decides whether the symbolic instance represented by a vector is SAT.
+     *
+     * @param vector the vector representing a symbolic instance.
+     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     */
+    public boolean isSatNoSymmetryBreak(String vector) {
+        boolean result = false;
+
+        try {
+            result = solver.startSolverExplorationNoSymmetryBreak(new SymKoratVector(vector));
         } catch (CannotInvokePredicateException e) {
             System.err.println("!!! Korat cannot invoke predicate method:");
             System.err.println("      <class> = " + e.getCls().getName());

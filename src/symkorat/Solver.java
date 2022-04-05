@@ -152,27 +152,25 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
     protected boolean startSolverExploration(SymKoratVector kcv) throws CannotInvokePredicateException {
         stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
         accessedFields = stateSpaceExplorer.getAccessedFields();
-        Object nextStructure = null;
-        while (true) {
-            nextStructure = stateSpaceExplorer.nextTestCase();
-            if (nextStructure == null)
-                return false;
-            if (checkPredicate(nextStructure, predicate))
+        Object candidate = stateSpaceExplorer.buildCandidate();
+        while (candidate != null) {
+            if (checkPredicate(candidate, predicate))
                 return true;
+            candidate = stateSpaceExplorer.getNextCandidate();
         }
+        return false;
     }
 
-    protected boolean startSolverExplorationNoIsmBreak(SymKoratVector kcv) throws CannotInvokePredicateException {
+    protected boolean startSolverExplorationNoSymmetryBreak(SymKoratVector kcv) throws CannotInvokePredicateException {
         stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
         accessedFields = stateSpaceExplorer.getAccessedFields();
-        Object nextStructure = null;
-        while (true) {
-            nextStructure = stateSpaceExplorer.nextTestCaseNoIsmBreak();
-            if (nextStructure == null)
-                return false;
-            if (checkPredicate(nextStructure, predicate))
+        Object candidate = stateSpaceExplorer.buildCandidate();
+        while (candidate != null) {
+            if (checkPredicate(candidate, predicate))
                 return true;
+            candidate = stateSpaceExplorer.getNextCandidateNoSymmetryBreak();
         }
+        return false;
     }
 
     private Method getFinMethod(Class<?> cls, String finName, String[] finArgs) throws CannotFindFinitizationException {
