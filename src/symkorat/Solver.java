@@ -1,7 +1,7 @@
 package symkorat;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Set;
 
 import korat.finitization.IFinitization;
 import korat.finitization.impl.Finitization;
@@ -15,20 +15,21 @@ import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
 
+public class Solver extends AbstractTestCaseGenerator implements ITester {
 
-public class KSolver extends AbstractTestCaseGenerator implements ITester {
-
-    private static KSolver instance = new KSolver();
-
-    public static KSolver getInstance() {
-        return instance;
-    }
+    private static Solver instance = new Solver();
 
     protected ClassLoader classLoader;
 
-    protected KSolver() {
+    private boolean traceStarted;
+
+    protected Solver() {
         classLoader = new InstrumentingClassLoader();
         Finitization.setClassLoader(classLoader);
+    }
+
+    public static Solver getInstance() {
+        return instance;
     }
 
     public ClassLoader getClassLoader() {
@@ -40,8 +41,6 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
      * Implementation of ITester interface.
      * -------------------------------------------------------------------------
      */
-
-    private boolean traceStarted;
 
     public void startFieldTrace() {
         traceStarted = true;
@@ -59,10 +58,7 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
     public void notifyFieldAccess(Object obj, String field) {
         if (!traceStarted)
             return;
-
-        int accessedFieldIndex = stateSpace.getIndexInCandidateVector(obj,
-                field);
-
+        int accessedFieldIndex = stateSpace.getIndexInCandidateVector(obj, field);
         if (accessedFieldIndex != -1)
             accessedFields.add(accessedFieldIndex);
     }
@@ -70,11 +66,9 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
     public void notifyFieldAccess(int accessedFieldIndex) {
         if (!traceStarted)
             return;
-
         if (accessedFieldIndex != -1)
             accessedFields.add(accessedFieldIndex);
     }
-
 
     /*
      * -------------------------------------------------------------------------
@@ -98,7 +92,6 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
         return stateSpace;
     }
 
-
     /*
      * -------------------------------------------------------------------------
      * Internal stuff.
@@ -121,35 +114,68 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
 
     Method predicate;
 
-    public ArrayList<String> vectorDescription;
-
     String[] finitizationArgs;
 
     SolverStateSpaceExplorer stateSpaceExplorer;
 
-    public KoratCandidateVector kcv;
+    protected void initialize(String className, String finArgs) throws ClassNotFoundException,
+            CannotFindFinitizationException, CannotInvokeFinitizationException, CannotFindPredicateException {
+        this.clazz = classLoader.loadClass(className);
+        this.finArgs = finArgs.split(",");
 
-    public void initialize(String className, String finArgs) throws ClassNotFoundException, CannotFindFinitizationException, CannotInvokeFinitizationException, CannotFindPredicateException {
-    	this.clazz = classLoader.loadClass(className);
-    	this.finArgs = finArgs.split(",");
+        String[] cs = className.split("\\.");
+        String finName = "fin" + cs[cs.length - 1];
+        this.finMethod = getFinMethod(clazz, finName, this.finArgs);
 
-    	String[] cs = className.split("\\.");
-    	String finName = "fin" + cs[cs.length - 1];
-    	this.finMethod = getFinMethod(clazz, finName, this.finArgs);
-
-    	this.fin = invokeFinMethod(clazz, this.finMethod, this.finArgs);
-		this.predicate = getPredicateMethod(fin.getFinClass(), "repOK");
+        this.fin = invokeFinMethod(clazz, this.finMethod, this.finArgs);
+        this.predicate = getPredicateMethod(fin.getFinClass(), "repOK");
         this.stateSpace = ((Finitization) fin).getStateSpace();
-        this.kcv = new KoratCandidateVector(stateSpace.getStructureList());
+        stateSpaceExplorer = new SolverStateSpaceExplorer(fin);
+        accessedFields = stateSpaceExplorer.getAccessedFields();
     }
 
-    private Method getFinMethod(Class<?> cls, String finName, String[] finArgs)
-            throws CannotFindFinitizationException {
+    protected boolean runAutoHybridRepok(SymKoratVector kcv) throws CannotInvokePredicateException {
+        stateSpaceExplorer.initialize(kcv);
+        Set<Integer> fixedIndices = kcv.getFixedIndices();
+        Object candidate = stateSpaceExplorer.buildCandidate();
+        if (checkPredicate(candidate, predicate))
+            return true;
+        else {
+            for (int i = 0; i < accessedFields.numberOfElements(); i++) {
+                int index = accessedFields.get(i);
+                if (!fixedIndices.contains(index))
+                    return true;
+            }
+        }
+        return false;
+    }
 
+    protected boolean startSolverExploration(SymKoratVector kcv) throws CannotInvokePredicateException {
+        stateSpaceExplorer.initialize(kcv);
+        Object candidate = stateSpaceExplorer.buildCandidate();
+        while (candidate != null) {
+            if (checkPredicate(candidate, predicate))
+                return true;
+            candidate = stateSpaceExplorer.getNextCandidate();
+        }
+        return false;
+    }
+
+    protected boolean startSolverExplorationNoSymmetryBreak(SymKoratVector kcv) throws CannotInvokePredicateException {
+        stateSpaceExplorer.initialize(kcv);
+        Object candidate = stateSpaceExplorer.buildCandidate();
+        while (candidate != null) {
+            if (checkPredicate(candidate, predicate))
+                return true;
+            candidate = stateSpaceExplorer.getNextCandidateNoSymmetryBreak();
+        }
+        return false;
+    }
+
+    private Method getFinMethod(Class<?> cls, String finName, String[] finArgs) throws CannotFindFinitizationException {
         Method finitize = null;
         for (Method m : cls.getDeclaredMethods()) {
-            if (finName.equals(m.getName())
-                    && m.getParameterTypes().length == finArgs.length) {
+            if (finName.equals(m.getName()) && m.getParameterTypes().length == finArgs.length) {
                 finitize = m;
                 break;
             }
@@ -158,7 +184,6 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
             throw new CannotFindFinitizationException(cls, finName);
         }
         return finitize;
-
     }
 
     private IFinitization invokeFinMethod(Class<?> cls, Method finitize,
@@ -203,55 +228,8 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
         }
 
     }
-    
-    public boolean runAutoHybridRepok(KoratCandidateVector kcv) throws CannotInvokePredicateException, CannotFindPredicateException {
-    	stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
-        accessedFields = stateSpaceExplorer.getAccessedFields();
 
-        Object candidate = stateSpaceExplorer.buildCandidate();
-        if (checkPredicate(candidate, predicate))
-            return true;
-        else {
-        	for (int i = 0; i < accessedFields.numberOfElements(); i++) {
-        		int index = accessedFields.get(i);
-        		if (!kcv.fixedIndexes.contains(index))
-        			return true;
-        	}	
-        }
-        return false;
-    }
-
-    public boolean startSolverExploration(KoratCandidateVector kcv) throws CannotInvokePredicateException, CannotFindPredicateException {
-    	stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
-        accessedFields = stateSpaceExplorer.getAccessedFields();
-
-        Object nextStructure = null;
-        while (true) {
-        	nextStructure = stateSpaceExplorer.nextTestCase();
-            if (nextStructure == null)
-                return false;
-            if (checkPredicate(nextStructure, predicate))
-                return true;
-        }
-    }
-    
-    public boolean startSolverExplorationNoIsmBreak(KoratCandidateVector kcv) throws CannotInvokePredicateException, CannotFindPredicateException {
-    	stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
-        accessedFields = stateSpaceExplorer.getAccessedFields();
-
-        Object nextStructure = null;
-        while (true) {
-        	nextStructure = stateSpaceExplorer.nextTestCaseNoIsmBreak();
-            if (nextStructure == null)
-                return false;
-            if (checkPredicate(nextStructure, predicate))
-                return true;
-        }
-    }
-    
-
-    protected Method getPredicateMethod(Class<?> testClass, String predicateName)
-            throws CannotFindPredicateException {
+    protected Method getPredicateMethod(Class<?> testClass, String predicateName) throws CannotFindPredicateException {
         try {
             return testClass.getMethod(predicateName, (Class[]) null);
         } catch (Exception e) {
@@ -259,14 +237,12 @@ public class KSolver extends AbstractTestCaseGenerator implements ITester {
         }
     }
 
-    protected boolean checkPredicate(Object testCase, Method predicate)
-            throws CannotInvokePredicateException {
+    protected boolean checkPredicate(Object testCase, Method predicate) throws CannotInvokePredicateException {
         startFieldTrace();
         try {
             return (Boolean) predicate.invoke(testCase, (Object[]) null);
         } catch (Exception e) {
-            throw new CannotInvokePredicateException(testCase.getClass(),
-                    predicate.getName(), e.getMessage(), e);
+            throw new CannotInvokePredicateException(testCase.getClass(), predicate.getName(), e.getMessage(), e);
         } finally {
             stopFieldTrace();
         }

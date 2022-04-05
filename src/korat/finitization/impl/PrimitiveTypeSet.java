@@ -32,7 +32,7 @@ public abstract class PrimitiveTypeSet extends FieldDomain {
 
     protected List<Number> primitives = new ArrayList<Number>();
 
-    PrimitiveTypeSet(Class classOfObjects) {
+    PrimitiveTypeSet(Class<?> classOfObjects) {
         super(classOfObjects);
         if (!classOfObjects.isPrimitive()) {
             throw new RuntimeException(

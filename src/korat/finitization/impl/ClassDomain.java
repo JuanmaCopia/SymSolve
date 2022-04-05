@@ -9,7 +9,7 @@ import java.util.List;
 import korat.finitization.IClassDomain;
 import korat.instrumentation.IKoratArray;
 import korat.testing.ITester;
-import symkorat.KSolver;
+import symkorat.Solver;
 
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
@@ -24,7 +24,7 @@ public class ClassDomain implements IClassDomain {
 
     int numOfObjects;
 
-    protected Constructor constructor;
+    protected Constructor<?> constructor;
 
     protected Object[] params;
 
@@ -111,7 +111,7 @@ public class ClassDomain implements IClassDomain {
             return;
         initialized = true;
 
-        ITester tester = KSolver.getInstance();
+        ITester tester = Solver.getInstance();
 
         //TODO:: generalize for other object types
         if (IKoratArray.class.isAssignableFrom(classOfObjects))
@@ -243,7 +243,7 @@ public class ClassDomain implements IClassDomain {
         }
     }
 
-    public void addObjects(Collection col) {
+    public void addObjects(Collection<Object> col) {
         assert (col != null);
         for (Object obj : col) {
             addObject(obj);

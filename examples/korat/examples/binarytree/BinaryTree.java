@@ -18,14 +18,14 @@ public class BinaryTree {
     private Node root;
     private int size;
 
-    @SuppressWarnings("unchecked")
+
     public boolean repOK() {
         if (root == null)
             return size == 0;
         // checks that tree has no cycle
-        Set visited = new HashSet();
+        Set<Node> visited = new HashSet<Node>();
         visited.add(root);
-        LinkedList workList = new LinkedList();
+        LinkedList<Node> workList = new LinkedList<Node>();
         workList.add(root);
         while (!workList.isEmpty()) {
             Node current = (Node) workList.removeFirst();

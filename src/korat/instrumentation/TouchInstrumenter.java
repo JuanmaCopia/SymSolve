@@ -223,7 +223,7 @@ class TouchInstrumenter extends AbstractInstrumenter {
                 boolean instrument = false;
                 CtClass[] superclassInterfaces = clz.getSuperclass().getInterfaces();
                 for (CtClass i : superclassInterfaces)
-                    if ((Class) i.getClass() == IKoratTouchable.class) {
+                    if ((Class<?>) i.getClass() == IKoratTouchable.class) {
                         instrument = true;
                         break;
                     }

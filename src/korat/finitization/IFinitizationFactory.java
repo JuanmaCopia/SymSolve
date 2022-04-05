@@ -9,6 +9,6 @@ public interface IFinitizationFactory {
      * @param clz class to create finitization for
      * @return finitization for the given class
      */
-    IFinitization createFinitization(Class clz);
+    IFinitization createFinitization(Class<?> clz);
 
 }

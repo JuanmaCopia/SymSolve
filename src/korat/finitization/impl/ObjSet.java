@@ -69,7 +69,7 @@ public class ObjSet extends FieldDomain implements IObjSet {
         isCacheValid = true;
     }
 
-    ObjSet(Class classOfField) {
+    ObjSet(Class<?> classOfField) {
         super(classOfField);
         // ===============  Added  ==============
         notAliasFields = new HashSet<String>();
@@ -91,7 +91,6 @@ public class ObjSet extends FieldDomain implements IObjSet {
      * @throws IllegalArgumentException -
      *             if this field is not assignable from the given class domain
      */
-    @SuppressWarnings("unchecked")
     public boolean addClassDomain(IClassDomain domain) {
         // handles NullClassDomain separately
         if (domain.getClassOfObjects() == null) {
@@ -225,11 +224,10 @@ public class ObjSet extends FieldDomain implements IObjSet {
         return objs.toArray();
     }
 
-    @SuppressWarnings("unchecked")
-    public Object[] getObjectsOfClass(Class cls) {
+    public Object[] getObjectsOfClass(Class<?> cls) {
         List<Object> objs = new ArrayList<Object>(getNumberOfElements());
         for (ClassDomain cd : domains) {
-            Class classOfObjects = cd.getClassOfObjects();
+        	Class<?> classOfObjects = cd.getClassOfObjects();
             if (classOfObjects != null)
                 if (cls.isAssignableFrom(classOfObjects))
                     objs.addAll(cd.getObjects());

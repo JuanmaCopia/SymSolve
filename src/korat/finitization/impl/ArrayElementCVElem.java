@@ -67,19 +67,19 @@ public class ArrayElementCVElem extends CVElem {
         this.indexInStateSpace = indexInStateSpace;
 
         String setterMethodName;
-        Class[] setterMethodArgs;
+        Class<?>[] setterMethodArgs;
         Object[] args;
 
         if (arrayIndex == -1) { // length
 
             setterMethodName = ArrayGenerator.GET_LENGTH_SETTER_METHOD_NAME;
-            setterMethodArgs = new Class[] { int.class };
+            setterMethodArgs = new Class<?>[] { int.class };
             args = new Integer[] { indexInStateSpace };
 
         } else { // array element
 
             setterMethodName = ArrayGenerator.GET_ELEMENT_SETTER_METHOD_NAME;
-            setterMethodArgs = new Class[] { int.class, int.class };
+            setterMethodArgs = new Class<?>[] { int.class, int.class };
             args = new Integer[] { arrayIndex, indexInStateSpace };
 
         }

@@ -1,54 +1,65 @@
+
 package symkorat;
 
-import korat.config.ConfigLoader;
+import korat.finitization.impl.CVElem;
 import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 
-
+/**
+ * API for the SymKorat Solver.
+ *
+ * @author Juan Manuel Copia
+ */
 public class SymKorat {
 
+    private Solver solver;
 
-	private KSolver ksolver;
+    /**
+     * Returns the representation format of the vector.
+     *
+     * @return A vector describing the types and fields that represent the
+     *         structure.
+     */
+    public CVElem[] getVectorFormat() {
+        return solver.getStateSpace().getStructureList().clone();
+    }
 
-	
-	public SymKorat(String className, String finArgs) {
-		ksolver = KSolver.getInstance();
-		try {
-			ksolver.initialize(className, finArgs);
-		} catch (CannotFindFinitizationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CannotInvokeFinitizationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CannotFindPredicateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    /**
+     * Creates a SymKorat instance to decide satisfiability for the specified class
+     * and bounds.
+     *
+     * @param className        fully qualified name of the class.
+     * @param finitizationArgs arguments to be passed to the finitization method.
+     */
+    public SymKorat(String className, String finitizationArgs) {
+        solver = Solver.getInstance();
+        try {
+            solver.initialize(className, finitizationArgs);
+        } catch (CannotFindFinitizationException e) {
+            e.printStackTrace();
+        } catch (CannotInvokeFinitizationException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (CannotFindPredicateException e) {
+            e.printStackTrace();
+        }
+    }
 
-    public boolean isSat(KoratCandidateVector cv) {
+    /**
+     * Decides whether the symbolic instance represented by a vector is SAT.
+     *
+     * @param cv the vector representing a symbolic instance.
+     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     */
+    public boolean isSat(SymKoratVector vector) {
         boolean result = false;
 
         try {
-            result = ksolver.startSolverExploration(cv);
-
-        } catch (CannotFindPredicateException e) {
-
-            System.err.println("!!! Korat cannot find predicate method for the class under test:");
-            System.err.println("        <class> = " + e.getCls().getName());
-            System.err.println("        <predicate> = " + e.getMethodName());
-            System.err.println("    Use -"
-                    + ConfigLoader.PREDICATE.getSwitches()
-                    + " switch to provide custom predicate method name.");
-
+            result = solver.startSolverExploration(vector);
         } catch (CannotInvokePredicateException e) {
-
             System.err.println("!!! Korat cannot invoke predicate method:");
             System.err.println("      <class> = " + e.getCls().getName());
             System.err.println("      <predicate> = " + e.getMethodName());
@@ -56,27 +67,21 @@ public class SymKorat {
             System.err.println("    Stack trace:");
             e.printStackTrace(System.err);
         }
-
         return result;
     }
-    
-    public boolean autoHybridRepOK(KoratCandidateVector cv) {
+
+    /**
+     * Decides whether the symbolic instance represented by a string vector is SAT.
+     *
+     * @param vector the vector representing a symbolic instance.
+     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     */
+    public boolean isSat(String vector) {
         boolean result = false;
 
         try {
-            result = ksolver.runAutoHybridRepok(cv);
-
-        } catch (CannotFindPredicateException e) {
-
-            System.err.println("!!! Korat cannot find predicate method for the class under test:");
-            System.err.println("        <class> = " + e.getCls().getName());
-            System.err.println("        <predicate> = " + e.getMethodName());
-            System.err.println("    Use -"
-                    + ConfigLoader.PREDICATE.getSwitches()
-                    + " switch to provide custom predicate method name.");
-
+            result = solver.startSolverExploration(new SymKoratVector(vector));
         } catch (CannotInvokePredicateException e) {
-
             System.err.println("!!! Korat cannot invoke predicate method:");
             System.err.println("      <class> = " + e.getCls().getName());
             System.err.println("      <predicate> = " + e.getMethodName());
@@ -84,28 +89,21 @@ public class SymKorat {
             System.err.println("    Stack trace:");
             e.printStackTrace(System.err);
         }
-
         return result;
     }
-    
-    public boolean isSat(String cv) {
+
+    /**
+     * Decides whether the symbolic instance represented by a vector is SAT.
+     *
+     * @param vector the vector representing a symbolic instance.
+     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     */
+    public boolean isSatNoSymmetryBreak(SymKoratVector vector) {
         boolean result = false;
 
         try {
-        	initCandidateVector(cv);
-            result = ksolver.startSolverExploration(ksolver.kcv);
-
-        } catch (CannotFindPredicateException e) {
-
-            System.err.println("!!! Korat cannot find predicate method for the class under test:");
-            System.err.println("        <class> = " + e.getCls().getName());
-            System.err.println("        <predicate> = " + e.getMethodName());
-            System.err.println("    Use -"
-                    + ConfigLoader.PREDICATE.getSwitches()
-                    + " switch to provide custom predicate method name.");
-
+            result = solver.startSolverExplorationNoSymmetryBreak(vector);
         } catch (CannotInvokePredicateException e) {
-
             System.err.println("!!! Korat cannot invoke predicate method:");
             System.err.println("      <class> = " + e.getCls().getName());
             System.err.println("      <predicate> = " + e.getMethodName());
@@ -113,27 +111,21 @@ public class SymKorat {
             System.err.println("    Stack trace:");
             e.printStackTrace(System.err);
         }
-
         return result;
     }
-    
-    public boolean isSatNoIsmBreak(KoratCandidateVector cv) {
+
+    /**
+     * Decides whether the symbolic instance represented by a vector is SAT.
+     *
+     * @param vector the vector representing a symbolic instance.
+     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     */
+    public boolean isSatNoSymmetryBreak(String vector) {
         boolean result = false;
 
         try {
-            result = ksolver.startSolverExplorationNoIsmBreak(cv);
-
-        } catch (CannotFindPredicateException e) {
-
-            System.err.println("!!! Korat cannot find predicate method for the class under test:");
-            System.err.println("        <class> = " + e.getCls().getName());
-            System.err.println("        <predicate> = " + e.getMethodName());
-            System.err.println("    Use -"
-                    + ConfigLoader.PREDICATE.getSwitches()
-                    + " switch to provide custom predicate method name.");
-
+            result = solver.startSolverExplorationNoSymmetryBreak(new SymKoratVector(vector));
         } catch (CannotInvokePredicateException e) {
-
             System.err.println("!!! Korat cannot invoke predicate method:");
             System.err.println("      <class> = " + e.getCls().getName());
             System.err.println("      <predicate> = " + e.getMethodName());
@@ -141,27 +133,29 @@ public class SymKorat {
             System.err.println("    Stack trace:");
             e.printStackTrace(System.err);
         }
-
         return result;
     }
-    
-    private void initCandidateVector(String strCV) {
-        String[] elemsCV = strCV.split(",");
-        ksolver.kcv.candidateVector = new int[elemsCV.length];
-        ksolver.kcv.fixedIndexes.clear();
-        for (int i = 0; i < elemsCV.length; i++) {
-        	int elem = Integer.parseInt(elemsCV[i]);
-        	if (elem <= -1)
-        		ksolver.kcv.candidateVector[i] = 0;
-        	else {
-        		ksolver.kcv.candidateVector[i] = elem;
-        		ksolver.kcv.fixedIndexes.add(i);
-        	}
+
+    /**
+     * Implements the automatically derived hybrid repOK.
+     *
+     * @param vector the vector representing a symbolic instance.
+     * @return the result of the automatically derived repOK.
+     */
+    public boolean autoHybridRepOK(SymKoratVector vector) {
+        boolean result = false;
+
+        try {
+            result = solver.runAutoHybridRepok(vector);
+        } catch (CannotInvokePredicateException e) {
+            System.err.println("!!! Korat cannot invoke predicate method:");
+            System.err.println("      <class> = " + e.getCls().getName());
+            System.err.println("      <predicate> = " + e.getMethodName());
+            System.err.println();
+            System.err.println("    Stack trace:");
+            e.printStackTrace(System.err);
         }
-    }
-    
-    public KoratCandidateVector getKoratCandidateVector() {
-    	return ksolver.kcv;
+        return result;
     }
 
 }

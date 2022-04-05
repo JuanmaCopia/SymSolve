@@ -35,7 +35,7 @@ public class InstrumentingClassLoader extends ClassLoader {
             throws ClassNotFoundException {
 
         // find the class if it was already loaded
-        Class c = findLoadedClass(className);
+    	Class<?> c = findLoadedClass(className);
 
         if (c == null) { // class was not found in local table
 

@@ -8,7 +8,7 @@ import korat.finitization.IFieldDomain;
  */
 public abstract class FieldDomain implements IFieldDomain {
 
-    protected Class classOfField;
+    protected Class<?> classOfField;
     
     protected boolean checkClassDomainIndex(int index) {
         if (index < 0 || index >= getNumOfClassDomains())
@@ -30,7 +30,7 @@ public abstract class FieldDomain implements IFieldDomain {
      * @param classOfField -
      *            type of the field
      */
-    FieldDomain(Class classOfField) {
+    FieldDomain(Class<?> classOfField) {
         this.classOfField = classOfField;
     }
 
@@ -46,7 +46,7 @@ public abstract class FieldDomain implements IFieldDomain {
                 Finitization.getClassLoader()));
     }
 
-    public Class getClassOfField() {
+    public Class<?> getClassOfField() {
         return classOfField;
     }
 

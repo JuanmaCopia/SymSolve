@@ -9,7 +9,7 @@ import korat.finitization.IIntSet;
 import korat.finitization.IObjSet;
 import korat.finitization.impl.FinitizationFactory;
 
-@SuppressWarnings("unchecked")
+
 public class SearchTree {
     private Node root; // root node
 
@@ -32,9 +32,9 @@ public class SearchTree {
     }
 
     private boolean isAcyclic() {
-        Set visited = new HashSet();
+        Set<Node> visited = new HashSet<Node>();
         visited.add(root);
-        LinkedList workList = new LinkedList();
+        LinkedList<Node> workList = new LinkedList<Node>();
         workList.add(root);
         while (!workList.isEmpty()) {
             Node current = (Node) workList.removeFirst();

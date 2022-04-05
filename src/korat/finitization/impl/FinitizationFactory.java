@@ -26,7 +26,7 @@ public class FinitizationFactory implements IFinitizationFactory {
     /**
      * @see IFinitizationFactory#createFinitization(Class)
      */
-    public IFinitization createFinitization(Class clz) {
+    public IFinitization createFinitization(Class<?> clz) {
         return new Finitization(clz);
     }
     
@@ -37,7 +37,7 @@ public class FinitizationFactory implements IFinitizationFactory {
      * @param clz class to create finitization for
      * @return finitization for the given class.
      */
-    public static IFinitization create(Class clz) {
+    public static IFinitization create(Class<?> clz) {
         return getInstance().createFinitization(clz);
     }
 

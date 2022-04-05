@@ -79,7 +79,7 @@ public interface IObjSet extends IFieldDomain {
      * @see #getAllObjects()
      * 
      */
-    Object[] getObjectsOfClass(Class cls);
+    Object[] getObjectsOfClass(Class<?> cls);
 
     /**
      * Sets whether <code>null</code> is allowed or not. By default

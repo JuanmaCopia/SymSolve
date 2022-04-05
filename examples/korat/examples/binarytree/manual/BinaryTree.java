@@ -235,13 +235,12 @@ public class BinaryTree /* the rest is added by Korat */ implements IKoratToucha
 
     // end -- instrumentation for field SIZE ---------------------------
 
-    @SuppressWarnings("unchecked")
     public boolean has(Node n) {
 
         if (getRoot() == null)
             return false;
 
-        LinkedList workList = new LinkedList();
+        LinkedList<Node> workList = new LinkedList<Node>();
         workList.add(getRoot());
         while (!workList.isEmpty()) {
             Node current = (Node) workList.removeFirst();
@@ -256,16 +255,15 @@ public class BinaryTree /* the rest is added by Korat */ implements IKoratToucha
     }
 
     // Class invariant ::
-    @SuppressWarnings("unchecked")
     public boolean repOK() {
 
         if (getRoot() == null)
             return getSize() == 0;
 
         // checks that tree has no cycle
-        Set visited = new HashSet();
+        Set<Node> visited = new HashSet<Node>();
         visited.add(getRoot());
-        LinkedList workList = new LinkedList();
+        LinkedList<Node> workList = new LinkedList<Node>();
         workList.add(getRoot());
         while (!workList.isEmpty()) {
             Node current = (Node) workList.removeFirst();
