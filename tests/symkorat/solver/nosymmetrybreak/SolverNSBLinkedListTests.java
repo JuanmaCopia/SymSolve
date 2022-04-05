@@ -1,4 +1,4 @@
-package symkorat.nosymmetrybreak.linkedlist;
+package symkorat.solver.nosymmetrybreak;
 
 import static org.junit.Assert.assertEquals;
 

@@ -1,4 +1,4 @@
-package symkorat.nosymmetrybreak.hashmap;
+package symkorat.solver.nosymmetrybreak;
 
 import static org.junit.Assert.assertEquals;
 

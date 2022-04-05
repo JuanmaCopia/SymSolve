@@ -14,44 +14,53 @@ import korat.utils.IntListAI;
 
 public class SolverStateSpaceExplorer {
 
-    protected StateSpace stateSpace;
+    private StateSpace stateSpace;
 
-    protected CandidateBuilder candidateBuilder;
+    private CandidateBuilder candidateBuilder;
 
-    protected int[] candidateVector;
+    private int[] candidateVector;
 
-    protected int[] maxInstances;
+    private int vectorSize;
 
-    protected boolean[] isInitialized;
+    private int[] maxInstances;
+
+    private boolean[] isInitialized;
 
     protected IIntList accessedFields;
 
     protected IIntList changedFields;
 
-    protected IIntList fixedIndices;
+    private IIntList fixedIndices;
 
-    protected HashMap<FieldDomain, Integer> maxFixedInstances;
+    private HashMap<FieldDomain, Integer> maxFixedInstances;
 
-    public SolverStateSpaceExplorer(IFinitization ifin, SymKoratVector vector) {
-        Finitization fin = (Finitization) ifin;
+    private Finitization fin;
+
+    public SolverStateSpaceExplorer(IFinitization ifin) {
+        fin = (Finitization) ifin;
         stateSpace = fin.getStateSpace();
-
-        int vectorSize = stateSpace.getTotalNumberOfFields();
-        this.candidateVector = vector.getConcreteVector();
-        if (vectorSize != this.candidateVector.length)
-            throw new IllegalArgumentException("The input vector does not match the finitization!");
-
+        vectorSize = stateSpace.getTotalNumberOfFields();
         this.isInitialized = new boolean[vectorSize];
         this.maxInstances = new int[vectorSize];
         accessedFields = new IntListAI(vectorSize);
         changedFields = new IntListAI(vectorSize);
         fixedIndices = new IntListAI(vectorSize);
+        candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
+    }
+
+    public void initialize(SymKoratVector vector) {
+        this.candidateVector = vector.getConcreteVector();
+        if (vectorSize != this.candidateVector.length)
+            throw new IllegalArgumentException("The input vector does not match the finitization!");
+
+        accessedFields.clear();
+        changedFields.clear();
+        fixedIndices.clear();
         for (int i = 0; i < vectorSize; i++) {
             maxInstances[i] = -1;
+            isInitialized[i] = false;
             changedFields.add(i);
         }
-
-        candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
         initializeMaxFixedInstances(vector.getFixedIndices());
     }
 

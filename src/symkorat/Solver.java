@@ -130,11 +130,12 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         this.fin = invokeFinMethod(clazz, this.finMethod, this.finArgs);
         this.predicate = getPredicateMethod(fin.getFinClass(), "repOK");
         this.stateSpace = ((Finitization) fin).getStateSpace();
+        stateSpaceExplorer = new SolverStateSpaceExplorer(fin);
+        accessedFields = stateSpaceExplorer.getAccessedFields();
     }
 
     protected boolean runAutoHybridRepok(SymKoratVector kcv) throws CannotInvokePredicateException {
-        stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
-        accessedFields = stateSpaceExplorer.getAccessedFields();
+        stateSpaceExplorer.initialize(kcv);
         Set<Integer> fixedIndices = kcv.getFixedIndices();
         Object candidate = stateSpaceExplorer.buildCandidate();
         if (checkPredicate(candidate, predicate))
@@ -150,8 +151,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
     }
 
     protected boolean startSolverExploration(SymKoratVector kcv) throws CannotInvokePredicateException {
-        stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
-        accessedFields = stateSpaceExplorer.getAccessedFields();
+        stateSpaceExplorer.initialize(kcv);
         Object candidate = stateSpaceExplorer.buildCandidate();
         while (candidate != null) {
             if (checkPredicate(candidate, predicate))
@@ -162,8 +162,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
     }
 
     protected boolean startSolverExplorationNoSymmetryBreak(SymKoratVector kcv) throws CannotInvokePredicateException {
-        stateSpaceExplorer = new SolverStateSpaceExplorer(fin, kcv);
-        accessedFields = stateSpaceExplorer.getAccessedFields();
+        stateSpaceExplorer.initialize(kcv);
         Object candidate = stateSpaceExplorer.buildCandidate();
         while (candidate != null) {
             if (checkPredicate(candidate, predicate))

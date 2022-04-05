@@ -1,4 +1,4 @@
-package symkorat.treeset;
+package symkorat.solver.symmetrybreak;
 
 import static org.junit.Assert.assertEquals;
 

@@ -1,4 +1,4 @@
-package symkorat.schedule;
+package symkorat.solver.symmetrybreak;
 
 import static org.junit.Assert.assertEquals;
 
