@@ -151,6 +151,7 @@ public class SolverStateSpaceExplorer {
         return false;
     }
 
+    @SuppressWarnings("unused")
     private boolean setNextValueInOrder(int lastAccessedFieldIndex) {
         CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
         if (fixedIndices.contains(lastAccessedFieldIndex) || lastAccessedField.isExcludedFromSearch())
