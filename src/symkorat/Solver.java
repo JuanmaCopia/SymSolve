@@ -1,9 +1,12 @@
 package symkorat;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Set;
 
 import korat.finitization.IFinitization;
+import korat.finitization.impl.CVElem;
+import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.Finitization;
 import korat.finitization.impl.StateSpace;
 import korat.loading.InstrumentingClassLoader;
@@ -246,6 +249,18 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         } finally {
             stopFieldTrace();
         }
+    }
+
+    protected HashMap<String, Integer> getBounds() {
+        HashMap<String, Integer> bounds = new HashMap<String, Integer>();
+        CVElem[] structureList = stateSpace.getStructureList();
+        for (int i = 0; i < structureList.length; i++) {
+            FieldDomain fieldDomain = structureList[i].getFieldDomain();
+            String classSimpleName = fieldDomain.getClassOfField().getSimpleName();
+            if (!bounds.containsKey(classSimpleName))
+                bounds.put(classSimpleName, fieldDomain.getNumberOfElements());
+        }
+        return bounds;
     }
 
 }

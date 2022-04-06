@@ -1,6 +1,8 @@
 
 package symkorat;
 
+import java.util.HashMap;
+
 import korat.finitization.impl.CVElem;
 import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
@@ -15,16 +17,6 @@ import korat.testing.impl.CannotInvokePredicateException;
 public class SymKorat {
 
     private Solver solver;
-
-    /**
-     * Returns the representation format of the vector.
-     *
-     * @return A vector describing the types and fields that represent the
-     *         structure.
-     */
-    public CVElem[] getVectorFormat() {
-        return solver.getStateSpace().getStructureList().clone();
-    }
 
     /**
      * Creates a SymKorat instance to decide satisfiability for the specified class
@@ -156,6 +148,25 @@ public class SymKorat {
             e.printStackTrace(System.err);
         }
         return result;
+    }
+
+    /**
+     * Returns the representation format of the vector.
+     *
+     * @return A vector describing the types and fields that represent the
+     *         structure.
+     */
+    public CVElem[] getVectorFormat() {
+        return solver.getStateSpace().getStructureList().clone();
+    }
+
+    /**
+     * Returns the finitization bounds for each class.
+     *
+     * @return A map of simple class names to number of objects.
+     */
+    public HashMap<String, Integer> getBounds() {
+        return solver.getBounds();
     }
 
 }
