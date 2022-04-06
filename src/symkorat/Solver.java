@@ -8,6 +8,7 @@ import korat.finitization.IFinitization;
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.Finitization;
+import korat.finitization.impl.ObjSet;
 import korat.finitization.impl.StateSpace;
 import korat.loading.InstrumentingClassLoader;
 import korat.testing.ITester;
@@ -256,9 +257,15 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         CVElem[] structureList = stateSpace.getStructureList();
         for (int i = 0; i < structureList.length; i++) {
             FieldDomain fieldDomain = structureList[i].getFieldDomain();
-            String classSimpleName = fieldDomain.getClassOfField().getSimpleName();
-            if (!bounds.containsKey(classSimpleName))
-                bounds.put(classSimpleName, fieldDomain.getNumberOfElements());
+            if (!fieldDomain.isPrimitiveType()) {
+            	String classSimpleName = fieldDomain.getClassOfField().getSimpleName();
+	            if (!bounds.containsKey(classSimpleName)) {
+	            	int bound = fieldDomain.getNumberOfElements();
+	            	if (((ObjSet) fieldDomain).isNullAllowed())
+	            		bound--;
+	                bounds.put(classSimpleName, bound);
+	            }
+            }
         }
         return bounds;
     }
