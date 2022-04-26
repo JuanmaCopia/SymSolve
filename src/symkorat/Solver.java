@@ -165,6 +165,18 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return false;
     }
 
+    protected int[] startSolverExplorationWithSolution(SymKoratVector kcv) throws CannotInvokePredicateException {
+        stateSpaceExplorer.initialize(kcv);
+        Object candidate = stateSpaceExplorer.buildCandidate();
+        while (candidate != null) {
+            if (checkPredicate(candidate, predicate)) {
+                return stateSpaceExplorer.getCandidateVector();
+            }
+            candidate = stateSpaceExplorer.getNextCandidate();
+        }
+        return null;
+    }
+
     protected boolean startSolverExplorationNoSymmetryBreak(SymKoratVector kcv) throws CannotInvokePredicateException {
         stateSpaceExplorer.initialize(kcv);
         Object candidate = stateSpaceExplorer.buildCandidate();
@@ -190,8 +202,8 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return finitize;
     }
 
-    private IFinitization invokeFinMethod(Class<?> cls, Method finitize,
-            String[] finArgs) throws CannotInvokeFinitizationException {
+    private IFinitization invokeFinMethod(Class<?> cls, Method finitize, String[] finArgs)
+            throws CannotInvokeFinitizationException {
 
         int paramNumber = finArgs.length;
         Class<?>[] finArgTypes = finitize.getParameterTypes();
@@ -258,13 +270,13 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         for (int i = 0; i < structureList.length; i++) {
             FieldDomain fieldDomain = structureList[i].getFieldDomain();
             if (!fieldDomain.isPrimitiveType()) {
-            	String classSimpleName = fieldDomain.getClassOfField().getSimpleName();
-	            if (!bounds.containsKey(classSimpleName)) {
-	            	int bound = fieldDomain.getNumberOfElements();
-	            	if (((ObjSet) fieldDomain).isNullAllowed())
-	            		bound--;
-	                bounds.put(classSimpleName, bound);
-	            }
+                String classSimpleName = fieldDomain.getClassOfField().getSimpleName();
+                if (!bounds.containsKey(classSimpleName)) {
+                    int bound = fieldDomain.getNumberOfElements();
+                    if (((ObjSet) fieldDomain).isNullAllowed())
+                        bound--;
+                    bounds.put(classSimpleName, bound);
+                }
             }
         }
         return bounds;

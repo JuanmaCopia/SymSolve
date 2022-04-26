@@ -63,6 +63,30 @@ public class SymKorat {
     }
 
     /**
+     * Decides whether the symbolic instance represented by a vector is SAT. If it
+     * is, returns the vector solution.
+     *
+     * @param cv the vector representing a symbolic instance.
+     * @return the solution vector if the symbolic structure is SAT, null if it is
+     *         UNSAT.
+     */
+    public int[] isSatWithSolution(SymKoratVector vector) {
+        int[] result = null;
+
+        try {
+            result = solver.startSolverExplorationWithSolution(vector);
+        } catch (CannotInvokePredicateException e) {
+            System.err.println("!!! Korat cannot invoke predicate method:");
+            System.err.println("      <class> = " + e.getCls().getName());
+            System.err.println("      <predicate> = " + e.getMethodName());
+            System.err.println();
+            System.err.println("    Stack trace:");
+            e.printStackTrace(System.err);
+        }
+        return result;
+    }
+
+    /**
      * Decides whether the symbolic instance represented by a string vector is SAT.
      *
      * @param vector the vector representing a symbolic instance.
