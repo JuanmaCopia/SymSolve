@@ -61,4 +61,18 @@
         </jar>
     </target>
 
+    <target name="createJarWithSource">
+        <antcall target="clean" />
+        <antcall target="build" />
+        <mkdir dir="${BUILD_DIR}" />
+        <jar destfile="${BUILD_DIR}/symKorat.jar" basedir="${BUILD_DIR}">
+            <manifest>
+                <attribute name="Class-Path" value="commons-cli-1.0.jar javassist.jar junit-4.13.2.jar" />
+                <attribute name="Main-Class" value="symkorat.SymKorat" />
+            </manifest>
+            <fileset dir="${BUILD_DIR}" includes="**/*.class"/>
+            <fileset dir="src" includes="**/*.java"/>
+        </jar>
+    </target>
+
 </project>
