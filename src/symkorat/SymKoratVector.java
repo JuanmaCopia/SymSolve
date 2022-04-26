@@ -1,6 +1,7 @@
 
 package symkorat;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -89,5 +90,17 @@ public class SymKoratVector {
 				this.fixedIndices.add(i);
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public String toString() {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("PartialVector: " + Arrays.toString(this.partialVector));
+	    sb.append("\nConcreteVector: " + Arrays.toString(this.concreteVector));
+	    sb.append("\nFixed Indices: " + this.fixedIndices.toString());
+	    return sb.toString();  
 	}
 }
