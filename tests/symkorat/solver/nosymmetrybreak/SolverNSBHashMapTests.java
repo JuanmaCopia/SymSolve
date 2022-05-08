@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import symkorat.SymKorat;
+import symsolve.SymSolve;
 
 public class SolverNSBHashMapTests {
 
-    private SymKorat symKorat = new SymKorat("symkorat.examples.hashmap.HashMap", Integer.toString(6));
+    private SymSolve symKorat = new SymSolve("symkorat.examples.hashmap.HashMap", Integer.toString(6));
 
     @Test
     public void HashMapSolverTest0() {

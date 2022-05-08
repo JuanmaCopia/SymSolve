@@ -1,4 +1,4 @@
-package symkorat;
+package symsolve;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -48,7 +48,7 @@ public class SolverStateSpaceExplorer {
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
     }
 
-    public void initialize(SymKoratVector vector) {
+    public void initialize(SymSolveVector vector) {
         this.candidateVector = vector.getConcreteVector();
         if (vectorSize != this.candidateVector.length)
             throw new IllegalArgumentException("The input vector does not match the finitization!");

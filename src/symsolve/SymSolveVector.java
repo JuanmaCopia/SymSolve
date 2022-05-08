@@ -1,5 +1,5 @@
 
-package symkorat;
+package symsolve;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @author Juan Manuel Copia
  */
-public class SymKoratVector {
+public class SymSolveVector {
 
 	public static final int SYMBOLIC = -1;
 
@@ -61,7 +61,7 @@ public class SymKoratVector {
 	 *                       represented with -1).
 	 * @param fixedIndices   The set of Fixed indices in this vector.
 	 */
-	public SymKoratVector(int[] concreteVector, int[] partialVector, Set<Integer> fixedIndices) {
+	public SymSolveVector(int[] concreteVector, int[] partialVector, Set<Integer> fixedIndices) {
 		this.concreteVector = concreteVector;
 		this.fixedIndices = fixedIndices;
 		this.partialVector = partialVector;
@@ -74,7 +74,7 @@ public class SymKoratVector {
 	 *
 	 * @param vector the string representation of the partial vector.
 	 */
-	public SymKoratVector(String vector) {
+	public SymSolveVector(String vector) {
 		String[] vectorValues = vector.split(",");
 		int vectorsSize = vectorValues.length;
 
@@ -83,8 +83,8 @@ public class SymKoratVector {
 		for (int i = 0; i < vectorsSize; i++) {
 			int elem = Integer.parseInt(vectorValues[i]);
 			this.partialVector[i] = elem;
-			if (elem == SymKoratVector.SYMBOLIC) {
-				this.concreteVector[i] = SymKoratVector.NULL;
+			if (elem == SymSolveVector.SYMBOLIC) {
+				this.concreteVector[i] = SymSolveVector.NULL;
 			} else {
 				this.concreteVector[i] = elem;
 				this.fixedIndices.add(i);

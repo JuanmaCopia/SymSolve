@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import symkorat.SymKorat;
+import symsolve.SymSolve;
 
 public class SolverLinkedListTests {
 
-    private SymKorat symKorat = new SymKorat("symkorat.examples.linkedlist.LinkedList", "5");
+    private SymSolve symKorat = new SymSolve("symkorat.examples.linkedlist.LinkedList", "5");
 
     @Test
     public void LinkedListSolverTest0() {

@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import symkorat.SymKorat;
+import symsolve.SymSolve;
 
 public class SolverNSBTreeMapTests {
 
-    private SymKorat symKorat = new SymKorat("symkorat.examples.treemap.TreeMap", "8");
+    private SymSolve symKorat = new SymSolve("symkorat.examples.treemap.TreeMap", "8");
 
     @Test
     public void TreeMapSolverTest0() {

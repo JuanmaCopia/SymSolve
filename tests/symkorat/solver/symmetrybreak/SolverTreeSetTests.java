@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import symkorat.SymKorat;
+import symsolve.SymSolve;
 
 public class SolverTreeSetTests {
 
-        private SymKorat symKorat = new SymKorat("symkorat.examples.treeset.TreeSet", "8");
+        private SymSolve symKorat = new SymSolve("symkorat.examples.treeset.TreeSet", "8");
 
         @Test
         public void TreeSetSolverTest0() {

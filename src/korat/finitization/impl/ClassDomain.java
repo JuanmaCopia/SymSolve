@@ -9,7 +9,7 @@ import java.util.List;
 import korat.finitization.IClassDomain;
 import korat.instrumentation.IKoratArray;
 import korat.testing.ITester;
-import symkorat.Solver;
+import symsolve.Solver;
 
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>

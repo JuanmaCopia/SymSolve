@@ -1,4 +1,4 @@
-package symkorat;
+package symsolve;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -138,7 +138,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         accessedFields = stateSpaceExplorer.getAccessedFields();
     }
 
-    protected boolean runAutoHybridRepok(SymKoratVector kcv) throws CannotInvokePredicateException {
+    protected boolean runAutoHybridRepok(SymSolveVector kcv) throws CannotInvokePredicateException {
         stateSpaceExplorer.initialize(kcv);
         Set<Integer> fixedIndices = kcv.getFixedIndices();
         Object candidate = stateSpaceExplorer.buildCandidate();
@@ -154,7 +154,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return false;
     }
 
-    protected boolean startSolverExploration(SymKoratVector kcv) throws CannotInvokePredicateException {
+    protected boolean startSolverExploration(SymSolveVector kcv) throws CannotInvokePredicateException {
         stateSpaceExplorer.initialize(kcv);
         Object candidate = stateSpaceExplorer.buildCandidate();
         while (candidate != null) {
@@ -165,7 +165,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return false;
     }
 
-    protected int[] startSolverExplorationWithSolution(SymKoratVector kcv) throws CannotInvokePredicateException {
+    protected int[] startSolverExplorationWithSolution(SymSolveVector kcv) throws CannotInvokePredicateException {
         stateSpaceExplorer.initialize(kcv);
         Object candidate = stateSpaceExplorer.buildCandidate();
         while (candidate != null) {
@@ -177,7 +177,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return null;
     }
 
-    protected boolean startSolverExplorationNoSymmetryBreak(SymKoratVector kcv) throws CannotInvokePredicateException {
+    protected boolean startSolverExplorationNoSymmetryBreak(SymSolveVector kcv) throws CannotInvokePredicateException {
         stateSpaceExplorer.initialize(kcv);
         Object candidate = stateSpaceExplorer.buildCandidate();
         while (candidate != null) {

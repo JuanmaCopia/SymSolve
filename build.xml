@@ -17,8 +17,8 @@
     <target name="help">
         <echo>
         Korat build options: 
-                build             -- builds SymKorat from source
-                createJar         -- creates symKorat.jar from source
+                build             -- builds SymSolve from source
+                createJar         -- creates symSolve.jar from source
         </echo>
     </target>
 
@@ -53,7 +53,7 @@
         <antcall target="clean" />
         <antcall target="build" />
         <mkdir dir="${BUILD_DIR}" />
-        <jar destfile="${BUILD_DIR}/symKorat.jar" basedir="${BUILD_DIR}">
+        <jar destfile="${BUILD_DIR}/symSolve.jar" basedir="${BUILD_DIR}">
             <manifest>
                 <attribute name="Class-Path" value="commons-cli-1.0.jar javassist.jar junit-4.13.2.jar" />
                 <attribute name="Main-Class" value="symkorat.SymKorat" />
@@ -65,7 +65,7 @@
         <antcall target="clean" />
         <antcall target="build" />
         <mkdir dir="${BUILD_DIR}" />
-        <jar destfile="${BUILD_DIR}/symKorat.jar" basedir="${BUILD_DIR}">
+        <jar destfile="${BUILD_DIR}/symSolve.jar" basedir="${BUILD_DIR}">
             <manifest>
                 <attribute name="Class-Path" value="commons-cli-1.0.jar javassist.jar junit-4.13.2.jar" />
                 <attribute name="Main-Class" value="symkorat.SymKorat" />

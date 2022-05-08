@@ -1,5 +1,5 @@
 
-package symkorat;
+package symsolve;
 
 import java.util.HashMap;
 
@@ -14,7 +14,7 @@ import korat.testing.impl.CannotInvokePredicateException;
  *
  * @author Juan Manuel Copia
  */
-public class SymKorat {
+public class SymSolve {
 
     private Solver solver;
 
@@ -25,7 +25,7 @@ public class SymKorat {
      * @param className        fully qualified name of the class.
      * @param finitizationArgs arguments to be passed to the finitization method.
      */
-    public SymKorat(String className, String finitizationArgs) {
+    public SymSolve(String className, String finitizationArgs) {
         solver = Solver.getInstance();
         try {
             solver.initialize(className, finitizationArgs);
@@ -46,7 +46,7 @@ public class SymKorat {
      * @param cv the vector representing a symbolic instance.
      * @return true if the symbolic structure is SAT, false if it is UNSAT.
      */
-    public boolean isSat(SymKoratVector vector) {
+    public boolean isSat(SymSolveVector vector) {
         boolean result = false;
 
         try {
@@ -70,7 +70,7 @@ public class SymKorat {
      * @return the solution vector if the symbolic structure is SAT, null if it is
      *         UNSAT.
      */
-    public int[] isSatWithSolution(SymKoratVector vector) {
+    public int[] isSatWithSolution(SymSolveVector vector) {
         int[] result = null;
 
         try {
@@ -96,7 +96,7 @@ public class SymKorat {
         boolean result = false;
 
         try {
-            result = solver.startSolverExploration(new SymKoratVector(vector));
+            result = solver.startSolverExploration(new SymSolveVector(vector));
         } catch (CannotInvokePredicateException e) {
             System.err.println("!!! Korat cannot invoke predicate method:");
             System.err.println("      <class> = " + e.getCls().getName());
@@ -114,7 +114,7 @@ public class SymKorat {
      * @param vector the vector representing a symbolic instance.
      * @return true if the symbolic structure is SAT, false if it is UNSAT.
      */
-    public boolean isSatNoSymmetryBreak(SymKoratVector vector) {
+    public boolean isSatNoSymmetryBreak(SymSolveVector vector) {
         boolean result = false;
 
         try {
@@ -140,7 +140,7 @@ public class SymKorat {
         boolean result = false;
 
         try {
-            result = solver.startSolverExplorationNoSymmetryBreak(new SymKoratVector(vector));
+            result = solver.startSolverExplorationNoSymmetryBreak(new SymSolveVector(vector));
         } catch (CannotInvokePredicateException e) {
             System.err.println("!!! Korat cannot invoke predicate method:");
             System.err.println("      <class> = " + e.getCls().getName());
@@ -158,7 +158,7 @@ public class SymKorat {
      * @param vector the vector representing a symbolic instance.
      * @return the result of the automatically derived repOK.
      */
-    public boolean autoHybridRepOK(SymKoratVector vector) {
+    public boolean autoHybridRepOK(SymSolveVector vector) {
         boolean result = false;
 
         try {

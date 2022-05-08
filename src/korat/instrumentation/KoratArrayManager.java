@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 
 import korat.testing.ITester;
 import korat.utils.ReflectionUtils;
-import symkorat.Solver;
+import symsolve.Solver;
 
 /**
  * Class KoratArrayManager provides some helper methods for creation and manipulation

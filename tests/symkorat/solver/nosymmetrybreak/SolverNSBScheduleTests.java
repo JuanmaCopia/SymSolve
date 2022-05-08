@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import symkorat.SymKorat;
+import symsolve.SymSolve;
 
 public class SolverNSBScheduleTests {
 
-        private SymKorat symKorat = new SymKorat("symkorat.examples.schedule.Schedule", "10");
+        private SymSolve symKorat = new SymSolve("symkorat.examples.schedule.Schedule", "10");
 
         @Test
         public void ScheduleSolverTest0() {
