@@ -2,7 +2,7 @@
 A Satisfiability Solver for Symbolic Structures with Complex Representation Invariants
 
 ## Getting Started
-To use the SymKorat please use Java 8.
+To use the SymSolve please use Java 8.
 
 Clone the repository
 ```

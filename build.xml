@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="help" name="SymKorat">
+<project basedir="." default="help" name="SymSolve">
 
     <property environment="env" />
     <property name="BUILD_DIR" value="build" />
@@ -56,7 +56,7 @@
         <jar destfile="${BUILD_DIR}/symSolve.jar" basedir="${BUILD_DIR}">
             <manifest>
                 <attribute name="Class-Path" value="commons-cli-1.0.jar javassist.jar junit-4.13.2.jar" />
-                <attribute name="Main-Class" value="symkorat.SymKorat" />
+                <attribute name="Main-Class" value="symkorat.SymSolve" />
             </manifest>
         </jar>
     </target>
@@ -68,7 +68,7 @@
         <jar destfile="${BUILD_DIR}/symSolve.jar" basedir="${BUILD_DIR}">
             <manifest>
                 <attribute name="Class-Path" value="commons-cli-1.0.jar javassist.jar junit-4.13.2.jar" />
-                <attribute name="Main-Class" value="symkorat.SymKorat" />
+                <attribute name="Main-Class" value="symkorat.SymSolve" />
             </manifest>
             <fileset dir="${BUILD_DIR}" includes="**/*.class"/>
             <fileset dir="src" includes="**/*.java"/>

@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @author Juan Manuel Copia
  */
-public class SymSolveVector {
+public class SymbolicVector {
 
 	public static final int SYMBOLIC = -1;
 
@@ -61,7 +61,7 @@ public class SymSolveVector {
 	 *                       represented with -1).
 	 * @param fixedIndices   The set of Fixed indices in this vector.
 	 */
-	public SymSolveVector(int[] concreteVector, int[] partialVector, Set<Integer> fixedIndices) {
+	public SymbolicVector(int[] concreteVector, int[] partialVector, Set<Integer> fixedIndices) {
 		this.concreteVector = concreteVector;
 		this.fixedIndices = fixedIndices;
 		this.partialVector = partialVector;
@@ -74,7 +74,7 @@ public class SymSolveVector {
 	 *
 	 * @param vector the string representation of the partial vector.
 	 */
-	public SymSolveVector(String vector) {
+	public SymbolicVector(String vector) {
 		String[] vectorValues = vector.split(",");
 		int vectorsSize = vectorValues.length;
 
@@ -83,8 +83,8 @@ public class SymSolveVector {
 		for (int i = 0; i < vectorsSize; i++) {
 			int elem = Integer.parseInt(vectorValues[i]);
 			this.partialVector[i] = elem;
-			if (elem == SymSolveVector.SYMBOLIC) {
-				this.concreteVector[i] = SymSolveVector.NULL;
+			if (elem == SymbolicVector.SYMBOLIC) {
+				this.concreteVector[i] = SymbolicVector.NULL;
 			} else {
 				this.concreteVector[i] = elem;
 				this.fixedIndices.add(i);

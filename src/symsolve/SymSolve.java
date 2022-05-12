@@ -4,13 +4,12 @@ package symsolve;
 import java.util.HashMap;
 
 import korat.finitization.impl.CVElem;
-import korat.testing.impl.CannotFindFinitizationException;
-import korat.testing.impl.CannotFindPredicateException;
-import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 
+import symsolve.explorers.impl.ExplorationStrategy;
+
 /**
- * API for the SymKorat Solver.
+ * API for the SymSolve tool.
  *
  * @author Juan Manuel Copia
  */
@@ -19,8 +18,9 @@ public class SymSolve {
     private Solver solver;
 
     /**
-     * Creates a SymKorat instance to decide satisfiability for the specified class
-     * and bounds.
+     * Creates a SymSolve instance that decides satisfiability of partially symbolic
+     * heaps, represented as vectors, for the specified class and bounds. The search
+     * of the state space of vectors is performed using symmetry breaking enabled.
      *
      * @param className        fully qualified name of the class.
      * @param finitizationArgs arguments to be passed to the finitization method.
@@ -28,150 +28,28 @@ public class SymSolve {
     public SymSolve(String className, String finitizationArgs) {
         solver = Solver.getInstance();
         try {
-            solver.initialize(className, finitizationArgs);
-        } catch (CannotFindFinitizationException e) {
-            e.printStackTrace();
-        } catch (CannotInvokeFinitizationException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (CannotFindPredicateException e) {
+            solver.initialize(new ConfigParameters(className, finitizationArgs));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * Decides whether the symbolic instance represented by a vector is SAT.
+     * Creates a SymSolve instance that decides satisfiability of partially symbolic
+     * heaps, represented as vectors, for the specified class and bounds. The search
+     * of the state space of vectors is performed using the specified strategy.
      *
-     * @param cv the vector representing a symbolic instance.
-     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     * @param className        fully qualified name of the class.
+     * @param finitizationArgs arguments to be passed to the finitization method.
+     * @param stategy          search Strategy to be used by SymSolve.
      */
-    public boolean isSat(SymSolveVector vector) {
-        boolean result = false;
-
+    public SymSolve(String className, String finitizationArgs, ExplorationStrategy strategy) {
+        solver = Solver.getInstance();
         try {
-            result = solver.startSolverExploration(vector);
-        } catch (CannotInvokePredicateException e) {
-            System.err.println("!!! Korat cannot invoke predicate method:");
-            System.err.println("      <class> = " + e.getCls().getName());
-            System.err.println("      <predicate> = " + e.getMethodName());
-            System.err.println();
-            System.err.println("    Stack trace:");
-            e.printStackTrace(System.err);
+            solver.initialize(new ConfigParameters(className, finitizationArgs, strategy));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return result;
-    }
-
-    /**
-     * Decides whether the symbolic instance represented by a vector is SAT. If it
-     * is, returns the vector solution.
-     *
-     * @param cv the vector representing a symbolic instance.
-     * @return the solution vector if the symbolic structure is SAT, null if it is
-     *         UNSAT.
-     */
-    public int[] isSatWithSolution(SymSolveVector vector) {
-        int[] result = null;
-
-        try {
-            result = solver.startSolverExplorationWithSolution(vector);
-        } catch (CannotInvokePredicateException e) {
-            System.err.println("!!! Korat cannot invoke predicate method:");
-            System.err.println("      <class> = " + e.getCls().getName());
-            System.err.println("      <predicate> = " + e.getMethodName());
-            System.err.println();
-            System.err.println("    Stack trace:");
-            e.printStackTrace(System.err);
-        }
-        return result;
-    }
-
-    /**
-     * Decides whether the symbolic instance represented by a string vector is SAT.
-     *
-     * @param vector the vector representing a symbolic instance.
-     * @return true if the symbolic structure is SAT, false if it is UNSAT.
-     */
-    public boolean isSat(String vector) {
-        boolean result = false;
-
-        try {
-            result = solver.startSolverExploration(new SymSolveVector(vector));
-        } catch (CannotInvokePredicateException e) {
-            System.err.println("!!! Korat cannot invoke predicate method:");
-            System.err.println("      <class> = " + e.getCls().getName());
-            System.err.println("      <predicate> = " + e.getMethodName());
-            System.err.println();
-            System.err.println("    Stack trace:");
-            e.printStackTrace(System.err);
-        }
-        return result;
-    }
-
-    /**
-     * Decides whether the symbolic instance represented by a vector is SAT.
-     *
-     * @param vector the vector representing a symbolic instance.
-     * @return true if the symbolic structure is SAT, false if it is UNSAT.
-     */
-    public boolean isSatNoSymmetryBreak(SymSolveVector vector) {
-        boolean result = false;
-
-        try {
-            result = solver.startSolverExplorationNoSymmetryBreak(vector);
-        } catch (CannotInvokePredicateException e) {
-            System.err.println("!!! Korat cannot invoke predicate method:");
-            System.err.println("      <class> = " + e.getCls().getName());
-            System.err.println("      <predicate> = " + e.getMethodName());
-            System.err.println();
-            System.err.println("    Stack trace:");
-            e.printStackTrace(System.err);
-        }
-        return result;
-    }
-
-    /**
-     * Decides whether the symbolic instance represented by a vector is SAT.
-     *
-     * @param vector the vector representing a symbolic instance.
-     * @return true if the symbolic structure is SAT, false if it is UNSAT.
-     */
-    public boolean isSatNoSymmetryBreak(String vector) {
-        boolean result = false;
-
-        try {
-            result = solver.startSolverExplorationNoSymmetryBreak(new SymSolveVector(vector));
-        } catch (CannotInvokePredicateException e) {
-            System.err.println("!!! Korat cannot invoke predicate method:");
-            System.err.println("      <class> = " + e.getCls().getName());
-            System.err.println("      <predicate> = " + e.getMethodName());
-            System.err.println();
-            System.err.println("    Stack trace:");
-            e.printStackTrace(System.err);
-        }
-        return result;
-    }
-
-    /**
-     * Implements the automatically derived hybrid repOK.
-     *
-     * @param vector the vector representing a symbolic instance.
-     * @return the result of the automatically derived repOK.
-     */
-    public boolean autoHybridRepOK(SymSolveVector vector) {
-        boolean result = false;
-
-        try {
-            result = solver.runAutoHybridRepok(vector);
-        } catch (CannotInvokePredicateException e) {
-            System.err.println("!!! Korat cannot invoke predicate method:");
-            System.err.println("      <class> = " + e.getCls().getName());
-            System.err.println("      <predicate> = " + e.getMethodName());
-            System.err.println();
-            System.err.println("    Stack trace:");
-            e.printStackTrace(System.err);
-        }
-        return result;
     }
 
     /**
@@ -185,12 +63,78 @@ public class SymSolve {
     }
 
     /**
-     * Returns the finitization bounds for each class.
+     * Returns a map of class names to maximum bound according to the Finitization
+     * method.
      *
-     * @return A map of simple class names to number of objects.
+     * @return A map of simple class names to maximum number of objects.
      */
     public HashMap<String, Integer> getBounds() {
         return solver.getBounds();
+    }
+
+    /**
+     * Decides whether a partially symbolic instance represented by a vector is SAT.
+     *
+     * @param vector the vector representing a partially symbolic instance.
+     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     */
+    public boolean isSat(SymbolicVector vector) {
+        boolean result = false;
+
+        try {
+            result = solver.startSolverExploration(vector);
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+        }
+        return result;
+    }
+
+    /**
+     * Decides whether a partially symbolic instance represented by a string vector
+     * is SAT.
+     *
+     * @param vector the vector representing a partially symbolic instance.
+     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     */
+    public boolean isSat(String vector) {
+        boolean result = false;
+        try {
+            result = solver.startSolverExploration(new SymbolicVector(vector));
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+        }
+        return result;
+    }
+
+    /**
+     * Decides whether the symbolic instance represented by a vector is SAT. If it
+     * is, returns the vector solution.
+     *
+     * @param cv the vector representing a symbolic instance.
+     * @return the solution vector if the symbolic structure is SAT, null if it is
+     *         UNSAT.
+     */
+    public int[] isSatWithSolution(SymbolicVector vector) {
+        if (isSat(vector))
+            return solver.getCandidateVector();
+        return null;
+    }
+    
+    /**
+     * Decides whether a partially symbolic instance represented by a string vector
+     * is SAT.
+     *
+     * @param vector the vector representing a partially symbolic instance.
+     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     */
+    public boolean isSatAutoHybridRepOK(SymbolicVector vector) {
+        boolean result = false;
+        try {
+            result = solver.runAutoHybridRepok(vector);
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+        }
+        return result;
     }
 
 }

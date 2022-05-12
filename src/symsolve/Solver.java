@@ -18,6 +18,10 @@ import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
+import symsolve.explorers.SymbolicVectorExplorerFactory;
+import symsolve.explorers.impl.SymbolicVectorExplorer;
+import symsolve.explorers.impl.SymbolicVectorExplorerFactoryImpl;
+import symsolve.utils.Helper;
 
 public class Solver extends AbstractTestCaseGenerator implements ITester {
 
@@ -27,7 +31,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
 
     private boolean traceStarted;
 
-    protected Solver() {
+    private Solver() {
         classLoader = new InstrumentingClassLoader();
         Finitization.setClassLoader(classLoader);
     }
@@ -81,7 +85,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
      */
 
     public int[] getCandidateVector() {
-        return stateSpaceExplorer.getCandidateVector().clone();
+        return this.symbolicVectorSpaceExplorer.getCandidateVector().clone();
     }
 
     public boolean isPredicateOK() {
@@ -89,7 +93,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
     }
 
     public IIntList getAccessedFields() {
-        return stateSpaceExplorer.getAccessedFields();
+        return this.symbolicVectorSpaceExplorer.getAccessedFields();
     }
 
     public StateSpace getStateSpace() {
@@ -108,40 +112,28 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
 
     protected boolean predicateOK;
 
-    protected Class<?> clazz;
-
-    protected String[] finArgs;
-
-    Method finMethod;
-
-    IFinitization fin;
-
     Method predicate;
 
-    String[] finitizationArgs;
+    SymbolicVectorExplorer symbolicVectorSpaceExplorer;
 
-    SolverStateSpaceExplorer stateSpaceExplorer;
-
-    protected void initialize(String className, String finArgs) throws ClassNotFoundException,
-            CannotFindFinitizationException, CannotInvokeFinitizationException, CannotFindPredicateException {
-        this.clazz = classLoader.loadClass(className);
-        this.finArgs = finArgs.split(",");
-
-        String[] cs = className.split("\\.");
-        String finName = "fin" + cs[cs.length - 1];
-        this.finMethod = getFinMethod(clazz, finName, this.finArgs);
-
-        this.fin = invokeFinMethod(clazz, this.finMethod, this.finArgs);
-        this.predicate = getPredicateMethod(fin.getFinClass(), "repOK");
+    public void initialize(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
+            CannotInvokeFinitizationException, CannotFindPredicateException {
+        Class<?> clazz = classLoader.loadClass(params.getFullyQualifiedClassName());
+        String[] finArgs = params.getFinitizationArgs();
+        Method finMethod = Helper.getFinMethod(clazz, params.getFinitizationName(), finArgs);
+        IFinitization fin = Helper.invokeFinMethod(clazz, finMethod, finArgs);
+        this.predicate = Helper.getPredicateMethod(fin.getFinClass(), "repOK");
         this.stateSpace = ((Finitization) fin).getStateSpace();
-        stateSpaceExplorer = new SolverStateSpaceExplorer(fin);
-        accessedFields = stateSpaceExplorer.getAccessedFields();
+        SymbolicVectorExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactoryImpl(this.stateSpace);
+        this.symbolicVectorSpaceExplorer = heapExplorerFactory
+                .makeSymoblicVectorExplorer(params.getExplorationStretegy());
+        this.accessedFields = this.symbolicVectorSpaceExplorer.getAccessedFields();
     }
 
-    protected boolean runAutoHybridRepok(SymSolveVector kcv) throws CannotInvokePredicateException {
-        stateSpaceExplorer.initialize(kcv);
-        Set<Integer> fixedIndices = kcv.getFixedIndices();
-        Object candidate = stateSpaceExplorer.buildCandidate();
+    public boolean runAutoHybridRepok(SymbolicVector vector) throws CannotInvokePredicateException {
+        this.symbolicVectorSpaceExplorer.initialize(vector);
+        Set<Integer> fixedIndices = vector.getFixedIndices();
+        Object candidate = this.symbolicVectorSpaceExplorer.buildCandidate();
         if (checkPredicate(candidate, predicate))
             return true;
         else {
@@ -154,106 +146,18 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return false;
     }
 
-    protected boolean startSolverExploration(SymSolveVector kcv) throws CannotInvokePredicateException {
-        stateSpaceExplorer.initialize(kcv);
-        Object candidate = stateSpaceExplorer.buildCandidate();
+    public boolean startSolverExploration(SymbolicVector vector) throws CannotInvokePredicateException {
+        this.symbolicVectorSpaceExplorer.initialize(vector);
+        Object candidate = this.symbolicVectorSpaceExplorer.buildCandidate();
         while (candidate != null) {
             if (checkPredicate(candidate, predicate))
                 return true;
-            candidate = stateSpaceExplorer.getNextCandidate();
+            candidate = this.symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return false;
     }
 
-    protected int[] startSolverExplorationWithSolution(SymSolveVector kcv) throws CannotInvokePredicateException {
-        stateSpaceExplorer.initialize(kcv);
-        Object candidate = stateSpaceExplorer.buildCandidate();
-        while (candidate != null) {
-            if (checkPredicate(candidate, predicate)) {
-                return stateSpaceExplorer.getCandidateVector();
-            }
-            candidate = stateSpaceExplorer.getNextCandidate();
-        }
-        return null;
-    }
-
-    protected boolean startSolverExplorationNoSymmetryBreak(SymSolveVector kcv) throws CannotInvokePredicateException {
-        stateSpaceExplorer.initialize(kcv);
-        Object candidate = stateSpaceExplorer.buildCandidate();
-        while (candidate != null) {
-            if (checkPredicate(candidate, predicate))
-                return true;
-            candidate = stateSpaceExplorer.getNextCandidateNoSymmetryBreak();
-        }
-        return false;
-    }
-
-    private Method getFinMethod(Class<?> cls, String finName, String[] finArgs) throws CannotFindFinitizationException {
-        Method finitize = null;
-        for (Method m : cls.getDeclaredMethods()) {
-            if (finName.equals(m.getName()) && m.getParameterTypes().length == finArgs.length) {
-                finitize = m;
-                break;
-            }
-        }
-        if (finitize == null) {
-            throw new CannotFindFinitizationException(cls, finName);
-        }
-        return finitize;
-    }
-
-    private IFinitization invokeFinMethod(Class<?> cls, Method finitize, String[] finArgs)
-            throws CannotInvokeFinitizationException {
-
-        int paramNumber = finArgs.length;
-        Class<?>[] finArgTypes = finitize.getParameterTypes();
-        Object[] finArgValues = new Object[paramNumber];
-
-        for (int i = 0; i < paramNumber; i++) {
-            Class<?> clazz = finArgTypes[i];
-            String arg = finArgs[i].trim();
-            Object val;
-
-            if (clazz == boolean.class || clazz == Boolean.class) {
-                val = Boolean.parseBoolean(arg);
-            } else if (clazz == byte.class || clazz == Byte.class) {
-                val = Byte.parseByte(arg);
-            } else if (clazz == double.class || clazz == Double.class) {
-                val = Double.parseDouble(arg);
-            } else if (clazz == float.class || clazz == Float.class) {
-                val = Float.parseFloat(arg);
-            } else if (clazz == int.class || clazz == Integer.class) {
-                val = Integer.parseInt(arg);
-            } else if (clazz == long.class || clazz == Long.class) {
-                val = Long.parseLong(arg);
-            } else if (clazz == short.class || clazz == Short.class) {
-                val = Short.parseShort(arg);
-            } else if (clazz == String.class) {
-                val = arg;
-            } else
-                throw new CannotInvokeFinitizationException(cls, finitize.getName(),
-                        "Only parameters of primitive classes are allowed");
-
-            finArgValues[i] = val;
-        }
-
-        try {
-            return (IFinitization) finitize.invoke(null, (Object[]) finArgValues);
-        } catch (Exception e) {
-            throw new CannotInvokeFinitizationException(cls, finitize.getName(), e);
-        }
-
-    }
-
-    protected Method getPredicateMethod(Class<?> testClass, String predicateName) throws CannotFindPredicateException {
-        try {
-            return testClass.getMethod(predicateName, (Class[]) null);
-        } catch (Exception e) {
-            throw new CannotFindPredicateException(testClass, predicateName, e);
-        }
-    }
-
-    protected boolean checkPredicate(Object testCase, Method predicate) throws CannotInvokePredicateException {
+    private boolean checkPredicate(Object testCase, Method predicate) throws CannotInvokePredicateException {
         startFieldTrace();
         try {
             return (Boolean) predicate.invoke(testCase, (Object[]) null);
@@ -264,7 +168,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         }
     }
 
-    protected HashMap<String, Integer> getBounds() {
+    public HashMap<String, Integer> getBounds() {
         HashMap<String, Integer> bounds = new HashMap<String, Integer>();
         CVElem[] structureList = stateSpace.getStructureList();
         for (int i = 0; i < structureList.length; i++) {
