@@ -1,4 +1,4 @@
-package symsolve.explorers;
+package symsolve.explorers.impl;
 
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;

@@ -1,4 +1,4 @@
-package symsolve.explorers;
+package symsolve.explorers.impl;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -9,8 +9,9 @@ import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
 import symsolve.SymbolicVector;
+import symsolve.explorers.VectorStateSpaceExplorer;
 
-public class SymmetryBreakingExplorer {
+public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
 
     protected StateSpace stateSpace;
 

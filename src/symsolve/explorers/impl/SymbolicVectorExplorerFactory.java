@@ -1,9 +1,11 @@
-package symsolve.explorers;
+package symsolve.explorers.impl;
 
 import korat.finitization.impl.StateSpace;
-import symsolve.explorers.SymbolicVectorExplorerFactory;
+import symsolve.explorers.VectorStateSpaceExplorer;
+import symsolve.explorers.VectorStateSpaceExplorerFactory;
+import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
 
-public class SymbolicVectorExplorerFactory {
+public class SymbolicVectorExplorerFactory implements VectorStateSpaceExplorerFactory {
 
     StateSpace stateSpace;
 
@@ -11,7 +13,7 @@ public class SymbolicVectorExplorerFactory {
         this.stateSpace = stateSpace;
     }
 
-    public SymmetryBreakingExplorer makeSymoblicVectorExplorer(ExplorationStrategy strategy) {
+    public VectorStateSpaceExplorer makeSymoblicVectorExplorer(ExplorationStrategy strategy) {
         switch (strategy) {
         case SYMMETRY_BREAK:
             return new SymmetryBreakingExplorer(this.stateSpace);

@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import korat.finitization.impl.CVElem;
 import korat.testing.impl.CannotInvokePredicateException;
-import symsolve.explorers.ExplorationStrategy;
+import symsolve.explorers.impl.ExplorationStrategy;
 
 /**
  * API for the SymSolve tool.

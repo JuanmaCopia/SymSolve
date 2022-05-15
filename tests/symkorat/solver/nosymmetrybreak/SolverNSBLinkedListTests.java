@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import symsolve.SymSolve;
-import symsolve.explorers.ExplorationStrategy;
+import symsolve.explorers.impl.ExplorationStrategy;
 
 public class SolverNSBLinkedListTests {
 

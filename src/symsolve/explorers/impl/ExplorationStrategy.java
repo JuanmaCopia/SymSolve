@@ -1,4 +1,4 @@
-package symsolve.explorers;
+package symsolve.explorers.impl;
 
 public enum ExplorationStrategy {
     SYMMETRY_BREAK,

@@ -18,8 +18,9 @@ import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
-import symsolve.explorers.SymbolicVectorExplorerFactory;
-import symsolve.explorers.SymmetryBreakingExplorer;
+import symsolve.explorers.VectorStateSpaceExplorer;
+import symsolve.explorers.VectorStateSpaceExplorerFactory;
+import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
 import symsolve.utils.Helper;
 
 public class Solver extends AbstractTestCaseGenerator implements ITester {
@@ -101,7 +102,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
 
     private Method predicate;
 
-    private SymmetryBreakingExplorer symbolicVectorSpaceExplorer;
+    private VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
 
     private CandidateBuilder candidateBuilder;
 
@@ -113,7 +114,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         IFinitization fin = Helper.invokeFinMethod(clazz, finMethod, finArgs);
         this.predicate = Helper.getPredicateMethod(fin.getFinClass(), "repOK");
         this.stateSpace = ((Finitization) fin).getStateSpace();
-        SymbolicVectorExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(this.stateSpace);
+        VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(this.stateSpace);
         this.symbolicVectorSpaceExplorer = heapExplorerFactory
                 .makeSymoblicVectorExplorer(params.getExplorationStretegy());
         this.accessedFields = this.symbolicVectorSpaceExplorer.getAccessedFields();
