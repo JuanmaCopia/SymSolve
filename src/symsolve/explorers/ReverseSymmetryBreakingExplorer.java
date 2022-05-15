@@ -1,15 +1,16 @@
-package symsolve.explorers.impl;
+package symsolve.explorers;
 
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 
-public class SymmetryBreakingExplorer extends SymbolicVectorExplorer {
+public class ReverseSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
 
-    public SymmetryBreakingExplorer(StateSpace stateSpace) {
+    public ReverseSymmetryBreakingExplorer(StateSpace stateSpace) {
         super(stateSpace);
     }
-
+    
+    @Override
     protected boolean setNextValue(int lastAccessedFieldIndex) {
         CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
         if (fixedIndices.contains(lastAccessedFieldIndex) || lastAccessedField.isExcludedFromSearch())
@@ -20,28 +21,37 @@ public class SymmetryBreakingExplorer extends SymbolicVectorExplorer {
         int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
         int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
 
-        if (currentInstanceIndex >= maxInstanceIndexForFieldDomain)
-            return false;
-
         if (lastAccessedFD.isPrimitiveType()) {
+            if (currentInstanceIndex >= maxInstanceIndexForFieldDomain) {
+                return false;
+            }
             candidateVector[lastAccessedFieldIndex]++;
             return true;
         }
-
         // Is a reference field
-        if (maxInstances[lastAccessedFieldIndex] == -1) {
-            maxInstances[lastAccessedFieldIndex] = getMaxInstanceInVector(lastAccessedFD, currentInstanceIndex);
+
+        if (!isInitialized[lastAccessedFieldIndex]) {
+            isInitialized[lastAccessedFieldIndex] = true;
+            int maxInstanceIndexInVector = getMaxInstanceInVector(lastAccessedFD, currentInstanceIndex);
+            if (maxInstanceIndexInVector >= maxInstanceIndexForFieldDomain) {
+                candidateVector[lastAccessedFieldIndex] = maxInstanceIndexInVector;
+            } else {
+                candidateVector[lastAccessedFieldIndex] = maxInstanceIndexInVector + 1;
+            }
+            return true;
         }
-        if (currentInstanceIndex <= maxInstances[lastAccessedFieldIndex]) {
-            candidateVector[lastAccessedFieldIndex]++;
+
+        if (currentInstanceIndex > 1) {
+            candidateVector[lastAccessedFieldIndex]--;
             return true;
         }
         return false;
     }
-
+    
+    @Override
     protected void backtrack(int lastAccessedFieldIndex) {
         candidateVector[lastAccessedFieldIndex] = 0;
-        maxInstances[lastAccessedFieldIndex] = -1;
+        isInitialized[lastAccessedFieldIndex] = false;
     }
 
 }

@@ -91,6 +91,10 @@ public class SymbolicVector {
             }
         }
     }
+    
+    public boolean isSymbolicIndex(int index) {
+        return !this.fixedIndices.contains(index);
+    }
 
     @Override
     public String toString() {

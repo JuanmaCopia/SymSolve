@@ -1,6 +1,6 @@
 package symsolve;
 
-import symsolve.explorers.impl.ExplorationStrategy;
+import symsolve.explorers.ExplorationStrategy;
 
 public class ConfigParameters {
 

@@ -1,20 +1,18 @@
-package symsolve.explorers.impl;
+package symsolve.explorers;
 
 import java.util.HashMap;
 import java.util.Set;
 
-import korat.finitization.impl.CandidateBuilder;
+import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
 import symsolve.SymbolicVector;
 
-public abstract class SymbolicVectorExplorer {
+public class SymmetryBreakingExplorer {
 
     protected StateSpace stateSpace;
-
-    protected CandidateBuilder candidateBuilder;
 
     protected int[] candidateVector;
 
@@ -32,7 +30,7 @@ public abstract class SymbolicVectorExplorer {
 
     protected HashMap<FieldDomain, Integer> maxFixedInstances;
 
-    public SymbolicVectorExplorer(StateSpace stateSpace) {
+    public SymmetryBreakingExplorer(StateSpace stateSpace) {
         this.stateSpace = stateSpace;
         vectorSize = stateSpace.getTotalNumberOfFields();
         this.isInitialized = new boolean[vectorSize];
@@ -40,19 +38,18 @@ public abstract class SymbolicVectorExplorer {
         accessedFields = new IntListAI(vectorSize);
         changedFields = new IntListAI(vectorSize);
         fixedIndices = new IntListAI(vectorSize);
-        candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
     }
 
     public IIntList getAccessedFields() {
         return accessedFields;
     }
+    
+    public IIntList getChangedFields() {
+        return changedFields;
+    }
 
     public int[] getCandidateVector() {
         return candidateVector;
-    }
-
-    public Object buildCandidate() {
-        return candidateBuilder.buildCandidate(candidateVector);
     }
 
     public void initialize(SymbolicVector vector) {
@@ -60,7 +57,7 @@ public abstract class SymbolicVectorExplorer {
         resetExplorerState();
         initializeMaxFixedInstances(vector.getFixedIndices());
     }
-    
+
     private void setCandidateVector(int[] vector) {
         this.candidateVector = vector;
         if (vectorSize != this.candidateVector.length)
@@ -88,7 +85,7 @@ public abstract class SymbolicVectorExplorer {
             }
         }
     }
-    
+
     private int getMaxFixedInstanceForFieldDomain(FieldDomain fieldDomain, int currentIndexValue) {
         Integer maxInstance = maxFixedInstances.get(fieldDomain);
         if (maxInstance == null) {
@@ -98,6 +95,46 @@ public abstract class SymbolicVectorExplorer {
                 maxInstance = 0;
         }
         return Math.max(maxInstance, currentIndexValue);
+    }
+
+    public int[] getNextCandidate() {
+        changedFields.clear();
+        while (!accessedFields.isEmpty()) {
+            int lastAccessedFieldIndex = accessedFields.removeLast();
+            if (setNextValue(lastAccessedFieldIndex))
+                return candidateVector;
+            backtrack(lastAccessedFieldIndex);
+        }
+        return null;
+    }
+
+    protected boolean setNextValue(int lastAccessedFieldIndex) {
+        CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
+        if (fixedIndices.contains(lastAccessedFieldIndex) || lastAccessedField.isExcludedFromSearch())
+            return false;
+
+        changedFields.add(lastAccessedFieldIndex);
+        FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
+        int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
+        int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
+
+        if (currentInstanceIndex >= maxInstanceIndexForFieldDomain)
+            return false;
+
+        if (lastAccessedFD.isPrimitiveType()) {
+            candidateVector[lastAccessedFieldIndex]++;
+            return true;
+        }
+
+        // Is a reference field
+        if (maxInstances[lastAccessedFieldIndex] == -1) {
+            maxInstances[lastAccessedFieldIndex] = getMaxInstanceInVector(lastAccessedFD, currentInstanceIndex);
+        }
+        if (currentInstanceIndex <= maxInstances[lastAccessedFieldIndex]) {
+            candidateVector[lastAccessedFieldIndex]++;
+            return true;
+        }
+        return false;
     }
 
     protected int getMaxInstanceInVector(FieldDomain fieldDomain, int currentInstanceIndex) {
@@ -116,19 +153,9 @@ public abstract class SymbolicVectorExplorer {
         return maxInstance;
     }
 
-    public Object getNextCandidate() {
-        changedFields.clear();
-        while (!accessedFields.isEmpty()) {
-            int lastAccessedFieldIndex = accessedFields.removeLast();
-            if (setNextValue(lastAccessedFieldIndex))
-                return candidateBuilder.buildCandidate(candidateVector);
-            backtrack(lastAccessedFieldIndex);
-        }
-        return null;
+    protected void backtrack(int lastAccessedFieldIndex) {
+        candidateVector[lastAccessedFieldIndex] = 0;
+        maxInstances[lastAccessedFieldIndex] = -1;
     }
-
-    protected abstract void backtrack(int lastAccessedFieldIndex);
-
-    protected abstract boolean setNextValue(int lastAccessedFieldIndex);
 
 }

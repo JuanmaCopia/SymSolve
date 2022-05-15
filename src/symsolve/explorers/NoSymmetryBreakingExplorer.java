@@ -1,15 +1,16 @@
-package symsolve.explorers.impl;
+package symsolve.explorers;
 
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 
-public class NoSymmetryBreakingExplorer extends SymbolicVectorExplorer {
+public class NoSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
 
     public NoSymmetryBreakingExplorer(StateSpace stateSpace) {
         super(stateSpace);
     }
 
+    @Override
     protected boolean setNextValue(int lastAccessedFieldIndex) {
         CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
         FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
@@ -28,6 +29,7 @@ public class NoSymmetryBreakingExplorer extends SymbolicVectorExplorer {
         return true;
     }
 
+    @Override
     protected void backtrack(int lastAccessedFieldIndex) {
         candidateVector[lastAccessedFieldIndex] = 0;
     }
