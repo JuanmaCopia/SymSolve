@@ -2,6 +2,7 @@ package symsolve;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Set;
 
 import korat.finitization.IFinitization;
 import korat.finitization.impl.CVElem;
@@ -121,16 +122,16 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         IIntList changedFields = this.symbolicVectorSpaceExplorer.getChangedFields();
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
     }
-
-    public boolean runAutoHybridRepok(SymbolicVector initialVector) throws CannotInvokePredicateException {
-        int[] vector = initialVector.getConcreteVector();
-        Object candidate = candidateBuilder.buildCandidate(vector);
-        if (!checkPredicate(candidate) && !symbolicFieldsAccessed(initialVector))
-            return false;
-        return true;
+    
+    public boolean runAutoHybridRepok(SymbolicVector vector) throws CannotInvokePredicateException {
+        this.symbolicVectorSpaceExplorer.initialize(vector);
+        Object candidate = this.candidateBuilder.buildCandidate(vector.getConcreteVector());
+        if (checkPredicate(candidate))
+            return true;
+        return areSymbolicFieldsAccessed(vector);
     }
 
-    private boolean symbolicFieldsAccessed(SymbolicVector vector) {
+    private boolean areSymbolicFieldsAccessed(SymbolicVector vector) {
         for (int i = 0; i < accessedFields.numberOfElements(); i++) {
             int index = accessedFields.get(i);
             if (vector.isSymbolicIndex(index))
