@@ -63,8 +63,8 @@ public class SymSolve {
     }
 
     /**
-     * Returns a map of class names to maximum bound according to the Finitization
-     * method.
+     * Returns a map of class names to the maximum number of allowed objects
+     * (bounds) of that class to construct possible concretizations.
      *
      * @return A map of simple class names to maximum number of objects.
      */
@@ -119,10 +119,10 @@ public class SymSolve {
             return solver.getCandidateVector();
         return null;
     }
-    
+
     /**
      * Decides whether a partially symbolic instance represented by a string vector
-     * is SAT.
+     * is SAT according to the hybrid repOK strategy.
      *
      * @param vector the vector representing a partially symbolic instance.
      * @return true if the symbolic structure is SAT, false if it is UNSAT.

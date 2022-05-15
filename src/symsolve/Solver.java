@@ -44,11 +44,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return classLoader;
     }
 
-    /*
-     * -------------------------------------------------------------------------
-     * Implementation of ITester interface.
-     * -------------------------------------------------------------------------
-     */
+    // Implementation of ITester interface:
 
     public void startFieldTrace() {
         traceStarted = true;
@@ -78,11 +74,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
             accessedFields.add(accessedFieldIndex);
     }
 
-    /*
-     * -------------------------------------------------------------------------
-     * Info that listeners may query in the middle of the search process.
-     * -------------------------------------------------------------------------
-     */
+    // Info that listeners may query in the middle of the search process:
 
     public int[] getCandidateVector() {
         return this.symbolicVectorSpaceExplorer.getCandidateVector().clone();
@@ -100,23 +92,19 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return stateSpace;
     }
 
-    /*
-     * -------------------------------------------------------------------------
-     * Internal stuff.
-     * -------------------------------------------------------------------------
-     */
+    // Search related:
 
-    protected StateSpace stateSpace;
+    private StateSpace stateSpace;
 
-    protected IIntList accessedFields;
+    private IIntList accessedFields;
 
-    protected boolean predicateOK;
+    private boolean predicateOK;
 
-    Method predicate;
+    private Method predicate;
 
-    SymbolicVectorExplorer symbolicVectorSpaceExplorer;
+    private SymbolicVectorExplorer symbolicVectorSpaceExplorer;
 
-    public void initialize(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
+    protected void initialize(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
         Class<?> clazz = classLoader.loadClass(params.getFullyQualifiedClassName());
         String[] finArgs = params.getFinitizationArgs();
