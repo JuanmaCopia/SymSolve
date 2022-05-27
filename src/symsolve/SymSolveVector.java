@@ -10,17 +10,19 @@ import java.util.Set;
  *
  * @author Juan Manuel Copia
  */
-public class SymbolicVector {
+public class SymSolveVector {
 
     public static final int SYMBOLIC = -1;
 
     public static final int NULL = 0;
 
-    private int[] concreteVector;
+    int size;
 
-    private int[] partialVector;
+    int[] concreteVector;
 
-    private Set<Integer> fixedIndices = new HashSet<Integer>();
+    int[] partialVector;
+
+    Set<Integer> fixedIndices = new HashSet<Integer>();
 
     /**
      * Returns the partial vector representation of this vector. i.e. symbolic
@@ -61,10 +63,22 @@ public class SymbolicVector {
      *                       represented with -1).
      * @param fixedIndices   The set of Fixed indices in this vector.
      */
-    public SymbolicVector(int[] concreteVector, int[] partialVector, Set<Integer> fixedIndices) {
+    public SymSolveVector(int[] concreteVector, Set<Integer> fixedIndices) {
+        this.size = concreteVector.length;
         this.concreteVector = concreteVector;
         this.fixedIndices = fixedIndices;
-        this.partialVector = partialVector;
+        this.partialVector = createPartialVector();
+    }
+
+    private int[] createPartialVector() {
+        int[] partialVector = new int[this.size];
+        for (int i = 0; i < this.size; i++) {
+            if (this.fixedIndices.contains(i))
+                partialVector[i] = this.concreteVector[i];
+            else
+                partialVector[i] = SYMBOLIC;
+        }
+        return partialVector;
     }
 
     /**
@@ -74,24 +88,24 @@ public class SymbolicVector {
      *
      * @param vector the string representation of the partial vector.
      */
-    public SymbolicVector(String vector) {
+    public SymSolveVector(String vector) {
         String[] vectorValues = vector.split(",");
-        int vectorsSize = vectorValues.length;
+        this.size = vectorValues.length;
 
-        this.concreteVector = new int[vectorsSize];
-        this.partialVector = new int[vectorsSize];
-        for (int i = 0; i < vectorsSize; i++) {
+        this.concreteVector = new int[size];
+        this.partialVector = new int[size];
+        for (int i = 0; i < size; i++) {
             int elem = Integer.parseInt(vectorValues[i]);
             this.partialVector[i] = elem;
-            if (elem == SymbolicVector.SYMBOLIC) {
-                this.concreteVector[i] = SymbolicVector.NULL;
+            if (elem == SymSolveVector.SYMBOLIC) {
+                this.concreteVector[i] = SymSolveVector.NULL;
             } else {
                 this.concreteVector[i] = elem;
                 this.fixedIndices.add(i);
             }
         }
     }
-    
+
     public boolean isSymbolicIndex(int index) {
         return !this.fixedIndices.contains(index);
     }

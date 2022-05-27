@@ -46,6 +46,10 @@ public class TreeMap {
     }
 
     
+    public boolean repOKPrim() {
+        return false;
+    }
+    
     public boolean repOK() {
 		if (root == null)
 			return true;

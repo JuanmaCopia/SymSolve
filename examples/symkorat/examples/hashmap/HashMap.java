@@ -146,5 +146,8 @@ public class HashMap {
 		public int hash;
 		public Entry next;
 	}
-
+	
+	public boolean repOKPrim() {
+        return false;
+    }
 }

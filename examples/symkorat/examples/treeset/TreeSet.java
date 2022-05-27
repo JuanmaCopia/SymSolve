@@ -31,5 +31,8 @@ public class TreeSet {
 			return false;
 		return m.repOK();
 	}
-
+    
+    public boolean repOKPrim() {
+        return false;
+    }
 }

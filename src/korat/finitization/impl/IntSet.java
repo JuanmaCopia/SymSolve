@@ -1,5 +1,8 @@
 package korat.finitization.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import korat.finitization.IIntSet;
 
 /**
@@ -9,6 +12,8 @@ import korat.finitization.IIntSet;
 
 // TODO: maybe better NumericTypeSet
 public class IntSet extends PrimitiveTypeSet implements IIntSet {
+    
+    Map<Integer, Integer> valueIndexMap = new HashMap<Integer, Integer>();
 
     IntSet(int min, int diff, int max) {
         super(int.class);
@@ -33,11 +38,13 @@ public class IntSet extends PrimitiveTypeSet implements IIntSet {
 
     public void addRange(int min, int diff, int max) {
         int i = min;
-        while (i < max) {
+        int count = 0;
+        while (i <= max) {
             primitives.add(i);
+            valueIndexMap.put(i, count);
             i += diff;
+            count++;
         }
-        primitives.add(max);
     }
 
     public int getInt(int index) {
@@ -50,6 +57,10 @@ public class IntSet extends PrimitiveTypeSet implements IIntSet {
             ints[i] = getInt(i);
 
         return ints;
+    }
+    
+    public Map<Integer, Integer> getValueIndexMap() {
+        return valueIndexMap;
     }
 
     public int getMin() {

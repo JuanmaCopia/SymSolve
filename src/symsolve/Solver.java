@@ -2,7 +2,6 @@ package symsolve;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Set;
 
 import korat.finitization.IFinitization;
 import korat.finitization.impl.CVElem;
@@ -19,9 +18,11 @@ import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
+
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.VectorStateSpaceExplorerFactory;
 import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
+import symsolve.utils.CodeGenerator;
 import symsolve.utils.Helper;
 
 public class Solver extends AbstractTestCaseGenerator implements ITester {
@@ -102,10 +103,14 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
     private boolean predicateOK;
 
     private Method predicate;
+    
+    private Method predicateWithPrimitives;
 
     private VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
 
     private CandidateBuilder candidateBuilder;
+
+    private CodeGenerator codeGenerator;
 
     protected void initialize(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
@@ -114,6 +119,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         Method finMethod = Helper.getFinMethod(clazz, params.getFinitizationName(), finArgs);
         IFinitization fin = Helper.invokeFinMethod(clazz, finMethod, finArgs);
         this.predicate = Helper.getPredicateMethod(fin.getFinClass(), "repOK");
+        this.predicateWithPrimitives = Helper.getPredicateMethod(fin.getFinClass(), "repOKPrim");
         this.stateSpace = ((Finitization) fin).getStateSpace();
         VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(this.stateSpace);
         this.symbolicVectorSpaceExplorer = heapExplorerFactory
@@ -121,17 +127,18 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         this.accessedFields = this.symbolicVectorSpaceExplorer.getAccessedFields();
         IIntList changedFields = this.symbolicVectorSpaceExplorer.getChangedFields();
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
+        codeGenerator = new CodeGenerator(clazz);
     }
-    
-    public boolean runAutoHybridRepok(SymbolicVector vector) throws CannotInvokePredicateException {
+
+    public boolean runAutoHybridRepok(SymSolveVector vector) throws CannotInvokePredicateException {
         this.symbolicVectorSpaceExplorer.initialize(vector);
         Object candidate = this.candidateBuilder.buildCandidate(vector.getConcreteVector());
-        if (checkPredicate(candidate))
+        if (checkPredicate(this.predicate, candidate))
             return true;
         return areSymbolicFieldsAccessed(vector);
     }
 
-    private boolean areSymbolicFieldsAccessed(SymbolicVector vector) {
+    private boolean areSymbolicFieldsAccessed(SymSolveVector vector) {
         for (int i = 0; i < accessedFields.numberOfElements(); i++) {
             int index = accessedFields.get(i);
             if (vector.isSymbolicIndex(index))
@@ -140,24 +147,36 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return false;
     }
 
-    public boolean startSolverExploration(SymbolicVector initialVector) throws CannotInvokePredicateException {
+    public boolean startSolverExploration(SymSolveVector initialVector) throws CannotInvokePredicateException {
         this.symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = initialVector.getConcreteVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
-            if (checkPredicate(candidate))
+            if (checkPredicate(this.predicate, candidate))
+                return true;
+            vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+        }
+        return false;
+    }
+    
+    public boolean startSolverExplorationWithPrimitives(SymSolveVector initialVector) throws CannotInvokePredicateException {
+        this.symbolicVectorSpaceExplorer.initialize(initialVector);
+        int[] vector = initialVector.getConcreteVector();
+        while (vector != null) {
+            Object candidate = candidateBuilder.buildCandidate(vector);
+            if (checkPredicate(this.predicateWithPrimitives, candidate))
                 return true;
             vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return false;
     }
 
-    private boolean checkPredicate(Object testCase) throws CannotInvokePredicateException {
+    private boolean checkPredicate(Method pred, Object testCase) throws CannotInvokePredicateException {
         startFieldTrace();
         try {
-            return (Boolean) predicate.invoke(testCase, (Object[]) null);
+            return (Boolean) pred.invoke(testCase, (Object[]) null);
         } catch (Exception e) {
-            throw new CannotInvokePredicateException(testCase.getClass(), predicate.getName(), e.getMessage(), e);
+            throw new CannotInvokePredicateException(testCase.getClass(), pred.getName(), e.getMessage(), e);
         } finally {
             stopFieldTrace();
         }
@@ -179,6 +198,10 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
             }
         }
         return bounds;
+    }
+
+    public String generateStructureCode(int[] vector) {
+        return codeGenerator.generateStructureCode(stateSpace, vector);
     }
 
 }

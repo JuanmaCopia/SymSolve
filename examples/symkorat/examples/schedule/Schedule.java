@@ -93,6 +93,9 @@ public class Schedule {
         return true;
 	}
 	
+	public boolean repOKPrim() {
+        return false;
+    }
 	
     public boolean repOK() {
     	if (

@@ -54,5 +54,8 @@ public class LinkedList {
 		
 		return true;
 	}
-
+	
+	public boolean repOKPrim() {
+        return false;
+    }
 }

@@ -77,7 +77,7 @@ public class SymSolve {
      * @param vector the vector representing a partially symbolic instance.
      * @return true if the symbolic structure is SAT, false if it is UNSAT.
      */
-    public boolean isSat(SymbolicVector vector) {
+    public boolean isSat(SymSolveVector vector) {
         boolean result = false;
 
         try {
@@ -98,12 +98,25 @@ public class SymSolve {
     public boolean isSat(String vector) {
         boolean result = false;
         try {
-            result = solver.startSolverExploration(new SymbolicVector(vector));
+            result = solver.startSolverExploration(new SymSolveVector(vector));
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
         return result;
     }
+    
+    
+    public boolean isSatPrimitives(SymSolveVector vector) {
+        boolean result = false;
+
+        try {
+            result = solver.startSolverExplorationWithPrimitives(vector);
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+        }
+        return result;
+    }
+    
 
     /**
      * Decides whether the symbolic instance represented by a vector is SAT. If it
@@ -113,8 +126,14 @@ public class SymSolve {
      * @return the solution vector if the symbolic structure is SAT, null if it is
      *         UNSAT.
      */
-    public int[] isSatWithSolution(SymbolicVector vector) {
+    public int[] isSatWithSolution(SymSolveVector vector) {
         if (isSat(vector))
+            return solver.getCandidateVector();
+        return null;
+    }
+    
+    public int[] isSatPrimitivesWithSolution(SymSolveVector vector) {
+        if (isSatPrimitives(vector))
             return solver.getCandidateVector();
         return null;
     }
@@ -126,7 +145,7 @@ public class SymSolve {
      * @param vector the vector representing a partially symbolic instance.
      * @return true if the symbolic structure is SAT, false if it is UNSAT.
      */
-    public boolean isSatAutoHybridRepOK(SymbolicVector vector) {
+    public boolean isSatAutoHybridRepOK(SymSolveVector vector) {
         boolean result = false;
         try {
             result = solver.runAutoHybridRepok(vector);
@@ -134,6 +153,15 @@ public class SymSolve {
             e.printStackTrace(System.err);
         }
         return result;
+    }
+    
+    /**
+     * 
+     * @param solutionVector
+     * @return
+     */
+    public String generateStructureCode(int[] solutionVector) {
+        return solver.generateStructureCode(solutionVector);
     }
 
 }

@@ -1,14 +1,17 @@
 package symsolve.explorers.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
+import korat.finitization.impl.IntSet;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
-import symsolve.SymbolicVector;
+import symsolve.SymSolveVector;
 import symsolve.explorers.VectorStateSpaceExplorer;
 
 public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
@@ -53,7 +56,7 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
         return candidateVector;
     }
 
-    public void initialize(SymbolicVector vector) {
+    public void initialize(SymSolveVector vector) {
         setCandidateVector(vector.getConcreteVector());
         resetExplorerState();
         initializeMaxFixedInstances(vector.getFixedIndices());
