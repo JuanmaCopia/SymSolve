@@ -170,6 +170,17 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         }
         return false;
     }
+    
+    public int[] searchOtherSolution() throws CannotInvokePredicateException {
+        int[] vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+        while (vector != null) {
+            Object candidate = candidateBuilder.buildCandidate(vector);
+            if (checkPredicate(this.predicateWithPrimitives, candidate))
+                return getCandidateVector();
+            vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+        }
+        return null;
+    }
 
     private boolean checkPredicate(Method pred, Object testCase) throws CannotInvokePredicateException {
         startFieldTrace();

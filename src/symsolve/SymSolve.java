@@ -89,6 +89,20 @@ public class SymSolve {
     }
 
     /**
+     * Decides whether the symbolic instance represented by a vector is SAT. If it
+     * is, returns the vector solution.
+     *
+     * @param cv the vector representing a symbolic instance.
+     * @return the solution vector if the symbolic structure is SAT, null if it is
+     *         UNSAT.
+     */
+    public int[] isSatWithSolution(SymSolveVector vector) {
+        if (isSat(vector))
+            return solver.getCandidateVector();
+        return null;
+    }
+
+    /**
      * Decides whether a partially symbolic instance represented by a string vector
      * is SAT.
      *
@@ -104,8 +118,13 @@ public class SymSolve {
         }
         return result;
     }
-    
-    
+
+    public int[] isSatPrimitivesWithSolution(SymSolveVector vector) {
+        if (isSatPrimitives(vector))
+            return solver.getCandidateVector();
+        return null;
+    }
+
     public boolean isSatPrimitives(SymSolveVector vector) {
         boolean result = false;
 
@@ -117,25 +136,14 @@ public class SymSolve {
         return result;
     }
     
-
-    /**
-     * Decides whether the symbolic instance represented by a vector is SAT. If it
-     * is, returns the vector solution.
-     *
-     * @param cv the vector representing a symbolic instance.
-     * @return the solution vector if the symbolic structure is SAT, null if it is
-     *         UNSAT.
-     */
-    public int[] isSatWithSolution(SymSolveVector vector) {
-        if (isSat(vector))
-            return solver.getCandidateVector();
-        return null;
-    }
-    
-    public int[] isSatPrimitivesWithSolution(SymSolveVector vector) {
-        if (isSatPrimitives(vector))
-            return solver.getCandidateVector();
-        return null;
+    public int[] searchOtherSolution() {
+        int[] result = null;
+        try {
+            result = solver.searchOtherSolution();
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+        }
+        return result;
     }
 
     /**
@@ -154,7 +162,7 @@ public class SymSolve {
         }
         return result;
     }
-    
+
     /**
      * 
      * @param solutionVector
