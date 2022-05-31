@@ -13,7 +13,7 @@ public class SymbolicVectorExplorerFactory implements VectorStateSpaceExplorerFa
         this.stateSpace = stateSpace;
     }
 
-    public VectorStateSpaceExplorer makeSymoblicVectorExplorer(ExplorationStrategy strategy) {
+    public VectorStateSpaceExplorer makeSymoblicVectorExplorer(SymmetryBreakStrategy strategy) {
         switch (strategy) {
         case SYMMETRY_BREAK:
             return new SymmetryBreakingExplorer(this.stateSpace);

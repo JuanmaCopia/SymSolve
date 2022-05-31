@@ -1,26 +1,32 @@
 package symsolve;
 
-import symsolve.explorers.impl.ExplorationStrategy;
+import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 public class ConfigParameters {
+    
+    static final String DEFAULT_PREDICATE_NAME = "repOK";
+    static final SymmetryBreakStrategy DEFAULT_SBREAK_STRATEGY = SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE;
 
     String fullClassName;
     String[] finitizationArgs;
     String finitizationName;
-    ExplorationStrategy strategy;
-
-    public ConfigParameters(String fullClassName, String finitizationArgs, ExplorationStrategy strategy) {
+    String predicateName;
+    SymmetryBreakStrategy symmetryBreakStrategy;
+    
+    public ConfigParameters(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, String predicateName) {
         this.fullClassName = fullClassName;
         this.finitizationArgs = finitizationArgs.split(",");
         this.finitizationName = calculateFinitizationName(fullClassName);
-        this.strategy = strategy;
+        this.symmetryBreakStrategy = symmetryBreakingStrategy;
+        this.predicateName = predicateName;
+    }
+
+    public ConfigParameters(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy) {
+        this(fullClassName, finitizationArgs, symmetryBreakingStrategy, DEFAULT_PREDICATE_NAME);
     }
 
     public ConfigParameters(String fullClassName, String finitizationArgs) {
-        this.fullClassName = fullClassName;
-        this.finitizationArgs = finitizationArgs.split(",");
-        this.finitizationName = calculateFinitizationName(fullClassName);
-        this.strategy = ExplorationStrategy.SYMMETRY_BREAK;
+        this(fullClassName, finitizationArgs, DEFAULT_SBREAK_STRATEGY, DEFAULT_PREDICATE_NAME);
     }
 
     public String[] getFinitizationArgs() {
@@ -34,9 +40,13 @@ public class ConfigParameters {
     public String getFullyQualifiedClassName() {
         return this.fullClassName;
     }
+    
+    public String getPredicateName() {
+        return this.predicateName;
+    }
 
-    public ExplorationStrategy getExplorationStretegy() {
-        return this.strategy;
+    public SymmetryBreakStrategy getsymmetryBreakStretegy() {
+        return this.symmetryBreakStrategy;
     }
 
     private String calculateFinitizationName(String fullClassName) {

@@ -1,6 +1,6 @@
 package symsolve.explorers.impl;
 
-public enum ExplorationStrategy {
+public enum SymmetryBreakStrategy {
     SYMMETRY_BREAK,
     SYMMETRY_BREAK_REVERSE,
     NO_SYMMETRY_BREAK

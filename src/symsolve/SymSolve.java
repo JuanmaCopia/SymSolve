@@ -2,10 +2,12 @@
 package symsolve;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import korat.finitization.impl.CVElem;
+import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokePredicateException;
-import symsolve.explorers.impl.ExplorationStrategy;
+import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 /**
  * API for the SymSolve tool.
@@ -25,12 +27,7 @@ public class SymSolve {
      * @param finitizationArgs arguments to be passed to the finitization method.
      */
     public SymSolve(String className, String finitizationArgs) {
-        solver = Solver.getInstance();
-        try {
-            solver.initialize(new ConfigParameters(className, finitizationArgs));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this(new ConfigParameters(className, finitizationArgs));
     }
 
     /**
@@ -38,37 +35,40 @@ public class SymSolve {
      * heaps, represented as vectors, for the specified class and bounds. The search
      * of the state space of vectors is performed using the specified strategy.
      *
-     * @param className        fully qualified name of the class.
-     * @param finitizationArgs arguments to be passed to the finitization method.
-     * @param stategy          search Strategy to be used by SymSolve.
+     * @param className             fully qualified name of the class.
+     * @param finitizationArgs      arguments to be passed to the finitization
+     *                              method.
+     * @param symmetryBreakStrategy symmetry break strategy to be used by the
+     *                              solver.
      */
-    public SymSolve(String className, String finitizationArgs, ExplorationStrategy strategy) {
+    public SymSolve(String className, String finitizationArgs, SymmetryBreakStrategy symmetryBreakStrategy) {
+        this(new ConfigParameters(className, finitizationArgs, symmetryBreakStrategy));
+    }
+
+    /**
+     * Creates a SymSolve instance that decides satisfiability of partially symbolic
+     * heaps, represented as vectors, for the specified class and bounds. The search
+     * of the state space of vectors is performed using the specified strategy.
+     *
+     * @param className             fully qualified name of the class.
+     * @param finitizationArgs      arguments to be passed to the finitization
+     *                              method.
+     * @param symmetryBreakStrategy symmetry break strategy to be used by the
+     *                              solver.
+     * @param predicateName         name of the predicate method.
+     */
+    public SymSolve(String className, String finitizationArgs, SymmetryBreakStrategy symmetryBreakStrategy,
+            String predicateName) {
+        this(new ConfigParameters(className, finitizationArgs, symmetryBreakStrategy, predicateName));
+    }
+
+    private SymSolve(ConfigParameters config) {
         solver = Solver.getInstance();
         try {
-            solver.initialize(new ConfigParameters(className, finitizationArgs, strategy));
+            solver.initialize(config);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Returns the representation format of the vector.
-     *
-     * @return A vector describing the types and fields that represent the
-     *         structure.
-     */
-    public CVElem[] getVectorFormat() {
-        return solver.getStateSpace().getStructureList().clone();
-    }
-
-    /**
-     * Returns a map of class names to the maximum number of allowed objects
-     * (bounds) of that class to construct possible concretizations.
-     *
-     * @return A map of simple class names to maximum number of objects.
-     */
-    public HashMap<String, Integer> getBounds() {
-        return solver.getBounds();
     }
 
     /**
@@ -77,29 +77,15 @@ public class SymSolve {
      * @param vector the vector representing a partially symbolic instance.
      * @return true if the symbolic structure is SAT, false if it is UNSAT.
      */
-    public boolean isSat(SymSolveVector vector) {
+    public boolean isSatisfiable(SymSolveVector vector) {
         boolean result = false;
 
         try {
-            result = solver.startSolverExploration(vector);
+            result = solver.startSearch(vector);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
         return result;
-    }
-
-    /**
-     * Decides whether the symbolic instance represented by a vector is SAT. If it
-     * is, returns the vector solution.
-     *
-     * @param cv the vector representing a symbolic instance.
-     * @return the solution vector if the symbolic structure is SAT, null if it is
-     *         UNSAT.
-     */
-    public int[] isSatWithSolution(SymSolveVector vector) {
-        if (isSat(vector))
-            return solver.getCandidateVector();
-        return null;
     }
 
     /**
@@ -109,41 +95,58 @@ public class SymSolve {
      * @param vector the vector representing a partially symbolic instance.
      * @return true if the symbolic structure is SAT, false if it is UNSAT.
      */
-    public boolean isSat(String vector) {
-        boolean result = false;
-        try {
-            result = solver.startSolverExploration(new SymSolveVector(vector));
-        } catch (CannotInvokePredicateException e) {
-            e.printStackTrace(System.err);
-        }
-        return result;
+    public boolean isSatisfiable(String vector) {
+        return isSatisfiable(new SymSolveVector(vector));
     }
 
-    public int[] isSatPrimitivesWithSolution(SymSolveVector vector) {
-        if (isSatPrimitives(vector))
+    /**
+     * Decides whether the symbolic instance represented by a vector is SAT. If it
+     * is, returns the vector solution.
+     *
+     * @param vector the vector representing a partially symbolic instance.
+     * @return the solution vector if the symbolic structure is SAT, null if it is
+     *         UNSAT.
+     */
+    public int[] solve(SymSolveVector vector) {
+        if (isSatisfiable(vector))
             return solver.getCandidateVector();
         return null;
     }
 
-    public boolean isSatPrimitives(SymSolveVector vector) {
-        boolean result = false;
-
+    /**
+     * Resumes the search where it was left off. If a new solution is found, it is
+     * returned.
+     * 
+     * @return a solution vector if founded, null otherwise.
+     */
+    public int[] searchAnotherSolution() {
+        boolean isSat = false;
         try {
-            result = solver.startSolverExplorationWithPrimitives(vector);
+            isSat = solver.searchOtherSolution();
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
-        return result;
+        if (isSat)
+            return solver.getCandidateVector();
+        return null;
     }
-    
-    public int[] searchOtherSolution() {
-        int[] result = null;
+
+    /**
+     * Returns All the solutions for the provided partially symbolic instance
+     * represented by vector.
+     * 
+     * @param vector the vector representing a partially symbolic instance.
+     * @return All the solution vectors found for that partially symbolic vector. If
+     *         no solution is found, an empty set is returned.
+     */
+    public Set<int[]> getAllSolutions(SymSolveVector vector) {
+        Set<int[]> vectorSolutions = null;
         try {
-            result = solver.searchOtherSolution();
+            vectorSolutions = solver.getAllSolutions(vector);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
-        return result;
+        return vectorSolutions;
     }
 
     /**
@@ -170,6 +173,40 @@ public class SymSolve {
      */
     public String generateStructureCode(int[] solutionVector) {
         return solver.generateStructureCode(solutionVector);
+    }
+
+    /**
+     * Sets the predicate that will determine the satisfiability of vectors during
+     * solver search.
+     * 
+     * @param predicateName name of the predicate to be used.
+     */
+    public void setPredicate(String predicateName) {
+        try {
+            solver.setPredicate(predicateName);
+        } catch (CannotFindPredicateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Returns the representation format of the vector.
+     *
+     * @return A vector describing the types and fields that represent the
+     *         structure.
+     */
+    public CVElem[] getVectorFormat() {
+        return solver.getStateSpace().getStructureList().clone();
+    }
+
+    /**
+     * Returns a map of class names to the maximum number of allowed objects
+     * (bounds) of that class to construct possible concretizations.
+     *
+     * @return A map of simple class names to maximum number of objects.
+     */
+    public HashMap<String, Integer> getBounds() {
+        return solver.getBounds();
     }
 
 }
