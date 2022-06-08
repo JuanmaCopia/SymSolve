@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import korat.finitization.impl.CVElem;
+import korat.finitization.impl.IntSet;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokePredicateException;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
@@ -102,7 +103,9 @@ public class SymSolve {
     /**
      * Decides whether the symbolic instance represented by a vector is SAT. If it
      * is, returns the vector solution.
-     *
+     *public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
+        return this.integerFieldsMinMax;
+    }
      * @param vector the vector representing a partially symbolic instance.
      * @return the solution vector if the symbolic structure is SAT, null if it is
      *         UNSAT.
@@ -220,6 +223,10 @@ public class SymSolve {
      */
     public HashMap<String, Integer> getBounds() {
         return solver.getBounds();
+    }
+    
+    public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
+        return this.solver.getIntegerFieldsMinMaxMap();
     }
 
 }

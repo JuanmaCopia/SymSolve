@@ -10,6 +10,7 @@ import korat.finitization.impl.CVElem;
 import korat.finitization.impl.CandidateBuilder;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.Finitization;
+import korat.finitization.impl.IntSet;
 import korat.finitization.impl.ObjSet;
 import korat.finitization.impl.StateSpace;
 import korat.loading.InstrumentingClassLoader;
@@ -115,6 +116,8 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
     private CodeGenerator codeGenerator;
     
     Class<?> rootClass;
+    
+    public HashMap<String, IntSet> integerFieldsMinMaxMap;
 
     protected void initialize(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
@@ -125,6 +128,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         this.predicate = Helper.getPredicateMethod(this.rootClass, params.getPredicateName());
         this.predicateMap.put(params.getPredicateName(), this.predicate);
         this.stateSpace = ((Finitization) fin).getStateSpace();
+        this.integerFieldsMinMaxMap = fin.getIntegerFieldsMinMaxMap();
         VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(this.stateSpace);
         this.symbolicVectorSpaceExplorer = heapExplorerFactory
                 .makeSymoblicVectorExplorer(params.getsymmetryBreakStretegy());
@@ -235,6 +239,10 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
             this.predicate = Helper.getPredicateMethod(this.rootClass, predicateName);
             predicateMap.put(predicateName, this.predicate);
         }
+    }
+    
+    public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
+        return this.integerFieldsMinMaxMap;
     }
 
 }

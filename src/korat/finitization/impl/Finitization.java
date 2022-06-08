@@ -3,6 +3,7 @@ package korat.finitization.impl;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -386,6 +387,16 @@ public class Finitization implements IFinitization {
         ret.setNullAllowed(includeNull);
         return ret;
     }
+    // ===================================== MODIFICATION
+    HashMap<String, IntSet> integerFieldsMinMax = new HashMap<String, IntSet>();
+    
+    private String createFieldName(Class<?> cls, String fieldName) {
+        return cls.getSimpleName() + "." + fieldName;
+    }
+    
+    public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
+        return this.integerFieldsMinMax;
+    }
 
     public void set(Class<?> cls, String fieldName, IFieldDomain fieldDomain) {
 
@@ -411,7 +422,12 @@ public class Finitization implements IFinitization {
         }
 
         fieldsMap.put(fieldName, fieldDomain);
-
+        
+     // ===================================== MODIFICATION
+        if (fieldDomain instanceof IntSet) {
+            this.integerFieldsMinMax.put(createFieldName(cls, fieldName), (IntSet) fieldDomain);
+        }
+     // ===================================== MODIFICATION
         // ---------------------
         // Arrays stuff
         // ---------------------

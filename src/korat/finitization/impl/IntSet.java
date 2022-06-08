@@ -14,9 +14,14 @@ import korat.finitization.IIntSet;
 public class IntSet extends PrimitiveTypeSet implements IIntSet {
     
     Map<Integer, Integer> valueIndexMap = new HashMap<Integer, Integer>();
+    
+    int min = 0;
+    int max = 0;
 
     IntSet(int min, int diff, int max) {
         super(int.class);
+        this.min = min;
+        this.max = max;
         addRange(min, diff, max);
     }
 
@@ -63,32 +68,40 @@ public class IntSet extends PrimitiveTypeSet implements IIntSet {
         return valueIndexMap;
     }
 
+//    public int getMin() {
+//        if (primitives.size() == 0)
+//            throw new RuntimeException("Size of int set is zero");
+//
+//        int min = Integer.MAX_VALUE;
+//        for (int i = 0; i < primitives.size(); i++) {
+//            int elem = getInt(i);
+//            if (elem < min)
+//                min = elem;
+//        }
+//
+//        return min;
+//    }
+//
+//    public int getMax() {
+//        if (primitives.size() == 0)
+//            throw new RuntimeException("Size of int set is zero");
+//
+//        int max = Integer.MIN_VALUE;
+//        for (int i = 0; i < primitives.size(); i++) {
+//            int elem = getInt(i);
+//            if (elem > max)
+//                max = elem;
+//        }
+//
+//        return max;
+//    }
+    
     public int getMin() {
-        if (primitives.size() == 0)
-            throw new RuntimeException("Size of int set is zero");
-
-        int min = Integer.MAX_VALUE;
-        for (int i = 0; i < primitives.size(); i++) {
-            int elem = getInt(i);
-            if (elem < min)
-                min = elem;
-        }
-
-        return min;
+        return this.min;
     }
 
     public int getMax() {
-        if (primitives.size() == 0)
-            throw new RuntimeException("Size of int set is zero");
-
-        int max = Integer.MIN_VALUE;
-        for (int i = 0; i < primitives.size(); i++) {
-            int elem = getInt(i);
-            if (elem > max)
-                max = elem;
-        }
-
-        return max;
+        return this.max;
     }
 
 }

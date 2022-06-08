@@ -1,5 +1,9 @@
 package korat.finitization;
 
+import java.util.HashMap;
+
+import korat.finitization.impl.IntSet;
+
 /**
  * The <code>IFinitization</code> interface is used to set up the bounds
  * for the search.  The <code>Finitization</code> class uses these bounds
@@ -656,4 +660,6 @@ public interface IFinitization {
      * @return - are arrays treated as objects during Korat search
      */
     boolean areArraysHandledAsObjects();
+    
+    public HashMap<String, IntSet> getIntegerFieldsMinMaxMap();
 }
