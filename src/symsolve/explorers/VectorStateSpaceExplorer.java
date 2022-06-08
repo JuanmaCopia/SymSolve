@@ -14,5 +14,7 @@ public interface VectorStateSpaceExplorer {
     public void initialize(SymSolveVector vector);
 
     public int[] getNextCandidate();
+    
+    public void resetChangedFields();
 
 }

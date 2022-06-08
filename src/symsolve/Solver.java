@@ -141,6 +141,12 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
             return true;
         return areSymbolicFieldsAccessed(vector);
     }
+    
+    public boolean runRepOK(SymSolveVector vector) throws CannotInvokePredicateException {
+        this.symbolicVectorSpaceExplorer.resetChangedFields();
+        Object candidate = this.candidateBuilder.buildCandidate(vector.getConcreteVector());
+        return checkPredicate(candidate);
+    }
 
     private boolean areSymbolicFieldsAccessed(SymSolveVector vector) {
         for (int i = 0; i < accessedFields.numberOfElements(); i++) {
@@ -163,7 +169,8 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return false;
     }
     
-    public boolean searchOtherSolution() throws CannotInvokePredicateException {
+    public boolean searchOtherSolution(SymSolveVector initialVector) throws CannotInvokePredicateException {
+        runRepOK(initialVector);
         int[] vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);

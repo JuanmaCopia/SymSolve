@@ -43,6 +43,10 @@ public class SymSolveVector {
     public int[] getConcreteVector() {
         return this.concreteVector.clone();
     }
+    
+    public void setConcreteVector(int[] newConcreteVector) {
+        this.concreteVector = newConcreteVector;
+    }
 
     /**
      * Returns the set of Fixed indices in this vector.

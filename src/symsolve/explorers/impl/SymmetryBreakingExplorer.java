@@ -1,13 +1,10 @@
 package symsolve.explorers.impl;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
-import korat.finitization.impl.IntSet;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
@@ -76,6 +73,11 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
             this.isInitialized[i] = false;
             this.changedFields.add(i);
         }
+    }
+    
+    public void resetChangedFields() {
+        for (int i = 0; i < this.vectorSize; i++)
+            this.changedFields.add(i);
     }
 
     private void initializeMaxFixedInstances(Set<Integer> fi) {

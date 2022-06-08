@@ -119,10 +119,10 @@ public class SymSolve {
      * 
      * @return a solution vector if founded, null otherwise.
      */
-    public int[] searchAnotherSolution() {
+    public int[] searchAnotherSolution(SymSolveVector vector) {
         boolean isSat = false;
         try {
-            isSat = solver.searchOtherSolution();
+            isSat = solver.searchOtherSolution(vector);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
@@ -165,6 +165,19 @@ public class SymSolve {
         }
         return result;
     }
+    
+    
+    
+    public boolean runRepOK(SymSolveVector vector) {
+        boolean result = false;
+        try {
+            result = solver.runRepOK(vector);
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+        }
+        return result;
+    }
+    
 
     /**
      * 
