@@ -153,7 +153,7 @@ public class CodeGenerator {
 
             StringSet set = (StringSet) fieldDomain;
             String value = set.getString(fieldDomainIndex);
-            return value;
+            return String.format("\"%s\"", value);
             
         } else if (clsOfField == byte.class) {
 
