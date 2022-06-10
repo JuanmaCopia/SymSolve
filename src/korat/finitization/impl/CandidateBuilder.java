@@ -86,7 +86,12 @@ public class CandidateBuilder {
                 BooleanSet set = (BooleanSet) fd;
                 boolean value = set.getBoolean(index);
                 setter.set(value);
-
+            } else if (clsOfField == String.class) {
+                
+                StringSet set = (StringSet) fd;
+                String value = set.getString(index);
+                setter.set(value);
+                
             } else if (clsOfField == byte.class) {
 
                 ByteSet set = (ByteSet) fd;
