@@ -26,6 +26,7 @@ import korat.finitization.IShortSet;
 import korat.instrumentation.IKoratArray;
 import korat.instrumentation.InstrumentationManager;
 import korat.instrumentation.KoratArrayManager;
+import korat.utils.RandomStrings;
 import korat.utils.ReflectionUtils;
 
 /**
@@ -290,6 +291,14 @@ public class Finitization implements IFinitization {
 
     public IByteSet createByteSet(byte min, byte diff, byte max) {
         return new ByteSet(min, diff, max);
+    }
+    
+    public StringSet createRandomStringSet(int setSize, int minLength, int maxLength) {
+        return new StringSet(RandomStrings.generateRandomStringSet(setSize, minLength, maxLength));
+    }
+    
+    public StringSet createStringSet(Set<String> set) {
+        return new StringSet(set);
     }
 
     public IByteSet createByteSet(byte min, byte max) {

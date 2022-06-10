@@ -3,10 +3,8 @@ package korat.finitization.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 public class StringSet extends FieldDomain {
@@ -16,10 +14,6 @@ public class StringSet extends FieldDomain {
     Set<String> stringSet;
 
     Map<String, Integer> valueIndexMap;
-
-    StringSet(int setSize, int minLength, int maxLength) {
-        this(generateRandomStringSet(setSize, minLength, maxLength));
-    }
 
     StringSet(Set<String> stringSet) {
         super(String.class);
@@ -35,36 +29,12 @@ public class StringSet extends FieldDomain {
             valueIndexMap.put(this.sortedStringList.get(i), i);
     }
 
-    private static Set<String> generateRandomStringSet(int setSize, int minLength, int maxLength) {
-        Set<String> set = new HashSet<String>();
-        for (int i = 0; i < setSize; i++)
-            addRandomStringToSet(set, minLength, maxLength);
-        assert (setSize == set.size());
-        return set;
-    }
-
-    private static void addRandomStringToSet(Set<String> set, int minLength, int maxLength) {
-        Random r = new Random();
-        int length = r.nextInt((maxLength - minLength) + 1) + minLength;
-        String elem = generateRandomString(length);
-        while (set.contains(elem))
-            elem = generateRandomString(length);
-        set.add(elem);
-    }
-
-    private static String generateRandomString(int stringLength) {
-        int leftLimit = 97; // letter 'a'
-        int rightLimit = 122; // letter 'z'
-        Random random = new Random();
-
-        String generatedString = random.ints(leftLimit, rightLimit + 1).limit(stringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
-
-        return generatedString;
-    }
-
     public Map<String, Integer> getValueIndexMap() {
         return valueIndexMap;
+    }
+    
+    public String getString(int index) {
+        return sortedStringList.get(index);
     }
 
     @Override
