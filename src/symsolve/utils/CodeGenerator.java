@@ -16,6 +16,7 @@ import korat.finitization.impl.LongSet;
 import korat.finitization.impl.ObjSet;
 import korat.finitization.impl.ShortSet;
 import korat.finitization.impl.StateSpace;
+import korat.finitization.impl.StringSet;
 
 public class CodeGenerator {
 
@@ -147,7 +148,13 @@ public class CodeGenerator {
             BooleanSet set = (BooleanSet) fieldDomain;
             boolean value = set.getBoolean(fieldDomainIndex);
             return Boolean.toString(value);
+        
+        } else if (clsOfField == String.class) {
 
+            StringSet set = (StringSet) fieldDomain;
+            String value = set.getString(fieldDomainIndex);
+            return value;
+            
         } else if (clsOfField == byte.class) {
 
             ByteSet set = (ByteSet) fieldDomain;
