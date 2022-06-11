@@ -6,6 +6,7 @@ import java.util.Set;
 
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.IntSet;
+import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokePredicateException;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
@@ -227,6 +228,11 @@ public class SymSolve {
     
     public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
         return this.solver.getIntegerFieldsMinMaxMap();
+    }
+    
+
+    public StateSpace getStateSpace() {
+        return solver.getStateSpace();
     }
 
 }
