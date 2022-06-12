@@ -107,18 +107,19 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
         changedFields.clear();
         while (!accessedFields.isEmpty()) {
             int lastAccessedFieldIndex = accessedFields.removeLast();
-            if (setNextValue(lastAccessedFieldIndex))
-                return candidateVector;
-            backtrack(lastAccessedFieldIndex);
+            if (!fixedIndices.contains(lastAccessedFieldIndex)) {
+                CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
+                if (!lastAccessedField.isExcludedFromSearch()) {
+                    if (setNextValue(lastAccessedFieldIndex))
+                        return candidateVector;
+                    backtrack(lastAccessedFieldIndex);
+                }
+            }
         }
         return null;
     }
 
     protected boolean setNextValue(int lastAccessedFieldIndex) {
-        CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
-        if (fixedIndices.contains(lastAccessedFieldIndex) || lastAccessedField.isExcludedFromSearch())
-            return false;
-
         changedFields.add(lastAccessedFieldIndex);
         FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
         int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;

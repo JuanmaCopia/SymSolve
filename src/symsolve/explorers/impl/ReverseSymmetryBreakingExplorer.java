@@ -1,6 +1,5 @@
 package symsolve.explorers.impl;
 
-import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 
@@ -12,10 +11,6 @@ public class ReverseSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
     
     @Override
     protected boolean setNextValue(int lastAccessedFieldIndex) {
-        CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
-        if (fixedIndices.contains(lastAccessedFieldIndex) || lastAccessedField.isExcludedFromSearch())
-            return false;
-
         changedFields.add(lastAccessedFieldIndex);
         FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
         int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
