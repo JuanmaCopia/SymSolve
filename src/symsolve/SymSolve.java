@@ -123,10 +123,10 @@ public class SymSolve {
      * 
      * @return a solution vector if founded, null otherwise.
      */
-    public int[] searchAnotherSolution(SymSolveVector vector) {
+    public int[] searchAnotherSolution() {
         boolean isSat = false;
         try {
-            isSat = solver.searchOtherSolution(vector);
+            isSat = solver.searchOtherSolution();
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }

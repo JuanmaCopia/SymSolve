@@ -173,8 +173,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         return false;
     }
     
-    public boolean searchOtherSolution(SymSolveVector initialVector) throws CannotInvokePredicateException {
-        runRepOK(initialVector);
+    public boolean searchOtherSolution() throws CannotInvokePredicateException {
         int[] vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
