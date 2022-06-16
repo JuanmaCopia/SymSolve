@@ -11,7 +11,6 @@ public class ReverseSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
     
     @Override
     protected boolean setNextValue(int lastAccessedFieldIndex) {
-        changedFields.add(lastAccessedFieldIndex);
         FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
         int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
         int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];

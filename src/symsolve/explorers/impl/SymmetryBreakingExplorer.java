@@ -1,13 +1,14 @@
 package symsolve.explorers.impl;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
 
-import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
+
 import symsolve.SymSolveVector;
 import symsolve.explorers.VectorStateSpaceExplorer;
 
@@ -29,7 +30,7 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
 
     protected IIntList fixedIndices;
 
-    protected HashMap<FieldDomain, Integer> maxFixedInstances;
+    protected Map<FieldDomain, Integer> maxFixedInstancePerReferenceFieldDomain = new IdentityHashMap<FieldDomain, Integer>();
 
     public SymmetryBreakingExplorer(StateSpace stateSpace) {
         this.stateSpace = stateSpace;
@@ -41,86 +42,21 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
         fixedIndices = new IntListAI(vectorSize);
     }
 
-    public IIntList getAccessedFields() {
-        return accessedFields;
-    }
-    
-    public IIntList getChangedFields() {
-        return changedFields;
-    }
-
-    public int[] getCandidateVector() {
-        return candidateVector;
-    }
-
-    public void initialize(SymSolveVector vector) {
-        setCandidateVector(vector.getConcreteVector());
-        resetExplorerState();
-        initializeMaxFixedInstances(vector.getFixedIndices());
-    }
-
-    private void setCandidateVector(int[] vector) {
-        this.candidateVector = vector;
-        if (vectorSize != this.candidateVector.length)
-            throw new IllegalArgumentException("The input vector does not match the finitization!");
-    }
-
-    private void resetExplorerState() {
-        this.accessedFields.clear();
-        this.fixedIndices.clear();
-        for (int i = 0; i < this.vectorSize; i++) {
-            this.maxInstances[i] = -1;
-            this.isInitialized[i] = false;
-            this.changedFields.add(i);
-        }
-    }
-    
-    public void resetChangedFields() {
-        for (int i = 0; i < this.vectorSize; i++)
-            this.changedFields.add(i);
-    }
-
-    private void initializeMaxFixedInstances(Set<Integer> fi) {
-        maxFixedInstances = new HashMap<FieldDomain, Integer>();
-        for (Integer i : fi) {
-            this.fixedIndices.add(i);
-            FieldDomain fd = stateSpace.getFieldDomain(i);
-            if (!fd.isPrimitiveType()) {
-                int maxFixedInstance = getMaxFixedInstanceForFieldDomain(fd, candidateVector[i]);
-                maxFixedInstances.put(fd, maxFixedInstance);
-            }
-        }
-    }
-
-    private int getMaxFixedInstanceForFieldDomain(FieldDomain fieldDomain, int currentIndexValue) {
-        Integer maxInstance = maxFixedInstances.get(fieldDomain);
-        if (maxInstance == null) {
-            if (fieldDomain.getClassOfField() == stateSpace.getRootObject().getClass())
-                maxInstance = 1;
-            else
-                maxInstance = 0;
-        }
-        return Math.max(maxInstance, currentIndexValue);
-    }
-
     public int[] getNextCandidate() {
         changedFields.clear();
         while (!accessedFields.isEmpty()) {
             int lastAccessedFieldIndex = accessedFields.removeLast();
             if (!fixedIndices.contains(lastAccessedFieldIndex)) {
-                CVElem lastAccessedField = stateSpace.getCVElem(lastAccessedFieldIndex);
-                if (!lastAccessedField.isExcludedFromSearch()) {
-                    if (setNextValue(lastAccessedFieldIndex))
-                        return candidateVector;
-                    backtrack(lastAccessedFieldIndex);
-                }
+                changedFields.add(lastAccessedFieldIndex);
+                if (setNextValue(lastAccessedFieldIndex))
+                    return candidateVector;
+                backtrack(lastAccessedFieldIndex);
             }
         }
         return null;
     }
 
     protected boolean setNextValue(int lastAccessedFieldIndex) {
-        changedFields.add(lastAccessedFieldIndex);
         FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
         int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
         int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
@@ -144,25 +80,80 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
         return false;
     }
 
+    protected void backtrack(int lastAccessedFieldIndex) {
+        candidateVector[lastAccessedFieldIndex] = 0;
+        maxInstances[lastAccessedFieldIndex] = -1;
+    }
+
     protected int getMaxInstanceInVector(FieldDomain fieldDomain, int currentInstanceIndex) {
-        Integer maxInstance = maxFixedInstances.get(fieldDomain);
+        Integer maxInstance = this.maxFixedInstancePerReferenceFieldDomain.get(fieldDomain);
         if (maxInstance == null)
             maxInstance = 0;
-        maxInstance = currentInstanceIndex > maxInstance ? currentInstanceIndex : maxInstance;
+        if (currentInstanceIndex > maxInstance)
+            maxInstance = currentInstanceIndex;
         for (int i = 0; i < accessedFields.numberOfElements(); i++) {
             int index = accessedFields.get(i);
-            if (!fixedIndices.contains(index) && stateSpace.getFieldDomain(index) == fieldDomain) {
+            if (!this.fixedIndices.contains(index) && stateSpace.getFieldDomain(index) == fieldDomain) {
                 int value = candidateVector[index];
-                if (maxInstance < value)
+                if (value > maxInstance)
                     maxInstance = value;
             }
         }
         return maxInstance;
     }
 
-    protected void backtrack(int lastAccessedFieldIndex) {
-        candidateVector[lastAccessedFieldIndex] = 0;
-        maxInstances[lastAccessedFieldIndex] = -1;
+    public void initialize(SymSolveVector vector) {
+        resetExplorerState();
+        setCandidateVector(vector.getConcreteVector());
+        calculateMaxFixedInstancePerReferenceFieldDomain(vector.getFixedIndices());
+    }
+
+    private void setCandidateVector(int[] vector) {
+        this.candidateVector = vector;
+        if (vectorSize != this.candidateVector.length)
+            throw new IllegalArgumentException("The input vector does not match the finitization!");
+    }
+
+    private void resetExplorerState() {
+        this.accessedFields.clear();
+        for (int i = 0; i < this.vectorSize; i++) {
+            this.maxInstances[i] = -1;
+            this.isInitialized[i] = false;
+            this.changedFields.add(i);
+        }
+    }
+
+    private void calculateMaxFixedInstancePerReferenceFieldDomain(Set<Integer> fixedIndices) {
+        this.maxFixedInstancePerReferenceFieldDomain.clear();
+        this.fixedIndices.clear();
+        for (Integer index : fixedIndices) {
+            this.fixedIndices.add(index);
+            FieldDomain fieldDomain = stateSpace.getFieldDomain(index);
+            if (!fieldDomain.isPrimitiveType()) {
+                int value = candidateVector[index];
+                Integer currentMaxFDInstance = this.maxFixedInstancePerReferenceFieldDomain.get(fieldDomain);
+                if (currentMaxFDInstance == null || value > currentMaxFDInstance)
+                    this.maxFixedInstancePerReferenceFieldDomain.put(fieldDomain, value);
+            }
+        }
+
+    }
+
+    public void resetChangedFields() {
+        for (int i = 0; i < this.vectorSize; i++)
+            this.changedFields.add(i);
+    }
+
+    public IIntList getAccessedFields() {
+        return accessedFields;
+    }
+
+    public IIntList getChangedFields() {
+        return changedFields;
+    }
+
+    public int[] getCandidateVector() {
+        return candidateVector;
     }
 
 }
