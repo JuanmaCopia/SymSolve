@@ -120,13 +120,32 @@ public class SymSolve {
     /**
      * Resumes the search where it was left off. If a new solution is found, it is
      * returned.
-     * 
+     *
      * @return a solution vector if founded, null otherwise.
      */
-    public int[] searchAnotherSolution() {
+    // public int[] searchAnotherSolution() {
+    //     boolean isSat = false;
+    //     try {
+    //         isSat = solver.searchOtherSolution();
+    //     } catch (CannotInvokePredicateException e) {
+    //         e.printStackTrace(System.err);
+    //     }
+    //     if (isSat)
+    //         return solver.getCandidateVector();
+    //     return null;
+    // }
+
+
+    /**
+     * Resumes the search where it was left off. If a new solution is found, it is
+     * returned.
+     *
+     * @return a solution vector if founded, null otherwise.
+     */
+    public int[] searchAnotherSolution(SymSolveVector vector) {
         boolean isSat = false;
         try {
-            isSat = solver.searchOtherSolution();
+            isSat = solver.searchOtherSolution(vector);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
@@ -138,7 +157,7 @@ public class SymSolve {
     /**
      * Returns All the solutions for the provided partially symbolic instance
      * represented by vector.
-     * 
+     *
      * @param vector the vector representing a partially symbolic instance.
      * @return All the solution vectors found for that partially symbolic vector. If
      *         no solution is found, an empty set is returned.
@@ -169,9 +188,9 @@ public class SymSolve {
         }
         return result;
     }
-    
-    
-    
+
+
+
     public boolean runRepOK(SymSolveVector vector) {
         boolean result = false;
         try {
@@ -181,10 +200,10 @@ public class SymSolve {
         }
         return result;
     }
-    
+
 
     /**
-     * 
+     *
      * @param solutionVector
      * @return
      */
@@ -195,7 +214,7 @@ public class SymSolve {
     /**
      * Sets the predicate that will determine the satisfiability of vectors during
      * solver search.
-     * 
+     *
      * @param predicateName name of the predicate to be used.
      */
     public void setPredicate(String predicateName) {
@@ -225,11 +244,11 @@ public class SymSolve {
     public HashMap<String, Integer> getBounds() {
         return solver.getBounds();
     }
-    
+
     public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
         return this.solver.getIntegerFieldsMinMaxMap();
     }
-    
+
 
     public StateSpace getStateSpace() {
         return solver.getStateSpace();

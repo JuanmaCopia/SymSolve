@@ -139,6 +139,14 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
 
     }
 
+    public void setInitializedFields() {
+        for (int i = 0; i < this.vectorSize; i++) {
+            if (!fixedIndices.contains(i) && candidateVector[i] > 0) {
+                this.isInitialized[i] = true;
+            }
+        }
+    }
+
     public void resetChangedFields() {
         for (int i = 0; i < this.vectorSize; i++)
             this.changedFields.add(i);

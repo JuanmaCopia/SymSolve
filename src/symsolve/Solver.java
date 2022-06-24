@@ -106,7 +106,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
     private boolean predicateOK;
 
     private Method predicate;
-    
+
     private HashMap<String, Method> predicateMap = new HashMap<String, Method>();
 
     private VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
@@ -114,9 +114,9 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
     private CandidateBuilder candidateBuilder;
 
     private CodeGenerator codeGenerator;
-    
+
     Class<?> rootClass;
-    
+
     public HashMap<String, IntSet> integerFieldsMinMaxMap;
 
     protected void initialize(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
@@ -145,9 +145,9 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
             return true;
         return areSymbolicFieldsAccessed(vector);
     }
-    
+
     public boolean runRepOK(SymSolveVector vector) throws CannotInvokePredicateException {
-        this.symbolicVectorSpaceExplorer.resetChangedFields();
+        this.symbolicVectorSpaceExplorer.initialize(vector);
         Object candidate = this.candidateBuilder.buildCandidate(vector.getConcreteVector());
         return checkPredicate(candidate);
     }
@@ -172,8 +172,21 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         }
         return false;
     }
-    
-    public boolean searchOtherSolution() throws CannotInvokePredicateException {
+
+    // public boolean searchOtherSolution() throws CannotInvokePredicateException {
+    //     int[] vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+    //     while (vector != null) {
+    //         Object candidate = candidateBuilder.buildCandidate(vector);
+    //         if (checkPredicate(candidate))
+    //             return true;
+    //         vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+    //     }
+    //     return false;
+    // }
+
+    public boolean searchOtherSolution(SymSolveVector initialVector) throws CannotInvokePredicateException {
+        runRepOK(initialVector);
+        this.symbolicVectorSpaceExplorer.setInitializedFields();
         int[] vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
@@ -183,7 +196,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
         }
         return false;
     }
-    
+
     public Set<int[]> getAllSolutions(SymSolveVector initialVector) throws CannotInvokePredicateException {
         this.symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = initialVector.getConcreteVector();
@@ -239,7 +252,7 @@ public class Solver extends AbstractTestCaseGenerator implements ITester {
             predicateMap.put(predicateName, this.predicate);
         }
     }
-    
+
     public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
         return this.integerFieldsMinMaxMap;
     }

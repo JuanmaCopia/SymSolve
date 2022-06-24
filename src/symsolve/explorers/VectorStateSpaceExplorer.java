@@ -17,4 +17,6 @@ public interface VectorStateSpaceExplorer {
     
     public void resetChangedFields();
 
+    public void setInitializedFields();
+
 }
