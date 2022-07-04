@@ -5,7 +5,6 @@ import java.util.Set;
 
 import korat.finitization.impl.IntSet;
 import korat.finitization.impl.StringSet;
-import korat.utils.RandomStrings;
 
 /**
  * The <code>IFinitization</code> interface is used to set up the bounds
