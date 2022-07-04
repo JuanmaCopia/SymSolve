@@ -1,14 +1,15 @@
-package symkorat.solver.symmetrybreak;
+package symsolve.nosymmetrybreak;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import symsolve.SymSolve;
+import symsolve.explorers.impl.SymmetryBreakStrategy;
 
-public class SolverTreeMapTests {
+public class SolverNSBTreeMapTests {
 
-        private SymSolve symKorat = new SymSolve("symkorat.examples.treemap.TreeMap", "8");
+        private SymSolve symKorat = new SymSolve("symkorat.examples.treemap.TreeMap", "8",
+                        SymmetryBreakStrategy.NO_SYMMETRY_BREAK);
 
         @Test
         public void TreeMapSolverTest0() {
@@ -16418,8 +16419,9 @@ public class SolverTreeMapTests {
                                 "1,-1,-1,2,3,-1,-1,-1,0,0,-1,-1,-1,4,0,-1,-1,-1,5,0,-1,-1,-1,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1"));
                 assertEquals(false, symKorat.isSatisfiable(
                                 "1,-1,-1,2,3,-1,-1,-1,0,0,-1,-1,-1,4,-1,-1,-1,-1,0,5,-1,-1,-1,0,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1"));
-                assertEquals(false, symKorat.isSatisfiable(
-                                "1,-1,-1,2,3,-1,-1,-1,0,0,-1,-1,-1,4,5,-1,-1,-1,0,0,-1,-1,-1,0,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1"));
+                assertEquals(false, symKorat
+                                .isSatisfiable(
+                                                "1,-1,-1,2,3,-1,-1,-1,0,0,-1,-1,-1,4,5,-1,-1,-1,0,0,-1,-1,-1,0,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1"));
         }
 
 }

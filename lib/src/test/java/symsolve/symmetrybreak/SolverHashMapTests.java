@@ -1,10 +1,9 @@
-package symkorat.solver.symmetrybreak;
+package symsolve.symmetrybreak;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import symsolve.SymSolve;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SolverHashMapTests {
 

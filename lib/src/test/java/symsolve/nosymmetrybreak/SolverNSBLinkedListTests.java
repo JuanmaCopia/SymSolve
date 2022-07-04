@@ -1,8 +1,7 @@
-package symkorat.solver.nosymmetrybreak;
+package symsolve.nosymmetrybreak;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import symsolve.SymSolve;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
