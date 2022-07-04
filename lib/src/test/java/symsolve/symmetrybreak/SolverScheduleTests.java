@@ -1,14 +1,13 @@
-package symkorat.solver.symmetrybreak;
+package symsolve.symmetrybreak;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import symsolve.SymSolve;
 
 public class SolverScheduleTests {
 
-        private SymSolve symKorat = new SymSolve("symkorat.examples.schedule.Schedule", "10");
+        private final SymSolve symKorat = new SymSolve("symkorat.examples.schedule.Schedule", "10");
 
         @Test
         public void ScheduleSolverTest0() {

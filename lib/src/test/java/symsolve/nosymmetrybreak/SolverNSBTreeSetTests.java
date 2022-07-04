@@ -1,14 +1,15 @@
-package symkorat.solver.symmetrybreak;
+package symsolve.nosymmetrybreak;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import symsolve.SymSolve;
+import symsolve.explorers.impl.SymmetryBreakStrategy;
 
-public class SolverTreeSetTests {
+public class SolverNSBTreeSetTests {
 
-        private SymSolve symKorat = new SymSolve("symkorat.examples.treeset.TreeSet", "8");
+        private SymSolve symKorat = new SymSolve("symkorat.examples.treeset.TreeSet", "8",
+                        SymmetryBreakStrategy.NO_SYMMETRY_BREAK);
 
         @Test
         public void TreeSetSolverTest0() {

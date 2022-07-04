@@ -1,8 +1,15 @@
 
 *.class
 *.dat
+*.jar
 
 build/
 
 .project
 .classpath
+
+hs_err_pid*
+
+.gradle
+!gradle-wrapper.jar
+.gradletasknamecache
