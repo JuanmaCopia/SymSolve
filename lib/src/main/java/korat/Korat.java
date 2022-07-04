@@ -2,7 +2,6 @@ package korat;
 
 import java.util.Arrays;
 
-import korat.config.ConfigLoader;
 import korat.config.ConfigManager;
 import korat.testing.impl.CannotFindClassUnderTest;
 import korat.testing.impl.CannotFindFinitizationException;
@@ -172,7 +171,7 @@ public class Korat {
      * korat.examples.binarytree.BinaryTree --args 3,3,3
      * 
      */
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         TestCradle testCradle = TestCradle.getInstance();
         ConfigManager config = ConfigManager.getInstance();
@@ -245,6 +244,6 @@ public class Korat {
             
         }
 
-    }
+    }*/
 
 }

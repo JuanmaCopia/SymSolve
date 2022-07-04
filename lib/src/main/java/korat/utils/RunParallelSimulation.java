@@ -7,7 +7,7 @@ import korat.testing.impl.TestCradleII;
 
 public class RunParallelSimulation {
 
-    public static void main(String[] args) {
+/*    public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println("Enter number of seeds to generate");
             System.exit(-1);
@@ -30,6 +30,6 @@ public class RunParallelSimulation {
         
         System.out.println("\n------\n" + msg);
         
-    }
+    }*/
     
 }

@@ -20,14 +20,14 @@ import korat.utils.ReflectionUtils;
 import korat.utils.SerializationListener;
 import korat.utils.cv.WriteCVListener;
 
-import org.apache.commons.cli.CommandLine;
+/*import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.cli.UnrecognizedOptionException;*/
 
 /**
  * Class that should be used only by <code>CodeManager</code> for 
@@ -38,18 +38,18 @@ import org.apache.commons.cli.UnrecognizedOptionException;
  */
 public class ConfigLoader {
 
-    public static final char SEP = ',';
+/*    public static final char SEP = ',';
     
     public static final String SEP_STR = String.valueOf(SEP);
     
-    /* =================================================================================
+    *//* =================================================================================
      *   KORAT OPTIONS
      *   
      *   IMPORTANT: each of these options (except for HELP) must have its corresponding 
      *   field in the ConfigManager class which is named exaclty as the longOpt option's 
      *   property (this is because the storeOptions() method relies on it to store all 
      *   parsed options to ConfigManager instance using reflection.
-     * ================================================================================= */
+     * ================================================================================= *//*
     
     public static final MyOption ARGS = new MyOption( 
         "a", "args", "comma separated list of arguments to be given to finitization method", true, true, "params", null);
@@ -120,10 +120,10 @@ public class ConfigLoader {
     public static final MyOption VISUALIZE = new MyOption( 
         "v", "visualize", "visualize valid test cases", false, false, "", "false");
 
-    /**
+    *//**
      * This contains all defined options and will be initialized dynamically, through 
      * the java reflection mechanism.
-     */
+     *//*
     private Options koratOptions;
 
     ConfigLoader() {
@@ -131,9 +131,9 @@ public class ConfigLoader {
         initKoratOptions();
     }
 
-    /**
+    *//**
      * initialize koratOptions with all declared options
-     */
+     *//*
     private void initKoratOptions() {
         try {
         	Class<?> clz = getClass();
@@ -148,9 +148,9 @@ public class ConfigLoader {
         }
     }
     
-    /* =================================================================================
+    *//* =================================================================================
      *   INTERFACE TO ConfigManager
-     * ================================================================================= */
+     * ================================================================================= *//*
     
     void printUsage(Options options) {
         PrintWriter pw = null;
@@ -174,14 +174,14 @@ public class ConfigLoader {
         parseArgs(args, false);
     }
     
-    /* =================================================================================
+    *//* =================================================================================
      * PRIVATE STUFF FOR LOADING/PARSING/STORING OPTIONS
-     * ================================================================================= */
+     * ================================================================================= *//*
     
     private CommandLine cmdLine;
     private CommandLine fromFileCmdLine;
     
-    /**
+    *//**
      * <p>Parses options from the given string array. </p>
      *  
      * The algorithm for handling options is as follows:
@@ -205,7 +205,7 @@ public class ConfigLoader {
      * @see #storeOptions()
      * @see #checkRequiredOptions()
      * @see #initStuffFromOptions()          
-     */
+     *//*
     private void parseArgs(String[] args, boolean fromFile) {
         try {
             
@@ -247,7 +247,7 @@ public class ConfigLoader {
         }
     }
 
-    /**
+    *//**
      * <p>Loads options from the config file and returns them as a string array.</p>
      * 
      * <p>This method only searches for the file with the given name and then calls
@@ -262,7 +262,7 @@ public class ConfigLoader {
      * @throws IOException 
      *         if an I/O exception occurs.
      * @see #processConfigFile(InputStream)        
-     */
+     *//*
     private String[] loadFromFile(String fileName) throws IOException {
         File f = new File(fileName);
         InputStream is = null;
@@ -293,7 +293,7 @@ public class ConfigLoader {
         
     }
 
-    /**
+    *//**
      * <p>Loads options from the config file and returns them as a string array.</p>
      * 
      * Format of the config file should be like the format of the cmd line with 
@@ -309,7 +309,7 @@ public class ConfigLoader {
      *         options from file represented as string array (just like 
      *         they were specified through the cmd line).
      * @throws IOException if an I/O exception occurs.
-     */
+     *//*
     private static String[] processConfigFile(InputStream is) throws IOException {
         LinkedList<String> argsList = new LinkedList<String>();
         BufferedReader br = null;
@@ -331,11 +331,11 @@ public class ConfigLoader {
         return argsList.toArray(new String[0]);
     }
 
-    /**
+    *//**
      * Checks for the presence of the required options.
      * 
      * @throws MissingOptionException if a required options is not provided.
-     */
+     *//*
     private void checkRequiredOptions() throws MissingOptionException {
         String missingOptions = "";
         ConfigManager config = ConfigManager.getInstance();
@@ -352,9 +352,9 @@ public class ConfigLoader {
         }
     }
 
-    /**
+    *//**
      * Initializes stuff from the previously parsed options. 
-     */
+     *//*
     private void initStuffFromOptions() {
         TestCradle testCradle = TestCradle.getInstance();
         ConfigManager config = ConfigManager.getInstance();
@@ -401,14 +401,14 @@ public class ConfigLoader {
         }
     }
 
-    /**
+    *//**
      * Stores the previously parsed options to <code>ConfigManager</code> instance.
      * Since it uses java reflection to automatically store all declared options, 
      * it relies on the "naming rule" of the MyOption options and option fields in
      * ConfigManager class: <strong>each of MyOptions options (except for HELP) must 
      * have its corresponding field in the ConfigManager class which is named exactly 
      * as the longOpt property of that option.</strong>
-     */
+     *//*
     private void storeOptions() {
         ConfigManager config = ConfigManager.getInstance();
         for (Object optObj : koratOptions.getOptions()) {
@@ -537,6 +537,6 @@ public class ConfigLoader {
             System.exit(2);
         }
         return val;
-    }
+    }*/
 
 }

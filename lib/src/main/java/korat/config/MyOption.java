@@ -1,6 +1,6 @@
 package korat.config;
 
-import org.apache.commons.cli.Option;
+/*import org.apache.commons.cli.Option;*/
 
 /**
  * Just like org.apache.commons.cli.Option with default value
@@ -9,9 +9,9 @@ import org.apache.commons.cli.Option;
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
  * 
  */
-public class MyOption extends Option {
+public class MyOption /*extends Option */{
 
-    protected String argDefValue;
+/*    protected String argDefValue;
     
     public MyOption(String opt, String longOpt, String description, boolean isRequired,
             boolean hasArg, String argName, String argDefValue) throws IllegalArgumentException {
@@ -44,5 +44,5 @@ public class MyOption extends Option {
     
     public String getSwitches() {
         return "-" + getOpt() + " (--" + getLongOpt() + ")";
-    }
+    }*/
 }
