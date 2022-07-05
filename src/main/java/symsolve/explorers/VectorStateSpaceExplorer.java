@@ -1,22 +1,15 @@
 package symsolve.explorers;
 
-import korat.utils.IIntList;
 import symsolve.SymSolveVector;
 
 public interface VectorStateSpaceExplorer {
 
-    public IIntList getAccessedFields();
+    int[] getCandidateVector();
 
-    public IIntList getChangedFields();
+    void initialize(SymSolveVector vector);
 
-    public int[] getCandidateVector();
+    int[] getNextCandidate();
 
-    public void initialize(SymSolveVector vector);
-
-    public int[] getNextCandidate();
-    
-    public void resetChangedFields();
-
-    public void setInitializedFields();
+    void setInitializedFields();
 
 }

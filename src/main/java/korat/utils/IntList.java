@@ -3,39 +3,23 @@ package korat.utils;
 
 /**
  * Slow - use one of its derivatives, BS or AI
- * 
+ *
+ * @author Sasa Misailovic <sasa.misailovic@gmail.com>
  * @see IntListAI
  * @see IntListBS
- * 
- * @author Sasa Misailovic <sasa.misailovic@gmail.com>
- * 
  */
-public class IntList implements IIntList {
+public class IntList {
 
     private static final int defaultInitSize = 50;
-    
+
     private int initSize = defaultInitSize;
 
     private int[] elems = new int[initSize];
 
     private int lastElementIndex = -1;
 
-
-    public int numberOfElements() {
-        return lastElementIndex + 1;
-    }
-
     public boolean isEmpty() {
         return lastElementIndex == -1;
-    }
-
-    public boolean contains(int elem) {
-        for (int i = 0; i <= lastElementIndex; i++) {
-            if (elems[i] == elem) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public int[] toArray() {
@@ -45,12 +29,16 @@ public class IntList implements IIntList {
         return ret;
     }
 
+    public int numberOfElements() {
+        return lastElementIndex + 1;
+    }
+
     public boolean add(int elem) {
 
         if (contains(elem)) {
             return false;
         }
-        
+
         if (numberOfElements() == elems.length) {
             int[] newElems = new int[elems.length + initSize];
             initSize = initSize * 2;
@@ -62,6 +50,15 @@ public class IntList implements IIntList {
         elems[++lastElementIndex] = elem;
 
         return true;
+    }
+
+    public boolean contains(int elem) {
+        for (int i = 0; i <= lastElementIndex; i++) {
+            if (elems[i] == elem) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /*

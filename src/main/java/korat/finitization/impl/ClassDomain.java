@@ -1,46 +1,50 @@
 package korat.finitization.impl;
 
+import korat.finitization.IClassDomain;
+import korat.instrumentation.IKoratArray;
+import korat.testing.ITester;
+import symsolve.PredicateChecker;
+
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import korat.finitization.IClassDomain;
-import korat.instrumentation.IKoratArray;
-import korat.testing.ITester;
-import symsolve.Solver;
-
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
- *
  */
 public class ClassDomain implements IClassDomain {
     private final Class<?> classOfObjects;
-
-    private List<Object> objects;
-
     protected boolean initialized = false;
-
-    int numOfObjects;
-
     protected Constructor<?> constructor;
-
     protected Object[] params;
+    int numOfObjects;
+    private List<Object> objects;
+    private boolean isomorphismCheck;
 
-    private boolean checkObjIndex(int ind) {
-        if (ind < 0 || ind >= objects.size())
-            return false;
+    /**
+     * Helper.
+     *
+     * @param classOfObjectsName -
+     *                           fully qualified name of the Class of the objects
+     * @param numOfObjects       -
+     *                           number of objects to be created
+     * @throws ClassNotFoundException -
+     *                                throws if classOfObjectName is not valid
+     */
+    ClassDomain(String classOfObjectsName, int numOfObjects)
+            throws ClassNotFoundException {
 
-        return true;
+        this(Class.forName(classOfObjectsName, false,
+                Finitization.getClassLoader()), numOfObjects);
     }
 
     /**
-     *
      * @param classOfObjects -
-     *            type of objects, has to be a Class object of a class
-     * @param numOfObjects -
-     *            number of objects of classOfObject type to be created
+     *                       type of objects, has to be a Class object of a class
+     * @param numOfObjects   -
+     *                       number of objects of classOfObject type to be created
      */
     ClassDomain(Class<?> classOfObjects, int numOfObjects) {
 
@@ -56,21 +60,8 @@ public class ClassDomain implements IClassDomain {
 
     }
 
-    /**
-     * Helper.
-     *
-     * @param classOfObjectsName -
-     *            fully qualified name of the Class of the objects
-     * @param numOfObjects -
-     *            number of objects to be created
-     * @throws ClassNotFoundException -
-     *             throws if classOfObjectName is not valid
-     */
-    ClassDomain(String classOfObjectsName, int numOfObjects)
-            throws ClassNotFoundException {
-
-        this(Class.forName(classOfObjectsName, false,
-                Finitization.getClassLoader()), numOfObjects);
+    private boolean defaultIsomorphismCheck(Class<?> clazz) {
+        return clazz != null && !clazz.isPrimitive();
     }
 
     ClassDomain(Class<?> classOfObjects) {
@@ -78,32 +69,33 @@ public class ClassDomain implements IClassDomain {
         this.isomorphismCheck = defaultIsomorphismCheck(classOfObjects);
     }
 
-    private boolean defaultIsomorphismCheck(Class<?> clazz) {
-        return clazz != null && !clazz.isPrimitive();
+    /**
+     * Returns object stored at a given position inside the class domain
+     */
+    public Object getObject(int index) {
+        if (!isInitialized())
+            initialize();
+
+        if (!checkObjIndex(index)) {
+            String msg = "Index " + index
+                    + " is out of bounds for Class Domain "
+                    + classOfObjects.getName();
+            throw new IndexOutOfBoundsException(msg);
+        }
+
+        return objects.get(index);
     }
 
-    public Class<?> getClassOfObjects() {
-        return classOfObjects;
-    }
-
-    public String getClassNameOfObjects() {
-        return classOfObjects.getName();
-    }
-
-    public int getSize() {
-        if (initialized)
-            return objects.size();
-        else
-            return objects.size() + numOfObjects;
+    private boolean checkObjIndex(int ind) {
+        return ind >= 0 && ind < objects.size();
     }
 
     /**
      * Creates all uncreated objects. Constructor used for creation is
      * <code>className(ITester interface);</code> constructor
-     *
+     * <p>
      * <p/> Size and other properties of class domain should be set before
      * calling this method, through constructor or some specialized interface.
-     *
      */
     public void initialize() {
 
@@ -111,12 +103,12 @@ public class ClassDomain implements IClassDomain {
             return;
         initialized = true;
 
-        ITester tester = Solver.getInstance();
+        ITester tester = PredicateChecker.getInstance();
 
         //TODO:: generalize for other object types
         if (IKoratArray.class.isAssignableFrom(classOfObjects))
             for (Object o : objects) {
-                ((IKoratArray)o).initialize(tester);
+                ((IKoratArray) o).initialize(tester);
 
             }
         for (int i = 0; i < numOfObjects; i++) {
@@ -152,25 +144,6 @@ public class ClassDomain implements IClassDomain {
     }
 
     /**
-     * Returns object stored at a given position inside the class domain
-     *
-     */
-    public Object getObject(int index) {
-        if (!isInitialized())
-            initialize();
-
-        if (!checkObjIndex(index)){
-            String msg = "Index " + index
-                    + " is out of bounds for Class Domain "
-                    + classOfObjects.getName();
-            throw new IndexOutOfBoundsException(msg);
-        }
-
-        return objects.get(index);
-    }
-
-    /**
-     *
      * @return list of all objects in this class domain
      */
     public List<Object> getObjects() {
@@ -182,7 +155,6 @@ public class ClassDomain implements IClassDomain {
 
     /**
      * Returns index of object <code>obj</code> in this class domain
-     *
      */
     public int getIndexOf(Object obj) {
         if (!isInitialized())
@@ -193,13 +165,16 @@ public class ClassDomain implements IClassDomain {
 
     /**
      * Checks whether the object <code>obj</code> is the member of this class domain
-     *
      */
     public boolean contains(Object obj) {
         if (!isInitialized())
             initialize();
 
         return objects.contains(obj);
+    }
+
+    public int hashCode() {
+        return getClassNameOfObjects().hashCode();
     }
 
     public boolean equals(Object other) {
@@ -216,11 +191,20 @@ public class ClassDomain implements IClassDomain {
 
     }
 
-    public int hashCode() {
-        return getClassNameOfObjects().hashCode();
+    public Class<?> getClassOfObjects() {
+        return classOfObjects;
     }
 
-    private boolean isomorphismCheck;
+    public String getClassNameOfObjects() {
+        return classOfObjects.getName();
+    }
+
+    public int getSize() {
+        if (initialized)
+            return objects.size();
+        else
+            return objects.size() + numOfObjects;
+    }
 
     public void includeInIsomorphismCheck(boolean include) {
         isomorphismCheck = include;

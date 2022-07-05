@@ -1,66 +1,30 @@
 package korat.finitization.impl;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import korat.finitization.IArraySet;
-import korat.finitization.IBooleanSet;
-import korat.finitization.IByteSet;
-import korat.finitization.IClassDomain;
-import korat.finitization.IDoubleSet;
-import korat.finitization.IFieldDomain;
-import korat.finitization.IFinitization;
-import korat.finitization.IFloatSet;
-import korat.finitization.IIntSet;
-import korat.finitization.ILongSet;
-import korat.finitization.IObjSet;
-import korat.finitization.IShortSet;
+import korat.finitization.*;
 import korat.instrumentation.IKoratArray;
 import korat.instrumentation.InstrumentationManager;
 import korat.instrumentation.KoratArrayManager;
+import korat.loading.InstrumentingClassLoader;
 import korat.utils.RandomStrings;
 import korat.utils.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
  */
 public class Finitization implements IFinitization {
 
-    private Class<?> rootClass;
-
-    private ClassDomain rootClassDomain;
-
-    private Map<IClassDomain, Map<String, IFieldDomain>> clsDomainsMap;
-
-    private Map<Class<?>, IClassDomain> classDomains;
-
+    protected static ClassLoader classLoader = new InstrumentingClassLoader();
+    private final Class<?> rootClass;
+    private final ClassDomain rootClassDomain;
+    private final Map<IClassDomain, Map<String, IFieldDomain>> clsDomainsMap;
+    private final Map<Class<?>, IClassDomain> classDomains;
+    private final List<Finitization> includedFinitizations;
+    HashMap<String, IntSet> integerFieldsMinMax = new HashMap<String, IntSet>();
     private StateSpace stateSpace;
-
     private boolean handleArraysAsObjects;
-
-    private List<Finitization> includedFinitizations;
-
-    protected static ClassLoader classLoader;
-
-    static {
-        classLoader = Finitization.class.getClassLoader();
-    }
-
-    public static void setClassLoader(ClassLoader classLoader2) {
-        classLoader = classLoader2;
-    }
-
-    public static ClassLoader getClassLoader() {
-        return classLoader;
-    }
 
     public Finitization(Class<?> myClass) {
 
@@ -76,10 +40,126 @@ public class Finitization implements IFinitization {
 
     }
 
-    private Class<?> getClassFromName(String className) {
+    private Map<String, IFieldDomain> putClsDomainsMap(IClassDomain cd,
+                                                       Map<String, IFieldDomain> mfd) {
+        classDomains.put(cd.getClassOfObjects(), cd);
+        return clsDomainsMap.put(cd, mfd);
+    }    public static void setClassLoader(ClassLoader classLoader2) {
+        classLoader = classLoader2;
+    }
+
+    private String createFieldName(Class<?> cls, String fieldName) {
+        return cls.getSimpleName() + "." + fieldName;
+    }
+
+    public int[] getInitialCandidateVector() {
+
+        int size = getStateSpace().getTotalNumberOfFields();
+        int[] ret = new int[size];
+        Set<ArraySet> visited = new HashSet<ArraySet>();
+
+        for (int i = 0; i < size; i++) {
+            CVElem c = getStateSpace().getCVElem(i);
+
+            if (!(c.getFieldDomain() instanceof ArraySet))
+                continue;
+
+            if (!c.isExcludedFromSearch())
+                continue;
+
+            ArraySet as = (ArraySet) c.getFieldDomain();
+
+            if (visited.add(as)) {
+                int next = 0;
+                ret[i] = next;
+                for (int j = i + 1; j < size; j++) {
+                    CVElem c2 = getStateSpace().getCVElem(j);
+                    if (c2.getFieldDomain() == as && c2.isExcludedFromSearch()) {
+                        ret[j] = ++next;
+                    }
+                }
+                if (next > c.getFieldDomain().getNumberOfElements())
+                    throw new RuntimeException("There are not enough arrays to initialize objects.");
+
+            }
+        }
+
+        return ret;
+
+    }
+
+    /**
+     * Returns the <code>IStateSpace</code> according to the bounds of the
+     * system
+     */
+    public StateSpace getStateSpace() {
+        if (stateSpace == null)
+            initialize();
+
+        return stateSpace;
+    }    public static ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    /**
+     * Does all needed initialization. Korat search algorithm should call this
+     * before getting <code>StateSpace</code>
+     */
+    public void initialize() {
+
+        initializeClassDomains();
+        createStateSpace();
+        initializeFieldSetters();
+
+    }
+
+    private void initializeClassDomains() {
+
+        for (IClassDomain icd : clsDomainsMap.keySet()) {
+            ClassDomain cd = (ClassDomain) icd;
+            cd.initialize();
+            Class<?> cls = cd.getClassOfObjects();
+
+            // TODO: Check!
+            Class<?> superCls = cls.getSuperclass();
+            while (superCls != null) {
+                IClassDomain superDomain = getClassDomain(superCls);
+                if (superDomain != null) {
+                    superDomain.addObjects(cd.getObjects());
+                }
+                superCls = superCls.getSuperclass();
+            }
+        }
+
+    }
+
+    private void createStateSpace() {
+
+        stateSpace = new StateSpace(); // new CachedStateSpace();
+        List<CVElem> candidates = new LinkedList<CVElem>();
+
+        for (IClassDomain cd : clsDomainsMap.keySet()) {
+            appendClassDomain(candidates, (ClassDomain) cd);
+        }
+
+        stateSpace.setStructureList(candidates.toArray(new CVElem[0]));
+        ClassDomain cd = rootClassDomain;
+        stateSpace.setRootObject(cd.getObject(0));
+
+    }
+
+    private void appendClassDomain(List<CVElem> list, ClassDomain cd) {
+
+        for (int i = 0; i < cd.getSize(); i++) {
+            Object obj = cd.getObject(i);
+            Map<String, IFieldDomain> fieldsMap = clsDomainsMap.get(cd);
+            appendFields(list, obj, fieldsMap);
+        }
+
+    }    private Class<?> getClassFromName(String className) {
 
         try {
-        	Class<?> cls = null;
+            Class<?> cls = null;
             try {
                 // first chance - treat className as full class name
                 cls = Class.forName(className, false,
@@ -116,58 +196,8 @@ public class Finitization implements IFinitization {
 
     }
 
-    private String parseClassName(String fullFieldName) {
-        String className;
-        int i = fullFieldName.lastIndexOf(".");
-        if (i == -1)
-            className = rootClass.getName();
-        else
-            className = fullFieldName.substring(0, i);
-
-        return className;
-    }
-
-    private String parseFieldName(String fullFieldName) {
-
-        String fieldName;
-        int i = fullFieldName.lastIndexOf(".");
-        if (i == -1)
-            fieldName = fullFieldName;
-        else
-            fieldName = fullFieldName.substring(i + 1);
-
-        return fieldName;
-
-    }
-
-    private Map<String, IFieldDomain> putClsDomainsMap(IClassDomain cd,
-            Map<String, IFieldDomain> mfd) {
-        classDomains.put(cd.getClassOfObjects(), cd);
-        return clsDomainsMap.put(cd, mfd);
-    }
-
-    private void initializeClassDomains() {
-
-        for (IClassDomain icd : clsDomainsMap.keySet()) {
-            ClassDomain cd = (ClassDomain) icd;
-            cd.initialize();
-            Class<?> cls = cd.getClassOfObjects();
-
-            // TODO: Check!
-            Class<?> superCls = cls.getSuperclass();
-            while (superCls != null) {
-                IClassDomain superDomain = getClassDomain(superCls);
-                if (superDomain != null) {
-                    superDomain.addObjects(cd.getObjects());
-                }
-                superCls = superCls.getSuperclass();
-            }
-        }
-
-    }
-
     private void appendFields(List<CVElem> fieldsList, Object obj,
-            Map<String, IFieldDomain> fieldsMap) {
+                              Map<String, IFieldDomain> fieldsMap) {
 
         for (String fieldName : fieldsMap.keySet()) {
             IFieldDomain fd = fieldsMap.get(fieldName);
@@ -196,31 +226,6 @@ public class Finitization implements IFinitization {
 
     }
 
-    private void appendClassDomain(List<CVElem> list, ClassDomain cd) {
-
-        for (int i = 0; i < cd.getSize(); i++) {
-            Object obj = cd.getObject(i);
-            Map<String, IFieldDomain> fieldsMap = clsDomainsMap.get(cd);
-            appendFields(list, obj, fieldsMap);
-        }
-
-    }
-
-    private void createStateSpace() {
-
-        stateSpace = new StateSpace(); // new CachedStateSpace();
-        List<CVElem> candidates = new LinkedList<CVElem>();
-
-        for (IClassDomain cd : clsDomainsMap.keySet()) {
-            appendClassDomain(candidates, (ClassDomain) cd);
-        }
-
-        stateSpace.setStructureList(candidates.toArray(new CVElem[0]));
-        ClassDomain cd = rootClassDomain;
-        stateSpace.setRootObject(cd.getObject(0));
-
-    }
-
     private void initializeFieldSetters() {
         if (stateSpace == null)
             throw new RuntimeException("Cannot execute this method!");
@@ -228,6 +233,36 @@ public class Finitization implements IFinitization {
         stateSpace.initialize();
 
     }
+
+    private String parseClassName(String fullFieldName) {
+        String className;
+        int i = fullFieldName.lastIndexOf(".");
+        if (i == -1)
+            className = rootClass.getName();
+        else
+            className = fullFieldName.substring(0, i);
+
+        return className;
+    }
+
+
+
+
+
+    private String parseFieldName(String fullFieldName) {
+
+        String fieldName;
+        int i = fullFieldName.lastIndexOf(".");
+        if (i == -1)
+            fieldName = fullFieldName;
+        else
+            fieldName = fullFieldName.substring(i + 1);
+
+        return fieldName;
+
+    }
+
+
 
     public boolean areArraysHandledAsObjects() {
         return handleArraysAsObjects;
@@ -242,7 +277,7 @@ public class Finitization implements IFinitization {
     }
 
     public IClassDomain createClassDomain(String className, int numOfInstances) {
-    	Class<?> cls = getClassFromName(className);
+        Class<?> cls = getClassFromName(className);
         return createClassDomain(cls, numOfInstances);
     }
 
@@ -292,11 +327,11 @@ public class Finitization implements IFinitization {
     public IByteSet createByteSet(byte min, byte diff, byte max) {
         return new ByteSet(min, diff, max);
     }
-    
+
     public StringSet createRandomStringSet(int setSize, int minLength, int maxLength) {
         return new StringSet(RandomStrings.generateRandomStringSet(setSize, minLength, maxLength));
     }
-    
+
     public StringSet createStringSet(Set<String> set) {
         return new StringSet(set);
     }
@@ -377,7 +412,7 @@ public class Finitization implements IFinitization {
     }
 
     public IObjSet createObjSet(String fieldBaseClassName, boolean includeNull) {
-    	Class<?> cls = getClassFromName(fieldBaseClassName);
+        Class<?> cls = getClassFromName(fieldBaseClassName);
         return createObjSet(cls, includeNull);
     }
 
@@ -390,19 +425,14 @@ public class Finitization implements IFinitization {
     }
 
     public IFieldDomain createObjSet(IClassDomain classDomain,
-            boolean includeNull) {
+                                     boolean includeNull) {
         IObjSet ret = createObjSet(classDomain.getClassOfObjects());
         ret.addClassDomain(classDomain);
         ret.setNullAllowed(includeNull);
         return ret;
     }
-    // ===================================== MODIFICATION
-    HashMap<String, IntSet> integerFieldsMinMax = new HashMap<String, IntSet>();
-    
-    private String createFieldName(Class<?> cls, String fieldName) {
-        return cls.getSimpleName() + "." + fieldName;
-    }
-    
+
+
     public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
         return this.integerFieldsMinMax;
     }
@@ -431,12 +461,12 @@ public class Finitization implements IFinitization {
         }
 
         fieldsMap.put(fieldName, fieldDomain);
-        
-     // ===================================== MODIFICATION
+
+        // ===================================== MODIFICATION
         if (fieldDomain instanceof IntSet) {
             this.integerFieldsMinMax.put(createFieldName(cls, fieldName), (IntSet) fieldDomain);
         }
-     // ===================================== MODIFICATION
+        // ===================================== MODIFICATION
         // ---------------------
         // Arrays stuff
         // ---------------------
@@ -473,7 +503,7 @@ public class Finitization implements IFinitization {
 
     public void set(String className, String fieldName, IFieldDomain fieldDomain) {
 
-    	Class<?> cls = getClassFromName(className);
+        Class<?> cls = getClassFromName(className);
         set(cls, fieldName, fieldDomain);
 
     }
@@ -491,13 +521,13 @@ public class Finitization implements IFinitization {
     }
 
     public void set(String fullFieldName, IFieldDomain fieldDomain, boolean notNull, boolean notNew, boolean notAlias) {
-    	String fieldName = parseFieldName(fullFieldName);
-    	if (notNull)
-    		((ObjSet) fieldDomain).addToNotNullFields(fieldName);
-    	if (notNew)
-    		((ObjSet) fieldDomain).addToNotNewFields(fieldName);
-    	if (notAlias)
-    		((ObjSet) fieldDomain).addToNotAliasFields(fieldName);
+        String fieldName = parseFieldName(fullFieldName);
+        if (notNull)
+            ((ObjSet) fieldDomain).addToNotNullFields(fieldName);
+        if (notNew)
+            ((ObjSet) fieldDomain).addToNotNewFields(fieldName);
+        if (notAlias)
+            ((ObjSet) fieldDomain).addToNotAliasFields(fieldName);
         set(fullFieldName, fieldDomain);
 
     }
@@ -509,7 +539,7 @@ public class Finitization implements IFinitization {
 
     public IClassDomain getClassDomain(String name) {
 
-    	Class<?> cls = getClassFromName(name);
+        Class<?> cls = getClassFromName(name);
         return getClassDomain(cls);
 
     }
@@ -520,17 +550,17 @@ public class Finitization implements IFinitization {
         if (cd == null)
             return null;
 
-        Map<String, IFieldDomain> fieldsMap = (Map<String, IFieldDomain>) clsDomainsMap.get(cd);
+        Map<String, IFieldDomain> fieldsMap = clsDomainsMap.get(cd);
         if (fieldsMap == null)
             return null;
 
-        return (IFieldDomain) fieldsMap.get(fieldName);
+        return fieldsMap.get(fieldName);
 
     }
 
     public IFieldDomain getFieldDomain(String className, String fieldName) {
 
-    	Class<?> cls = getClassFromName(className);
+        Class<?> cls = getClassFromName(className);
         return getFieldDomain(cls, fieldName);
 
     }
@@ -543,33 +573,9 @@ public class Finitization implements IFinitization {
 
     }
 
-    /**
-     * Returns the <code>IStateSpace</code> according to the bounds of the
-     * system
-     *
-     */
-    public StateSpace getStateSpace() {
-        if (stateSpace == null)
-            initialize();
-
-        return stateSpace;
-    }
-
-    /**
-     * Does all needed initialization. Korat search algorithm should call this
-     * before getting <code>StateSpace</code>
-     *
-     */
-    public void initialize() {
-
-        initializeClassDomains();
-        createStateSpace();
-        initializeFieldSetters();
-
-    }
 
     public IArraySet createArraySet(Class<?> clz, IIntSet array$length,
-            IFieldDomain array$values, int count) {
+                                    IFieldDomain array$values, int count) {
 
         // TODO: check cls against array$values.getClassOf...
 
@@ -612,7 +618,7 @@ public class Finitization implements IFinitization {
     }
 
     public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances,
-            boolean includeNull) {
+                                boolean includeNull) {
 
         IObjSet ret = createObjSet(fieldBaseClass, includeNull);
         IClassDomain clz = createClassDomain(fieldBaseClass, numOfInstances);
@@ -627,8 +633,8 @@ public class Finitization implements IFinitization {
     }
 
     public IObjSet createObjSet(String fieldBaseClassName, int numOfInstances,
-            boolean includeNull) {
-    	Class<?> cls = getClassFromName(fieldBaseClassName);
+                                boolean includeNull) {
+        Class<?> cls = getClassFromName(fieldBaseClassName);
         return createObjSet(cls, numOfInstances, includeNull);
     }
 
@@ -647,7 +653,7 @@ public class Finitization implements IFinitization {
 
     public void addAll(String className, String fieldName, IObjSet objSet) {
 
-    	Class<?> cls = getClassFromName(className);
+        Class<?> cls = getClassFromName(className);
         addAll(cls, fieldName, objSet);
 
     }
@@ -681,41 +687,6 @@ public class Finitization implements IFinitization {
 
     }
 
-    public int[] getInitialCandidateVector() {
-
-        int size = getStateSpace().getTotalNumberOfFields();
-        int[] ret = new int[size];
-        Set<ArraySet> visited = new HashSet<ArraySet>();
-
-        for (int i = 0; i < size; i++) {
-            CVElem c = getStateSpace().getCVElem(i);
-
-            if (!(c.getFieldDomain() instanceof ArraySet))
-                continue;
-
-            if (!c.isExcludedFromSearch())
-                continue;
-
-            ArraySet as = (ArraySet) c.getFieldDomain();
-
-            if (visited.add(as)) {
-                int next = 0;
-                ret[i] = next;
-                for (int j = i + 1; j < size; j++) {
-                    CVElem c2 = getStateSpace().getCVElem(j);
-                    if (c2.getFieldDomain() == as && c2.isExcludedFromSearch()) {
-                        ret[j] = ++next;
-                    }
-                }
-                if (next > c.getFieldDomain().getNumberOfElements())
-                    throw new RuntimeException("There are not enough arrays to initialize objects.");
-
-            }
-        }
-
-        return ret;
-
-    }
 
     public boolean includeFinitization(IFinitization ifin) {
 

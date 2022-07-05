@@ -63,14 +63,18 @@ public class SymSolveVector {
      *
      * @param concreteVector The concrete vector representation (Symbolic fields
      *                       represented with 0).
-     * @param partialVector  The partial vector representation (Symbolic fields
-     *                       represented with -1).
      * @param fixedIndices   The set of Fixed indices in this vector.
      */
     public SymSolveVector(int[] concreteVector, Set<Integer> fixedIndices) {
         this.size = concreteVector.length;
         this.concreteVector = concreteVector;
         this.fixedIndices = fixedIndices;
+        this.partialVector = createPartialVector();
+    }
+
+    public SymSolveVector(int vectorSize) {
+        this.size = vectorSize;
+        this.concreteVector = new int[vectorSize];
         this.partialVector = createPartialVector();
     }
 
