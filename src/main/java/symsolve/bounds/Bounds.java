@@ -5,6 +5,7 @@ import korat.finitization.impl.StateSpace;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class Bounds {
 
@@ -37,6 +38,15 @@ public class Bounds {
 
     private static String createFieldSignature(String className, String fieldName) {
         return String.format("%s.%s", className, fieldName);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, HashSet<Integer>> e : bounds.entrySet()) {
+            sb.append(String.format("%s : %s\n", e.getKey(), e.getValue().toString()));
+        }
+        return sb.toString();
     }
 
 }

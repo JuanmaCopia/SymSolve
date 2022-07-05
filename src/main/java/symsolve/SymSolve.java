@@ -5,6 +5,7 @@ import korat.finitization.impl.IntSet;
 import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokePredicateException;
+import symsolve.bounds.Bounds;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 import java.util.HashMap;
@@ -110,7 +111,8 @@ public class SymSolve {
      * UNSAT.
      */
     public int[] solve(SymSolveVector vector) {
-        if (isSatisfiable(vector)) return solver.getCandidateVector();
+        if (isSatisfiable(vector))
+            return solver.getCandidateVector();
         return null;
     }
 
@@ -127,7 +129,8 @@ public class SymSolve {
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
-        if (isSat) return solver.getCandidateVector();
+        if (isSat)
+            return solver.getCandidateVector();
         return null;
     }
 
@@ -147,6 +150,16 @@ public class SymSolve {
             e.printStackTrace(System.err);
         }
         return vectorSolutions;
+    }
+
+    public Bounds calculateBounds() {
+        Bounds bounds = null;
+        try {
+            bounds = solver.calculateBounds();
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+        }
+        return bounds;
     }
 
     /**
@@ -218,8 +231,8 @@ public class SymSolve {
      *
      * @return A map of simple class names to maximum number of objects.
      */
-    public HashMap<String, Integer> getBounds() {
-        return solver.getBounds();
+    public HashMap<String, Integer> getScopes() {
+        return solver.getScopes();
     }
 
     public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {

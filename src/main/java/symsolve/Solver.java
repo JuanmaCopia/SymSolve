@@ -8,6 +8,7 @@ import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
+import symsolve.bounds.Bounds;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.VectorStateSpaceExplorerFactory;
 import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
@@ -102,7 +103,7 @@ public class Solver {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))
                 return true;
-            vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+            vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return false;
     }
@@ -121,26 +122,26 @@ public class Solver {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))
                 solutions.add(vector.clone());
-            vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+            vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return solutions;
     }
 
-/*    public Bounds calculateBounds() throws CannotInvokePredicateException {
+    public Bounds calculateBounds() throws CannotInvokePredicateException {
         Bounds bounds = new Bounds(stateSpace);
         SymSolveVector initialVector = new SymSolveVector(stateSpace.getTotalNumberOfFields());
-        this.symbolicVectorSpaceExplorer.initialize(initialVector);
-        int[] vector = initialVector.getConcreteVector();
+        symbolicVectorSpaceExplorer.initialize(initialVector);
+        int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))
                 bounds.recordBounds(vector);
-            vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+            vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return bounds;
-    }*/
+    }
 
-    public HashMap<String, Integer> getBounds() {
+    public HashMap<String, Integer> getScopes() {
         HashMap<String, Integer> bounds = new HashMap<>();
         CVElem[] structureList = stateSpace.getStructureList();
         for (CVElem cvElem : structureList) {
