@@ -8,7 +8,6 @@ import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
-import symsolve.bounds.Bounds;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.VectorStateSpaceExplorerFactory;
 import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
@@ -127,7 +126,7 @@ public class Solver {
         return solutions;
     }
 
-    public Bounds calculateBounds() throws CannotInvokePredicateException {
+    /*public Bounds calculateBounds() throws CannotInvokePredicateException {
         Bounds bounds = new Bounds(stateSpace);
         SymSolveVector initialVector = new SymSolveVector(stateSpace.getTotalNumberOfFields());
         symbolicVectorSpaceExplorer.initialize(initialVector);
@@ -139,7 +138,7 @@ public class Solver {
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return bounds;
-    }
+    }*/
 
     public HashMap<String, Integer> getScopes() {
         HashMap<String, Integer> bounds = new HashMap<>();

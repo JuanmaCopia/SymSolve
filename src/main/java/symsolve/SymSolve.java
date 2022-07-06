@@ -5,7 +5,6 @@ import korat.finitization.impl.IntSet;
 import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokePredicateException;
-import symsolve.bounds.Bounds;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 import java.util.HashMap;
@@ -152,7 +151,7 @@ public class SymSolve {
         return vectorSolutions;
     }
 
-    public Bounds calculateBounds() {
+/*    public Bounds calculateBounds() {
         Bounds bounds = null;
         try {
             bounds = solver.calculateBounds();
@@ -160,7 +159,7 @@ public class SymSolve {
             e.printStackTrace(System.err);
         }
         return bounds;
-    }
+    }*/
 
     /**
      * Decides whether a partially symbolic instance represented by a string vector

@@ -1,15 +1,45 @@
 package symsolve.bounds;
 
 import korat.finitization.impl.CVElem;
+import korat.finitization.impl.Finitization;
 import korat.finitization.impl.StateSpace;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Bounds {
 
-    HashMap<String, HashSet<Integer>> bounds = new HashMap<>();
+    Map<Class<?>, ClassBound> classBoundMap = new HashMap<>();
+    Finitization finitization;
+    Class<?> rootClass;
+
+
+    public Bounds(Finitization finitization, Class<?> rootClass) {
+        this.finitization = finitization;
+        this.rootClass = rootClass;
+        initializeClassBoundMap();
+    }
+
+    private void initializeClassBoundMap() {
+        Set<Class<?>> classes = finitization.getClasses();
+        for (Class<?> cls : classes) {
+            if (!classBoundMap.containsKey(cls))
+                classBoundMap.put(cls, new ClassBound(cls, finitization));
+        }
+    }
+
+    public void recordBounds(int[] vector) {
+        StateSpace stateSpace = finitization.getStateSpace();
+        for (int i = 0; i < vector.length; i++) {
+            CVElem cvElem = stateSpace.getCVElem(i);
+            Object ownerObj = cvElem.getObj();
+            int value = vector[i];
+            //addBound(cvElem, vector[i]);
+        }
+    }
+
+/*    HashMap<String, HashSet<Integer>> bounds = new HashMap<>();
 
     StateSpace stateSpace;
 
@@ -47,6 +77,6 @@ public class Bounds {
             sb.append(String.format("%s : %s\n", e.getKey(), e.getValue().toString()));
         }
         return sb.toString();
-    }
+    }*/
 
 }

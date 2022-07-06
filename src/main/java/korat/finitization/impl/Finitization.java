@@ -40,12 +40,28 @@ public class Finitization implements IFinitization {
 
     }
 
+    public static ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public static void setClassLoader(ClassLoader classLoader2) {
+        classLoader = classLoader2;
+    }
+
+    public Set<Class<?>> getClasses() {
+        return classDomains.keySet();
+    }
+
+    public List<String> getFieldNames(Class<?> cls) {
+        Map<String, IFieldDomain> fieldDomains = clsDomainsMap.get(cls);
+        Set<String> fieldNames = fieldDomains.keySet();
+        return new ArrayList<String>(fieldNames);
+    }
+
     private Map<String, IFieldDomain> putClsDomainsMap(IClassDomain cd,
                                                        Map<String, IFieldDomain> mfd) {
         classDomains.put(cd.getClassOfObjects(), cd);
         return clsDomainsMap.put(cd, mfd);
-    }    public static void setClassLoader(ClassLoader classLoader2) {
-        classLoader = classLoader2;
     }
 
     private String createFieldName(Class<?> cls, String fieldName) {
@@ -97,8 +113,6 @@ public class Finitization implements IFinitization {
             initialize();
 
         return stateSpace;
-    }    public static ClassLoader getClassLoader() {
-        return classLoader;
     }
 
     /**
@@ -156,7 +170,9 @@ public class Finitization implements IFinitization {
             appendFields(list, obj, fieldsMap);
         }
 
-    }    private Class<?> getClassFromName(String className) {
+    }
+
+    private Class<?> getClassFromName(String className) {
 
         try {
             Class<?> cls = null;
@@ -246,9 +262,6 @@ public class Finitization implements IFinitization {
     }
 
 
-
-
-
     private String parseFieldName(String fullFieldName) {
 
         String fieldName;
@@ -262,16 +275,6 @@ public class Finitization implements IFinitization {
 
     }
 
-
-
-    public boolean areArraysHandledAsObjects() {
-        return handleArraysAsObjects;
-    }
-
-    public void handleArraysAsObjects(boolean handleAsObjects) {
-        this.handleArraysAsObjects = handleAsObjects;
-    }
-
     public Class<?> getFinClass() {
         return rootClass;
     }
@@ -279,6 +282,10 @@ public class Finitization implements IFinitization {
     public IClassDomain createClassDomain(String className, int numOfInstances) {
         Class<?> cls = getClassFromName(className);
         return createClassDomain(cls, numOfInstances);
+    }
+
+    public IClassDomain createClassDomain(String className) {
+        return createClassDomain(className, 0);
     }
 
     public IClassDomain createClassDomain(Class<?> cls, int numOfInstances) {
@@ -308,8 +315,8 @@ public class Finitization implements IFinitization {
 
     }
 
-    public IBooleanSet createBooleanSet() {
-        return new BooleanSet();
+    public IClassDomain createClassDomain(Class<?> cls) {
+        return createClassDomain(cls, 0);
     }
 
     public IIntSet createIntSet(int min, int diff, int max) {
@@ -324,16 +331,12 @@ public class Finitization implements IFinitization {
         return new IntSet(singleValue);
     }
 
+    public IBooleanSet createBooleanSet() {
+        return new BooleanSet();
+    }
+
     public IByteSet createByteSet(byte min, byte diff, byte max) {
         return new ByteSet(min, diff, max);
-    }
-
-    public StringSet createRandomStringSet(int setSize, int minLength, int maxLength) {
-        return new StringSet(RandomStrings.generateRandomStringSet(setSize, minLength, maxLength));
-    }
-
-    public StringSet createStringSet(Set<String> set) {
-        return new StringSet(set);
     }
 
     public IByteSet createByteSet(byte min, byte max) {
@@ -342,6 +345,30 @@ public class Finitization implements IFinitization {
 
     public IByteSet createByteSet(byte singleValue) {
         return new ByteSet(singleValue);
+    }
+
+    public IShortSet createShortSet(short min, short diff, short max) {
+        return new ShortSet(min, diff, max);
+    }
+
+    public IShortSet createShortSet(short min, short max) {
+        return new ShortSet(min, max);
+    }
+
+    public IShortSet createShortSet(short singleValue) {
+        return new ShortSet(singleValue);
+    }
+
+    public ILongSet createLongSet(long min, long diff, long max) {
+        return new LongSet(min, diff, max);
+    }
+
+    public ILongSet createLongSet(long min, long max) {
+        return new LongSet(min, max);
+    }
+
+    public ILongSet createLongSet(long singleValue) {
+        return new LongSet(singleValue);
     }
 
     public IDoubleSet createDoubleSet(double min, double diff, double max) {
@@ -368,30 +395,6 @@ public class Finitization implements IFinitization {
         return new FloatSet(singleValue);
     }
 
-    public ILongSet createLongSet(long min, long diff, long max) {
-        return new LongSet(min, diff, max);
-    }
-
-    public ILongSet createLongSet(long min, long max) {
-        return new LongSet(min, max);
-    }
-
-    public ILongSet createLongSet(long singleValue) {
-        return new LongSet(singleValue);
-    }
-
-    public IShortSet createShortSet(short min, short diff, short max) {
-        return new ShortSet(min, diff, max);
-    }
-
-    public IShortSet createShortSet(short min, short max) {
-        return new ShortSet(min, max);
-    }
-
-    public IShortSet createShortSet(short singleValue) {
-        return new ShortSet(singleValue);
-    }
-
     public IObjSet createObjSet(Class<?> fieldBaseClass, boolean includeNull) {
 
         IObjSet oset = null;
@@ -407,8 +410,23 @@ public class Finitization implements IFinitization {
 
     }
 
+    public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances,
+                                boolean includeNull) {
+
+        IObjSet ret = createObjSet(fieldBaseClass, includeNull);
+        IClassDomain clz = createClassDomain(fieldBaseClass, numOfInstances);
+        ret.addClassDomain(clz);
+
+        return ret;
+
+    }
+
     public IObjSet createObjSet(Class<?> fieldBaseClass) {
         return createObjSet(fieldBaseClass, false);
+    }
+
+    public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances) {
+        return createObjSet(fieldBaseClass, numOfInstances, false);
     }
 
     public IObjSet createObjSet(String fieldBaseClassName, boolean includeNull) {
@@ -416,8 +434,18 @@ public class Finitization implements IFinitization {
         return createObjSet(cls, includeNull);
     }
 
+    public IObjSet createObjSet(String fieldBaseClassName, int numOfInstances,
+                                boolean includeNull) {
+        Class<?> cls = getClassFromName(fieldBaseClassName);
+        return createObjSet(cls, numOfInstances, includeNull);
+    }
+
     public IObjSet createObjSet(String fieldBaseClassName) {
         return createObjSet(fieldBaseClassName, false);
+    }
+
+    public IObjSet createObjSet(String fieldBaseClassName, int numOfInstances) {
+        return createObjSet(fieldBaseClassName, numOfInstances, false);
     }
 
     public IFieldDomain createObjSet(IClassDomain classDomain) {
@@ -432,9 +460,58 @@ public class Finitization implements IFinitization {
         return ret;
     }
 
+    public IArraySet createArraySet(Class<?> clz, IIntSet array$length,
+                                    IFieldDomain array$values, int count) {
 
-    public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
-        return this.integerFieldsMinMax;
+        // TODO: check cls against array$values.getClassOf...
+
+        ClassDomain arrays = null;
+        IntSet _array$length = (IntSet) array$length;
+        FieldDomain _array$values = (FieldDomain) array$values;
+
+        if (!clz.isArray())
+            throw new IllegalArgumentException("clz must be of array type");
+
+        Class<?> arrayClass = null;
+        try {
+
+            arrayClass = KoratArrayManager.createArrayClass(clz);
+            arrays = (ClassDomain) createClassDomain(arrayClass);
+
+            int maxSize = _array$length.getMax();
+
+            for (int i = 0; i < count; i++)
+                arrays.addObject(KoratArrayManager.createArray(arrayClass,
+                        maxSize));
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (arrays == null)
+            throw new RuntimeException("arrays class domain must be resolved");
+
+        return new ArraySet(arrays, _array$length, _array$values);
+
+    }
+
+    public void set(String fullFieldName, IFieldDomain fieldDomain) {
+
+        String fieldName = parseFieldName(fullFieldName);
+        String className = parseClassName(fullFieldName);
+
+        if (fieldDomain.isArrayType())
+            fieldName = InstrumentationManager.getKoratArrayFieldName(fieldName);
+
+        set(className, fieldName, fieldDomain);
+
+    }
+
+    public void set(String className, String fieldName, IFieldDomain fieldDomain) {
+
+        Class<?> cls = getClassFromName(className);
+        set(cls, fieldName, fieldDomain);
+
     }
 
     public void set(Class<?> cls, String fieldName, IFieldDomain fieldDomain) {
@@ -501,25 +578,6 @@ public class Finitization implements IFinitization {
 
     }
 
-    public void set(String className, String fieldName, IFieldDomain fieldDomain) {
-
-        Class<?> cls = getClassFromName(className);
-        set(cls, fieldName, fieldDomain);
-
-    }
-
-    public void set(String fullFieldName, IFieldDomain fieldDomain) {
-
-        String fieldName = parseFieldName(fullFieldName);
-        String className = parseClassName(fullFieldName);
-
-        if (fieldDomain.isArrayType())
-            fieldName = InstrumentationManager.getKoratArrayFieldName(fieldName);
-
-        set(className, fieldName, fieldDomain);
-
-    }
-
     public void set(String fullFieldName, IFieldDomain fieldDomain, boolean notNull, boolean notNew, boolean notAlias) {
         String fieldName = parseFieldName(fullFieldName);
         if (notNull)
@@ -532,16 +590,16 @@ public class Finitization implements IFinitization {
 
     }
 
-    public ClassDomain getClassDomain(Class<?> cls) {
-
-        return (ClassDomain) classDomains.get(cls);
-    }
-
     public IClassDomain getClassDomain(String name) {
 
         Class<?> cls = getClassFromName(name);
         return getClassDomain(cls);
 
+    }
+
+    public ClassDomain getClassDomain(Class<?> cls) {
+
+        return (ClassDomain) classDomains.get(cls);
     }
 
     public IFieldDomain getFieldDomain(Class<?> cls, String fieldName) {
@@ -571,75 +629,6 @@ public class Finitization implements IFinitization {
         String className = parseClassName(fullFieldName);
         return getFieldDomain(className, fieldName);
 
-    }
-
-
-    public IArraySet createArraySet(Class<?> clz, IIntSet array$length,
-                                    IFieldDomain array$values, int count) {
-
-        // TODO: check cls against array$values.getClassOf...
-
-        ClassDomain arrays = null;
-        IntSet _array$length = (IntSet) array$length;
-        FieldDomain _array$values = (FieldDomain) array$values;
-
-        if (!clz.isArray())
-            throw new IllegalArgumentException("clz must be of array type");
-
-        Class<?> arrayClass = null;
-        try {
-
-            arrayClass = KoratArrayManager.createArrayClass(clz);
-            arrays = (ClassDomain) createClassDomain(arrayClass);
-
-            int maxSize = _array$length.getMax();
-
-            for (int i = 0; i < count; i++)
-                arrays.addObject(KoratArrayManager.createArray(arrayClass,
-                        maxSize));
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        if (arrays == null)
-            throw new RuntimeException("arrays class domain must be resolved");
-
-        return new ArraySet(arrays, _array$length, _array$values);
-
-    }
-
-    public IClassDomain createClassDomain(String className) {
-        return createClassDomain(className, 0);
-    }
-
-    public IClassDomain createClassDomain(Class<?> cls) {
-        return createClassDomain(cls, 0);
-    }
-
-    public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances,
-                                boolean includeNull) {
-
-        IObjSet ret = createObjSet(fieldBaseClass, includeNull);
-        IClassDomain clz = createClassDomain(fieldBaseClass, numOfInstances);
-        ret.addClassDomain(clz);
-
-        return ret;
-
-    }
-
-    public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances) {
-        return createObjSet(fieldBaseClass, numOfInstances, false);
-    }
-
-    public IObjSet createObjSet(String fieldBaseClassName, int numOfInstances,
-                                boolean includeNull) {
-        Class<?> cls = getClassFromName(fieldBaseClassName);
-        return createObjSet(cls, numOfInstances, includeNull);
-    }
-
-    public IObjSet createObjSet(String fieldBaseClassName, int numOfInstances) {
-        return createObjSet(fieldBaseClassName, numOfInstances, false);
     }
 
     public void addAll(String fullFieldName, IObjSet objSet) {
@@ -687,7 +676,6 @@ public class Finitization implements IFinitization {
 
     }
 
-
     public boolean includeFinitization(IFinitization ifin) {
 
         if (getIncludedFinitization(ifin.getFinClass()) != null)
@@ -718,6 +706,26 @@ public class Finitization implements IFinitization {
                 return includedFinitizations.get(i);
         return null;
 
+    }
+
+    public void handleArraysAsObjects(boolean handleAsObjects) {
+        this.handleArraysAsObjects = handleAsObjects;
+    }
+
+    public boolean areArraysHandledAsObjects() {
+        return handleArraysAsObjects;
+    }
+
+    public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
+        return this.integerFieldsMinMax;
+    }
+
+    public StringSet createRandomStringSet(int setSize, int minLength, int maxLength) {
+        return new StringSet(RandomStrings.generateRandomStringSet(setSize, minLength, maxLength));
+    }
+
+    public StringSet createStringSet(Set<String> set) {
+        return new StringSet(set);
     }
 
 }
