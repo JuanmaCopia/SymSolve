@@ -45,7 +45,7 @@ public class CandidateBuilder {
 
             if (!fd.isPrimitiveType() && !fd.isArrayType()) {
 
-                ObjSet set = (ObjSet) fd;
+                ObjSet2 set = (ObjSet2) fd;
                 Object value = set.getObject(index);
                 setter.set(value);
 

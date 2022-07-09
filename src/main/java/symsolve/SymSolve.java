@@ -8,6 +8,7 @@ import korat.testing.impl.CannotInvokePredicateException;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -234,7 +235,7 @@ public class SymSolve {
         return solver.getScopes();
     }
 
-    public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
+    public Map<String, IntSet> getIntegerFieldsMinMaxMap() {
         return this.solver.getIntegerFieldsMinMaxMap();
     }
 

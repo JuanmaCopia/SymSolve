@@ -1,6 +1,6 @@
 package symsolve;
 
-import korat.finitization.IFinitization;
+
 import korat.finitization.impl.*;
 import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
@@ -14,10 +14,12 @@ import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 import symsolve.utils.CodeGenerator;
 import symsolve.utils.Helper;
+import symsolve.utils.Utils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Solver {
@@ -28,20 +30,20 @@ public class Solver {
     CodeGenerator codeGenerator;
     IIntList accessedIndices;
     Class<?> rootClass;
-    IFinitization finitization;
+    Finitization2 finitization;
 
     PredicateChecker predicateChecker;
 
     public Solver(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
 
-        rootClass = Finitization.getClassLoader().loadClass(params.getFullyQualifiedClassName());
+        rootClass = Finitization2.getClassLoader().loadClass(params.getFullyQualifiedClassName());
 
         String[] finArgs = params.getFinitizationArgs();
         Method finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
         finitization = Helper.invokeFinMethod(rootClass, finMethod, finArgs);
 
-        stateSpace = ((Finitization) finitization).getStateSpace();
+        stateSpace = finitization.getStateSpace();
         int vectorSize = stateSpace.getTotalNumberOfFields();
         accessedIndices = new IntListAI(vectorSize);
         IIntList changedFields = new IntListAI(vectorSize);
@@ -83,8 +85,11 @@ public class Solver {
     }
 
     public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
+        System.out.println("\nStarting search for vector: ");
+
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
+        Utils.printVectorFormat(vector, stateSpace.getStructureList());
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))
@@ -162,7 +167,7 @@ public class Solver {
         return codeGenerator.generateStructureCode(vector);
     }
 
-    public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
+    public Map<String, IntSet> getIntegerFieldsMinMaxMap() {
         return finitization.getIntegerFieldsMinMaxMap();
     }
 

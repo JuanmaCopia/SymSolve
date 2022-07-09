@@ -51,6 +51,34 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
         calculateMaxFixedInstancePerReferenceFieldDomain(vector.getFixedIndices());
     }
 
+    public int[] getNextCandidate() {
+        changedFields.clear();
+        while (!accessedIndices.isEmpty()) {
+            int lastAccessedFieldIndex = accessedIndices.removeLast();
+            if (!fixedIndices.contains(lastAccessedFieldIndex)) {
+                changedFields.add(lastAccessedFieldIndex);
+                if (setNextValue(lastAccessedFieldIndex))
+                    return candidateVector;
+                backtrack(lastAccessedFieldIndex);
+            }
+        }
+        return null;
+    }
+
+    public void setInitializedFields() {
+        for (int i = 0; i < this.vectorSize; i++) {
+            if (!fixedIndices.contains(i) && candidateVector[i] > 0) {
+                this.initializedFields[i] = true;
+            }
+        }
+    }
+
+    private void setCandidateVector(SymSolveVector vector) {
+        this.candidateVector = vector.getConcreteVector();
+        if (vectorSize != this.candidateVector.length)
+            throw new IllegalArgumentException(String.format("Wrong vector size! Expected: %d, but got: %d", vectorSize, this.candidateVector.length));
+    }
+
     private void resetExplorerState() {
         for (int i = 0; i < vectorSize; i++) {
             maxInstances[i] = -1;
@@ -73,28 +101,6 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
             }
         }
 
-    }
-
-    public int[] getNextCandidate() {
-        changedFields.clear();
-        while (!accessedIndices.isEmpty()) {
-            int lastAccessedFieldIndex = accessedIndices.removeLast();
-            if (!fixedIndices.contains(lastAccessedFieldIndex)) {
-                changedFields.add(lastAccessedFieldIndex);
-                if (setNextValue(lastAccessedFieldIndex))
-                    return candidateVector;
-                backtrack(lastAccessedFieldIndex);
-            }
-        }
-        return null;
-    }
-
-    public void setInitializedFields() {
-        for (int i = 0; i < this.vectorSize; i++) {
-            if (!fixedIndices.contains(i) && candidateVector[i] > 0) {
-                this.initializedFields[i] = true;
-            }
-        }
     }
 
     protected boolean setNextValue(int lastAccessedFieldIndex) {
@@ -141,12 +147,6 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
     protected void backtrack(int lastAccessedFieldIndex) {
         candidateVector[lastAccessedFieldIndex] = 0;
         maxInstances[lastAccessedFieldIndex] = -1;
-    }
-
-    private void setCandidateVector(SymSolveVector vector) {
-        this.candidateVector = vector.getConcreteVector();
-        if (vectorSize != this.candidateVector.length)
-            throw new IllegalArgumentException("The input vector does not match the finitization!");
     }
 
 }

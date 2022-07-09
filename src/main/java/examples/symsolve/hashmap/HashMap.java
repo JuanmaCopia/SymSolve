@@ -1,8 +1,9 @@
 package examples.symsolve.hashmap;
 
-import korat.finitization.IFinitization;
 import korat.finitization.IObjSet;
-import korat.finitization.impl.FinitizationFactory;
+import korat.finitization.impl.Finitization2;
+import korat.finitization.impl.IntSet;
+import korat.finitization.impl.ObjSet2;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,13 +35,12 @@ public class HashMap {
     public Entry e14;
     public Entry e15;
 
-    public static IFinitization finHashMap(int nodesNum) {
+    public static Finitization2 finHashMap(int nodesNum) {
+        Finitization2 f = new Finitization2(HashMap.class);
 
-        IFinitization f = FinitizationFactory.create(HashMap.class);
+        f.set(HashMap.class, "size", new IntSet(0, nodesNum));
 
-        f.set(HashMap.class, "size", f.createIntSet(0, nodesNum));
-
-        IObjSet entries = f.createObjSet(Entry.class, nodesNum, true);
+        IObjSet entries = new ObjSet2(Entry.class, nodesNum, true);
 
         f.set(HashMap.class, "e0", entries);
         f.set(HashMap.class, "e1", entries);
@@ -61,11 +61,22 @@ public class HashMap {
 
         int maxint = DEFAULT_INITIAL_CAPACITY * nodesNum;
 
-        f.set(Entry.class, "key", f.createIntSet(0, maxint - 1));
-        f.set(Entry.class, "hash", f.createIntSet(0, maxint - 1));
+        f.set(Entry.class, "key", new IntSet(0, maxint - 1));
+        f.set(Entry.class, "hash", new IntSet(0, maxint - 1));
         f.set(Entry.class, "next", entries);
 
         return f;
+    }
+
+    static int hash(int x) {
+        return x;
+    }
+
+    /**
+     * Returns index for hash code h.
+     */
+    static int indexFor(int h, int length) {
+        return h & (length - 1);
     }
 
     public boolean repOK() {
@@ -151,17 +162,6 @@ public class HashMap {
             current = current.next;
         }
         return true;
-    }
-
-    static int hash(int x) {
-        return x;
-    }
-
-    /**
-     * Returns index for hash code h.
-     */
-    static int indexFor(int h, int length) {
-        return h & (length - 1);
     }
 
 }
