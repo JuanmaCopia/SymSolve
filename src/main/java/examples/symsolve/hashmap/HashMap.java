@@ -1,9 +1,9 @@
 package examples.symsolve.hashmap;
 
 import korat.finitization.IObjSet;
-import korat.finitization.impl.Finitization2;
+import korat.finitization.impl.Finitization;
 import korat.finitization.impl.IntSet;
-import korat.finitization.impl.ObjSet2;
+import korat.finitization.impl.ObjSet;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,12 +35,12 @@ public class HashMap {
     public Entry e14;
     public Entry e15;
 
-    public static Finitization2 finHashMap(int nodesNum) {
-        Finitization2 f = new Finitization2(HashMap.class);
+    public static Finitization finHashMap(int nodesNum) {
+        Finitization f = new Finitization(HashMap.class);
 
         f.set(HashMap.class, "size", new IntSet(0, nodesNum));
 
-        IObjSet entries = new ObjSet2(Entry.class, nodesNum, true);
+        IObjSet entries = new ObjSet(Entry.class, nodesNum, true);
 
         f.set(HashMap.class, "e0", entries);
         f.set(HashMap.class, "e1", entries);

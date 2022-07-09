@@ -1,9 +1,9 @@
 package examples.symsolve.schedule;
 
 import korat.finitization.IObjSet;
-import korat.finitization.impl.Finitization2;
+import korat.finitization.impl.Finitization;
 import korat.finitization.impl.IntSet;
-import korat.finitization.impl.ObjSet2;
+import korat.finitization.impl.ObjSet;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,15 +32,15 @@ public class Schedule {
 
     public List blockQueue;
 
-    public static Finitization2 finSchedule(int jobsNum) {
-        Finitization2 f = new Finitization2(Schedule.class);
+    public static Finitization finSchedule(int jobsNum) {
+        Finitization f = new Finitization(Schedule.class);
 
-        IObjSet jobs = new ObjSet2(Job.class, jobsNum, true);
+        IObjSet jobs = new ObjSet(Job.class, jobsNum, true);
         f.set(Schedule.class, "allocProcNum", new IntSet(0, jobsNum + 1));
         f.set(Schedule.class, "numProcesses", new IntSet(0, jobsNum));
         f.set(Schedule.class, "curProc", jobs);
 
-        IObjSet lists = new ObjSet2(List.class, 4, true);
+        IObjSet lists = new ObjSet(List.class, 4, true);
         f.set(Schedule.class, "prio_0", lists);
         f.set(Schedule.class, "prio_1", lists);
         f.set(Schedule.class, "prio_2", lists);

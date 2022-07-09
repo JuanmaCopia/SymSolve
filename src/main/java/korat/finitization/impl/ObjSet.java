@@ -1,374 +1,144 @@
 package korat.finitization.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import korat.finitization.IObjSet;
+import korat.testing.ITester;
+import symsolve.PredicateChecker;
+
+import java.lang.reflect.Constructor;
+import java.text.MessageFormat;
+import java.util.LinkedList;
 import java.util.List;
 
-import korat.finitization.IClassDomain;
-import korat.finitization.IObjSet;
-
-/**
- * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
- *
- */
 public class ObjSet extends FieldDomain implements IObjSet {
 
-    static class CacheElement {
-        Object obj;
+    Class<?> classOfField;
+    int numOfObjects;
+    Object[] fieldDomainValues;
+    List<Object> objects = new LinkedList<>();
+    boolean includesNull;
 
-        ClassDomain oset;
 
-        int objIndexWithinObjSet;
-
-        int indexOfFirstObjectInNextClassDomain;
-
-        CacheElement(Object obj, ClassDomain cd, int objIndexWithinObjSet,
-                int indexOfFirstObjectInNextClassDomain) {
-            this.obj = obj;
-            this.oset = cd;
-            this.objIndexWithinObjSet = objIndexWithinObjSet;
-            this.indexOfFirstObjectInNextClassDomain = indexOfFirstObjectInNextClassDomain;
-        }
-    }
-
-    private List<CacheElement> cache = new ArrayList<CacheElement>();
-
-    private boolean isCacheValid = false;
-
-    protected List<ClassDomain> domains;
-
-    private boolean nullAllowed = false;
-
-    // ===============  Added  ==============
-
-    private HashSet<String> notAliasFields;
-
-    private HashSet<String> notNewFields;
-
-    private HashSet<String> notNullFields;
-
-    // ======================================
-
-    private void updateCache() {
-        cache.clear();
-
-        int cnt = 0;
-        int nDomains = domains.size();
-        for (int iDom = 0; iDom < nDomains; iDom++) {
-            ClassDomain cd = domains.get(iDom);
-            int nObjs = cd.getSize();
-            int firstInNext = cnt + nObjs;
-            if (iDom == nDomains - 1)
-                firstInNext = -1;
-
-            for (int i = 0; i < nObjs; i++) {
-                cache.add(new CacheElement(cd.getObject(i), cd, i, firstInNext));
-            }
-            cnt += nObjs;
-        }
-        isCacheValid = true;
-    }
-
-    ObjSet(Class<?> classOfField) {
+    public ObjSet(Class<?> classOfField, int numOfObjects, boolean includesNull) {
         super(classOfField);
-        // ===============  Added  ==============
-        notAliasFields = new HashSet<String>();
-        notNewFields = new HashSet<String>();
-        notNullFields = new HashSet<String>();
-        // ======================================
-        domains = new ArrayList<ClassDomain>();
-        if (classOfField.isArray() || classOfField.isPrimitive())
-            throw new IllegalArgumentException(
-                    "classOfField parameter must be Class object of a class or interface");
+        this.classOfField = classOfField;
+        this.includesNull = includesNull;
+        this.numOfObjects = numOfObjects;
+        initializeFieldDomain();
     }
 
-    ObjSet(String classOfFieldName) throws ClassNotFoundException {
-        this(Class.forName(classOfFieldName, false,
-                Finitization.getClassLoader()));
+    private void initializeFieldDomain() {
+        allocateObjects();
+        setUpFieldDomain();
     }
 
-    /**
-     * @throws IllegalArgumentException -
-     *             if this field is not assignable from the given class domain
-     */
-    public boolean addClassDomain(IClassDomain domain) {
-        // handles NullClassDomain separately
-        if (domain.getClassOfObjects() == null) {
-            boolean retVal = !isNullAllowed();
-            setNullAllowed(true);
-            return retVal;
+    private void allocateObjects() {
+        ITester tester = PredicateChecker.getInstance();
+
+        for (int i = 0; i < numOfObjects; i++) {
+            Object obj;
+            try {
+                Constructor<?> constructor = classOfField.getConstructor(ITester.class);
+                obj = constructor.newInstance(tester);
+                objects.add(obj);
+            } catch (Exception e) {
+                String msg = "{0}: object of class {1} cannot be created";
+                msg = MessageFormat.format(msg, e.getMessage(), classOfField.getName());
+                System.out.println(msg);
+                e.printStackTrace();
+                throw new RuntimeException(msg, e);
+            }
         }
+    }
 
-        if (!classOfField.isAssignableFrom(domain.getClassOfObjects())) {
-            throw new IllegalArgumentException("" + "This field domain ("
-                    + classOfField + ") is not assignable"
-                    + "from the given class domain ("
-                    + domain.getClassOfObjects() + ")");
+    private void setUpFieldDomain() {
+        if (includesNull) {
+            LinkedList<Object> objectsCopy = new LinkedList<>(objects);
+            objectsCopy.addFirst(null);
+            fieldDomainValues = objectsCopy.toArray();
+        } else {
+            fieldDomainValues = objects.toArray();
         }
-
-        if (domains.contains(domain))
-            return false;
-
-        if (domain.getSize() == 0)
-            return false;
-
-        domains.add((ClassDomain)domain);
-        isCacheValid = false;
-
-        return true;
     }
 
-    public boolean removeClassDomain(IClassDomain domain) {
-        // handles NullClassDomain separately
-        if (domain.getClassOfObjects() == null) {
-            boolean retVal = isNullAllowed();
-            setNullAllowed(false);
-            return retVal;
-        }
-
-        boolean isActuallyRemoved = domains.remove(domain);
-
-        if (isActuallyRemoved)
-            isCacheValid = false;
-
-        return isActuallyRemoved;
-
+    public List<Object> getObjects() {
+        return objects;
     }
 
-    public ClassDomain removeClassDomain(int index) {
-        // handles NullClassDomain separately
-        if (index == 0 && isNullAllowed()) {
-            setNullAllowed(false);
-            return NullClassDomain.getInstance();
-        }
-
-        if (!checkClassDomainIndex(index))
-            return null;
-
-        ClassDomain cd = domains.remove(index);
-        if (cd != null)
-            isCacheValid = false;
-
-        return cd;
+    public Object getObject(int index) {
+        return fieldDomainValues[index];
+        /*return objects.get(index);*/
     }
 
-    public List<IClassDomain> getClassDomains() {
-
-        List<IClassDomain> ret = new ArrayList<IClassDomain>();
-        for (ClassDomain c : domains)
-            ret.add(c);
-
-        return ret;
-
+    public Object getFirstObject() {
+        if (includesNull)
+            return objects.get(1);
+        return objects.get(0);
     }
 
-    public ClassDomain getClassDomain(int classDomainIndex) {
-        if (!checkClassDomainIndex(classDomainIndex))
-            return null;
-
-        return domains.get(classDomainIndex);
+    @Override
+    public Object[] getAllObjects() {
+        assert (false);
+        return objects.toArray();
     }
 
-    public ClassDomain getClassDomainFor(int objectIndex) {
-        if (!isCacheValid)
-            updateCache();
-
-        if (objectIndex < 0 || objectIndex >= cache.size())
-            return null;
-
-        return cache.get(objectIndex).oset;
+    @Override
+    public Object[] getObjectsOfClass(Class<?> cls) {
+        assert (false);
+        return objects.toArray();
     }
 
-    public ClassDomain getNextClassDomainFor(int objectIndex) {
-        if (!checkObjectIndex(objectIndex))
-            return null;
-
-        ClassDomain cd = getClassDomainFor(objectIndex);
-        int cdInd = domains.indexOf(cd);
-        return getClassDomain(cdInd + 1);
+    @Override
+    public Class<?> getClassOfField() {
+        return classOfField;
     }
 
-    public int getNumOfClassDomains() {
-        return domains.size();
-    }
-
-    public int getSizeOfClassDomain(int classDomainIndex) {
-        if (!checkClassDomainIndex(classDomainIndex))
-            return -1;
-
-        return domains.get(classDomainIndex).getSize();
-    }
-
+    @Override
     public int getNumberOfElements() {
-        if (!isCacheValid)
-            updateCache();
-
-        return cache.size();
+        return fieldDomainValues.length;
     }
 
+    @Override
+    public int getNumOfClassDomains() {
+        assert (false);
+        return 1;
+    }
+
+    @Override
+    public int getClassDomainIndexFor(int objectIndex) {
+        assert (false);
+        return 0;
+    }
+
+    @Override
+    public int getIndexOfFirstObjectInNextClassDomain(int objectIndex) {
+        assert (false);
+        return 0;
+    }
+
+    @Override
+    public int getSizeOfClassDomain(int classDomainIndex) {
+        assert (false);
+        return 0;
+    }
+
+    @Override
     public boolean isPrimitiveType() {
         return false;
     }
 
+    @Override
     public boolean isArrayType() {
         return false;
     }
 
-    public Object[] getAllObjects() {
-
-        List<Object> objs = new ArrayList<Object>();
-        for (ClassDomain cd : domains) {
-            objs.addAll(cd.getObjects());
-        }
-
-        return objs.toArray();
-    }
-
-    public Object[] getObjectsOfClass(Class<?> cls) {
-        List<Object> objs = new ArrayList<Object>(getNumberOfElements());
-        for (ClassDomain cd : domains) {
-        	Class<?> classOfObjects = cd.getClassOfObjects();
-            if (classOfObjects != null)
-                if (cls.isAssignableFrom(classOfObjects))
-                    objs.addAll(cd.getObjects());
-        }
-
-        return objs.toArray();
-    }
-
-    /**
-     * Returns instances of the class domain with the given index in this
-     * <code>ObjSet</code>.
-     *
-     * @param classDomainIndex
-     *            index of the class domain within this field domain
-     * @return objects of the class domain with the given index or zero-size
-     *         array if classDomainIndex is invalid.
-     * @see #getObjectsOfClass(Class)
-     * @see #getObject(int)
-     * @see #getAllObjects()
-     *
-     */
-    public Object[] getObjectsOfClass(int classDomainIndex) {
-        ClassDomain cd = getClassDomain(classDomainIndex);
-        if (cd == null)
-            return new Object[0];
-
-        return cd.getObjects().toArray();
-    }
-
-    /**
-     * Returns object with the given index in entire <code>ObjSet</code>.
-     *
-     * @param objectIndex -
-     *            zero based index of the object in this field domain
-     * @return requested object. If <code>isNullAllowed</code> evaluates to
-     *         <code>true</code>, the zero-index object in the
-     *         <code>ObjSet</code> is always <code>null</code>. Also
-     *         returns <code>null</code> if index is out of bounds.
-     *
-     * @see #getAllObjects()
-     * @see #getObjectsOfClass(Class)
-     * @see #getObjectsOfClass(int)
-     */
-    public Object getObject(int objectIndex) {
-        if (!isCacheValid)
-            updateCache();
-
-        if (objectIndex < 0 || objectIndex >= cache.size())
-            return null;
-
-        return cache.get(objectIndex).obj;
-    }
-
+    @Override
     public void setNullAllowed(boolean allowed) {
-        if (!nullAllowed && allowed) {
-            domains.add(0, NullClassDomain.getInstance());
-            isCacheValid = false;
-        } else if (nullAllowed && !allowed) {
-            domains.remove(0);
-            isCacheValid = false;
-        }
-
-        nullAllowed = allowed;
-
+        assert (false);
     }
 
+    @Override
     public boolean isNullAllowed() {
-        return nullAllowed;
+        return includesNull;
     }
-
-    public int getIndexOfFirstObjectInNextClassDomain(int objectIndex) {
-        if (!isCacheValid)
-            updateCache();
-
-        if (objectIndex < 0 || objectIndex >= cache.size())
-            return -1;
-
-        CacheElement elem = cache.get(objectIndex);
-        return elem.indexOfFirstObjectInNextClassDomain;
-    }
-
-    public int getClassDomainIndexFor(int objectIndex) {
-        if (!isCacheValid)
-            updateCache();
-
-        if (objectIndex < 0 || objectIndex >= cache.size())
-            return -1;
-
-        return cache.get(objectIndex).objIndexWithinObjSet;
-    }
-
- // =======================================   Modification  ====================================== //
-    public int getFieldDomainIndexFor(Object obj) {
-    	if (!isCacheValid)
-            updateCache();
-
-        for (int i = 0; i < cache.size(); i++)
-        	if (cache.get(i).obj == obj)
-        		return i;
-
-        return -1;
-    }
-
-
-    public int getIndexNotInSet(HashSet<Integer> set) {
-    	//updateCache();
-    	for (int i = 1; i < cache.size(); i++) {
-    		if (!set.contains(i) && cache.get(i).obj != null) {
-    			return i;
-    		}
-    	}
-    	return -1;
-    }
-
-
-	//===============  Added  ==============
-
-	public void addToNotAliasFields(String fieldName) {
-		notAliasFields.add(fieldName);
-	}
-
-	public void addToNotNewFields(String fieldName) {
-		notNewFields.add(fieldName);
-	}
-
-	public void addToNotNullFields(String fieldName) {
-		notNullFields.add(fieldName);
-	}
-
-	public boolean isNotAliasField(String fieldName) {
-		return notAliasFields.contains(fieldName);
-	}
-
-	public boolean isNotNewField(String fieldName) {
-		return notNewFields.contains(fieldName);
-	}
-
-	public boolean isNotNullField(String fieldName) {
-		return notNullFields.contains(fieldName);
-	}
-
- 	// =====================================
 
 }

@@ -30,14 +30,14 @@ public class Solver {
     CodeGenerator codeGenerator;
     IIntList accessedIndices;
     Class<?> rootClass;
-    Finitization2 finitization;
+    Finitization finitization;
 
     PredicateChecker predicateChecker;
 
     public Solver(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
 
-        rootClass = Finitization2.getClassLoader().loadClass(params.getFullyQualifiedClassName());
+        rootClass = Finitization.getClassLoader().loadClass(params.getFullyQualifiedClassName());
 
         String[] finArgs = params.getFinitizationArgs();
         Method finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);

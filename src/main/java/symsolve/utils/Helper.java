@@ -1,6 +1,6 @@
 package symsolve.utils;
 
-import korat.finitization.impl.Finitization2;
+import korat.finitization.impl.Finitization;
 import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 
 public class Helper {
 
-    public static Finitization2 invokeFinMethod(Class<?> cls, Method finitize, String[] finArgs)
+    public static Finitization invokeFinMethod(Class<?> cls, Method finitize, String[] finArgs)
             throws CannotInvokeFinitizationException {
 
         int paramNumber = finArgs.length;
@@ -45,7 +45,7 @@ public class Helper {
         }
 
         try {
-            return (Finitization2) finitize.invoke(null, finArgValues);
+            return (Finitization) finitize.invoke(null, finArgValues);
         } catch (Exception e) {
             throw new CannotInvokeFinitizationException(cls, finitize.getName(), e);
         }

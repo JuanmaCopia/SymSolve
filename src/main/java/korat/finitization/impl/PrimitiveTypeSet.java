@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Represents <em>Field domain for primitive type</em>. <br/>
- * 
+ * <p>
  * <p/> <code>PrimitiveTypeSet</code> cannot contain any class domains,
  * because values of these fields are not objects. Actually, primitive type
  * field domain should contain exactly one class domain of the same primitive
@@ -15,7 +15,8 @@ import java.util.List;
  * side, for all primitive types. That solution is not very convenient, so, in
  * this implementation, all of <code>IPrimitiveTypeSet</code> subtypes should
  * manage elements of that field domain internally.
- * 
+ *
+ * @author korat.team
  * @see BooleanSet
  * @see ByteSet
  * @see DoubleSet
@@ -24,9 +25,6 @@ import java.util.List;
  * @see LongSet
  * @see ObjSet
  * @see ShortSet
- * 
- * @author korat.team
- * 
  */
 public abstract class PrimitiveTypeSet extends FieldDomain {
 
@@ -39,7 +37,7 @@ public abstract class PrimitiveTypeSet extends FieldDomain {
                     "classOfObjects of the PrimitiveTypeSet must be Class of the primitive type");
         }
     }
-    
+
     public int getClassDomainIndexFor(int objectIndex) {
         if (!checkObjectIndex(objectIndex))
             return -1;
@@ -49,10 +47,6 @@ public abstract class PrimitiveTypeSet extends FieldDomain {
 
     public int getIndexOfFirstObjectInNextClassDomain(int objectIndex) {
         return -1;
-    }
-
-    public int getNumberOfElements() {
-        return primitives.size();
     }
 
     public int getNumOfClassDomains() {
@@ -66,22 +60,14 @@ public abstract class PrimitiveTypeSet extends FieldDomain {
         return getNumberOfElements();
     }
 
-    public ClassDomain getClassDomain(int classDomainIndex) {
-        return null;
+    public int getNumberOfElements() {
+        return primitives.size();
     }
 
-    public ClassDomain getClassDomainFor(int objectIndex) {
-        return null;
-    }
-
-    public ClassDomain getNextClassDomainFor(int objectIndex) {
-        return null;
-    }
-    
     public boolean isPrimitiveType() {
         return true;
     }
-    
+
     public boolean isArrayType() {
         return false;
     }

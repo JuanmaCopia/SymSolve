@@ -2,9 +2,9 @@ package examples.symsolve.treemap;
 
 import korat.finitization.IObjSet;
 import korat.finitization.impl.BooleanSet;
-import korat.finitization.impl.Finitization2;
+import korat.finitization.impl.Finitization;
 import korat.finitization.impl.IntSet;
-import korat.finitization.impl.ObjSet2;
+import korat.finitization.impl.ObjSet;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -17,9 +17,9 @@ public class TreeMap {
     public Entry root;
     public int size = 0;
 
-    public static Finitization2 finTreeMap(int nodesNum) {
-        Finitization2 f = new Finitization2(TreeMap.class);
-        IObjSet nodes = new ObjSet2(Entry.class, nodesNum, true);
+    public static Finitization finTreeMap(int nodesNum) {
+        Finitization f = new Finitization(TreeMap.class);
+        IObjSet nodes = new ObjSet(Entry.class, nodesNum, true);
         f.set(TreeMap.class, "root", nodes);
         f.set(TreeMap.class, "size", new IntSet(0, nodesNum));
         f.set(Entry.class, "key", new IntSet(0, nodesNum - 1));

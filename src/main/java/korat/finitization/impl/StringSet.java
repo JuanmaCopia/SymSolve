@@ -1,11 +1,6 @@
 package korat.finitization.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class StringSet extends FieldDomain {
 
@@ -32,7 +27,7 @@ public class StringSet extends FieldDomain {
     public Map<String, Integer> getValueIndexMap() {
         return valueIndexMap;
     }
-    
+
     public String getString(int index) {
         return sortedStringList.get(index);
     }
@@ -48,6 +43,16 @@ public class StringSet extends FieldDomain {
     }
 
     @Override
+    public int getNumberOfElements() {
+        return sortedStringList.size();
+    }
+
+    @Override
+    public int getNumOfClassDomains() {
+        return 1;
+    }
+
+    @Override
     public int getClassDomainIndexFor(int objectIndex) {
         if (!checkObjectIndex(objectIndex))
             return -1;
@@ -60,36 +65,11 @@ public class StringSet extends FieldDomain {
         return -1;
     }
 
-    @Override
-    public int getNumOfClassDomains() {
-        return 1;
-    }
-
     public int getSizeOfClassDomain(int classDomainIndex) {
         if (!checkClassDomainIndex(classDomainIndex))
             return -1;
 
         return getNumberOfElements();
-    }
-
-    @Override
-    public int getNumberOfElements() {
-        return sortedStringList.size();
-    }
-
-    @Override
-    public ClassDomain getClassDomain(int classDomainIndex) {
-        return null;
-    }
-
-    @Override
-    public ClassDomain getClassDomainFor(int objectIndex) {
-        return null;
-    }
-
-    @Override
-    public ClassDomain getNextClassDomainFor(int objectIndex) {
-        return null;
     }
 
 }

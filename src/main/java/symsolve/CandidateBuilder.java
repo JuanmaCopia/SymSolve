@@ -45,15 +45,15 @@ public class CandidateBuilder {
 
             if (!fd.isPrimitiveType() && !fd.isArrayType()) {
 
-                ObjSet2 set = (ObjSet2) fd;
+                ObjSet set = (ObjSet) fd;
                 Object value = set.getObject(index);
                 setter.set(value);
 
-            } else if (fd.isArrayType()) {
+/*            } else if (fd.isArrayType()) {
 
                 ArraySet aset = (ArraySet) fd;
                 Object ai = aset.getArray(index);
-                setter.set(ai);
+                setter.set(ai);*/
 
             } else if (clsOfField == int.class) {
 
