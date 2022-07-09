@@ -1,9 +1,8 @@
 package examples.symsolve.hashmap;
 
+import korat.finitization.IFinitization;
 import korat.finitization.IObjSet;
-import korat.finitization.impl.Finitization;
-import korat.finitization.impl.IntSet;
-import korat.finitization.impl.ObjSet;
+import korat.finitization.impl.FinitizationFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,12 +34,13 @@ public class HashMap {
     public Entry e14;
     public Entry e15;
 
-    public static Finitization finHashMap(int nodesNum) {
-        Finitization f = new Finitization(HashMap.class);
+    public static IFinitization finHashMap(int nodesNum) {
 
-        f.set(HashMap.class, "size", new IntSet(0, nodesNum));
+        IFinitization f = FinitizationFactory.create(HashMap.class);
 
-        IObjSet entries = new ObjSet(Entry.class, nodesNum, true);
+        f.set(HashMap.class, "size", f.createIntSet(0, nodesNum));
+
+        IObjSet entries = f.createObjSet(Entry.class, nodesNum, true);
 
         f.set(HashMap.class, "e0", entries);
         f.set(HashMap.class, "e1", entries);
@@ -61,8 +61,8 @@ public class HashMap {
 
         int maxint = DEFAULT_INITIAL_CAPACITY * nodesNum;
 
-        f.set(Entry.class, "key", new IntSet(0, maxint - 1));
-        f.set(Entry.class, "hash", new IntSet(0, maxint - 1));
+        f.set(Entry.class, "key", f.createIntSet(0, maxint - 1));
+        f.set(Entry.class, "hash", f.createIntSet(0, maxint - 1));
         f.set(Entry.class, "next", entries);
 
         return f;

@@ -1,9 +1,8 @@
 package examples.symsolve.schedule;
 
+import korat.finitization.IFinitization;
 import korat.finitization.IObjSet;
-import korat.finitization.impl.Finitization;
-import korat.finitization.impl.IntSet;
-import korat.finitization.impl.ObjSet;
+import korat.finitization.impl.FinitizationFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,15 +31,15 @@ public class Schedule {
 
     public List blockQueue;
 
-    public static Finitization finSchedule(int jobsNum) {
-        Finitization f = new Finitization(Schedule.class);
+    public static IFinitization finSchedule(int jobsNum) {
+        IFinitization f = FinitizationFactory.create(Schedule.class);
 
-        IObjSet jobs = new ObjSet(Job.class, jobsNum, true);
-        f.set(Schedule.class, "allocProcNum", new IntSet(0, jobsNum + 1));
-        f.set(Schedule.class, "numProcesses", new IntSet(0, jobsNum));
+        IObjSet jobs = f.createObjSet(Job.class, jobsNum, true);
+        f.set(Schedule.class, "allocProcNum", f.createIntSet(0, jobsNum + 1));
+        f.set(Schedule.class, "numProcesses", f.createIntSet(0, jobsNum));
         f.set(Schedule.class, "curProc", jobs);
 
-        IObjSet lists = new ObjSet(List.class, 4, true);
+        IObjSet lists = f.createObjSet(List.class, 4, true);
         f.set(Schedule.class, "prio_0", lists);
         f.set(Schedule.class, "prio_1", lists);
         f.set(Schedule.class, "prio_2", lists);
@@ -49,15 +48,16 @@ public class Schedule {
 
         f.set(Job.class, "next", jobs);
         f.set(Job.class, "prev", jobs);
-        f.set(Job.class, "val", new IntSet(0, jobsNum - 1));
-        f.set(Job.class, "priority", new IntSet(0, MAXPRIO));
+        f.set(Job.class, "val", f.createIntSet(0, jobsNum - 1));
+        f.set(Job.class, "priority", f.createIntSet(0, MAXPRIO));
 
-        f.set(List.class, "mem_count", new IntSet(0, jobsNum));
+        f.set(List.class, "mem_count", f.createIntSet(0, jobsNum));
         f.set(List.class, "first", jobs);
         f.set(List.class, "last", jobs);
 
         return f;
     }
+
 
     public boolean repOK() {
         if (!structureOK())

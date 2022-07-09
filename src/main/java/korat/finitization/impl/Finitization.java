@@ -1,12 +1,12 @@
 package korat.finitization.impl;
 
-import korat.finitization.IFieldDomain;
+import korat.finitization.*;
 import korat.loading.InstrumentingClassLoader;
 
 import java.util.*;
 
 
-public class Finitization {
+public class Finitization implements IFinitization {
 
     protected static ClassLoader classLoader = new InstrumentingClassLoader();
     private final Class<?> rootClass;
@@ -64,11 +64,91 @@ public class Finitization {
         stateSpace.initialize();
     }
 
-
+    @Override
     public Class<?> getFinClass() {
         return rootClass;
     }
 
+    public IIntSet createIntSet(int min, int diff, int max) {
+        return new IntSet(min, diff, max);
+    }
+
+    public IIntSet createIntSet(int min, int max) {
+        return new IntSet(min, max);
+    }
+
+    public IIntSet createIntSet(int singleValue) {
+        return new IntSet(singleValue);
+    }
+
+    public IBooleanSet createBooleanSet() {
+        return new BooleanSet();
+    }
+
+    public IByteSet createByteSet(byte min, byte diff, byte max) {
+        return new ByteSet(min, diff, max);
+    }
+
+    public IByteSet createByteSet(byte min, byte max) {
+        return new ByteSet(min, max);
+    }
+
+    public IByteSet createByteSet(byte singleValue) {
+        return new ByteSet(singleValue);
+    }
+
+    public IShortSet createShortSet(short min, short diff, short max) {
+        return new ShortSet(min, diff, max);
+    }
+
+    public IShortSet createShortSet(short min, short max) {
+        return new ShortSet(min, max);
+    }
+
+    public IShortSet createShortSet(short singleValue) {
+        return new ShortSet(singleValue);
+    }
+
+    public ILongSet createLongSet(long min, long diff, long max) {
+        return new LongSet(min, diff, max);
+    }
+
+    public ILongSet createLongSet(long min, long max) {
+        return new LongSet(min, max);
+    }
+
+    public ILongSet createLongSet(long singleValue) {
+        return new LongSet(singleValue);
+    }
+
+    public IDoubleSet createDoubleSet(double min, double diff, double max) {
+        return new DoubleSet(min, diff, max);
+    }
+
+    public IDoubleSet createDoubleSet(double min, double max) {
+        return new DoubleSet(min, max);
+    }
+
+    public IDoubleSet createDoubleSet(double singleValue) {
+        return new DoubleSet(singleValue);
+    }
+
+    public IFloatSet createFloatSet(float min, float diff, float max) {
+        return new FloatSet(min, diff, max);
+    }
+
+    public IFloatSet createFloatSet(float min, float max) {
+        return new FloatSet(min, max);
+    }
+
+    public IFloatSet createFloatSet(float singleValue) {
+        return new FloatSet(singleValue);
+    }
+
+    @Override
+    public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances, boolean includeNull) {
+        return new ObjSet(fieldBaseClass, numOfInstances, includeNull);
+    }
 
     public void set(Class<?> cls, String fieldName, IFieldDomain fieldDomain) {
         if (!clsDomainsMap.containsKey(cls))
