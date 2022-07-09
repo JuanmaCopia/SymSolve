@@ -2,6 +2,7 @@ package korat.finitization.impl;
 
 import korat.finitization.*;
 import korat.loading.InstrumentingClassLoader;
+import korat.utils.RandomStrings;
 
 import java.util.*;
 
@@ -145,6 +146,10 @@ public class Finitization implements IFinitization {
         return new FloatSet(singleValue);
     }
 
+    public StringSet createRandomStringSet(int setSize, int minLength, int maxLength) {
+        return new StringSet(RandomStrings.generateRandomStringSet(setSize, minLength, maxLength));
+    }
+
     @Override
     public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances, boolean includeNull) {
         return new ObjSet(fieldBaseClass, numOfInstances, includeNull);
@@ -187,17 +192,17 @@ public class Finitization implements IFinitization {
     private void addFieldsToVectorDescriptor(Object obj) {
         Class<?> cls = obj.getClass();
         Map<String, IFieldDomain> fieldsMap = clsDomainsMap.get(cls);
-        for (Map.Entry<String, IFieldDomain> e : fieldsMap.entrySet()) {
-            String fieldName = e.getKey();
-            IFieldDomain fd = e.getValue();
-            System.out.println("\nFieldDomain class: " + fd.getClass());
-            FieldDomain fieldDomain = (FieldDomain) e.getValue();
-            CVElem elem = new CVElem(obj, fieldName, fieldDomain, stateSpace);
-            vectorDescriptor.add(elem);
+        if (fieldsMap != null) {
+            for (Map.Entry<String, IFieldDomain> e : fieldsMap.entrySet()) {
+                String fieldName = e.getKey();
+                IFieldDomain fd = e.getValue();
+                System.out.println("\nFieldDomain class: " + fd.getClass());
+                FieldDomain fieldDomain = (FieldDomain) e.getValue();
+                CVElem elem = new CVElem(obj, fieldName, fieldDomain, stateSpace);
+                vectorDescriptor.add(elem);
+            }
         }
     }
-
-
 
 
     /*public StringSet createRandomStringSet(int setSize, int minLength, int maxLength) {

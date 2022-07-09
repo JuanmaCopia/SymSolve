@@ -5,7 +5,7 @@ import java.util.Random;
 import java.util.Set;
 
 public class RandomStrings {
-    
+
     public static Set<String> generateRandomStringSet(int setSize, int minLength, int maxLength) {
         Set<String> set = new HashSet<String>();
         for (int i = 0; i < setSize; i++)
@@ -28,9 +28,7 @@ public class RandomStrings {
         int rightLimit = 122; // letter 'z'
         Random random = new Random();
 
-        String generatedString = random.ints(leftLimit, rightLimit + 1).limit(stringLength)
+        return random.ints(leftLimit, rightLimit + 1).limit(stringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
-
-        return generatedString;
     }
 }
