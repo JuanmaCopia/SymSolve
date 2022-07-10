@@ -1,20 +1,19 @@
 package korat.finitization.impl;
 
+import korat.finitization.IIntSet;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import korat.finitization.IIntSet;
-
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
- * 
  */
 
 // TODO: maybe better NumericTypeSet
 public class IntSet extends PrimitiveTypeSet implements IIntSet {
-    
+
     Map<Integer, Integer> valueIndexMap = new HashMap<Integer, Integer>();
-    
+
     int min = 0;
     int max = 0;
 
@@ -25,7 +24,7 @@ public class IntSet extends PrimitiveTypeSet implements IIntSet {
         addRange(min, diff, max);
     }
 
-    IntSet(int min, int max) {
+    public IntSet(int min, int max) {
         this(min, 1, max);
     }
 
@@ -35,10 +34,6 @@ public class IntSet extends PrimitiveTypeSet implements IIntSet {
 
     public void addInt(int i) {
         primitives.add(i);
-    }
-
-    public void removeInt(int i) {
-        primitives.remove(new Integer(i));
     }
 
     public void addRange(int min, int diff, int max) {
@@ -52,6 +47,10 @@ public class IntSet extends PrimitiveTypeSet implements IIntSet {
         }
     }
 
+    public void removeInt(int i) {
+        primitives.remove(new Integer(i));
+    }
+
     public int getInt(int index) {
         return (Integer) primitives.get(index);
     }
@@ -63,7 +62,7 @@ public class IntSet extends PrimitiveTypeSet implements IIntSet {
 
         return ints;
     }
-    
+
     public Map<Integer, Integer> getValueIndexMap() {
         return valueIndexMap;
     }
@@ -95,7 +94,7 @@ public class IntSet extends PrimitiveTypeSet implements IIntSet {
 //
 //        return max;
 //    }
-    
+
     public int getMin() {
         return this.min;
     }

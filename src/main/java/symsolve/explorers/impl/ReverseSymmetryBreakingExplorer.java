@@ -2,13 +2,14 @@ package symsolve.explorers.impl;
 
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
+import korat.utils.IIntList;
 
 public class ReverseSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
 
-    public ReverseSymmetryBreakingExplorer(StateSpace stateSpace) {
-        super(stateSpace);
+    public ReverseSymmetryBreakingExplorer(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields) {
+        super(stateSpace, accessedIndices, changedFields);
     }
-    
+
     @Override
     protected boolean setNextValue(int lastAccessedFieldIndex) {
         FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
@@ -24,8 +25,8 @@ public class ReverseSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
         }
         // Is a reference field
 
-        if (!isInitialized[lastAccessedFieldIndex]) {
-            isInitialized[lastAccessedFieldIndex] = true;
+        if (!initializedFields[lastAccessedFieldIndex]) {
+            initializedFields[lastAccessedFieldIndex] = true;
             int maxInstanceIndexInVector = getMaxInstanceInVector(lastAccessedFD, currentInstanceIndex);
             if (maxInstanceIndexInVector >= maxInstanceIndexForFieldDomain) {
                 candidateVector[lastAccessedFieldIndex] = maxInstanceIndexInVector;
@@ -41,11 +42,11 @@ public class ReverseSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
         }
         return false;
     }
-    
+
     @Override
     protected void backtrack(int lastAccessedFieldIndex) {
         candidateVector[lastAccessedFieldIndex] = 0;
-        isInitialized[lastAccessedFieldIndex] = false;
+        initializedFields[lastAccessedFieldIndex] = false;
     }
 
 }

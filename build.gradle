@@ -23,9 +23,12 @@ dependencies {
     implementation 'javassist:javassist:3.12.1.GA'
 }
 
-tasks.named('test') {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+test {
+    useJUnitPlatform {
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
 }
 
 jar {

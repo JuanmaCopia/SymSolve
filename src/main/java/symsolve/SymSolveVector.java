@@ -1,4 +1,3 @@
-
 package symsolve;
 
 import java.util.Arrays;
@@ -25,46 +24,11 @@ public class SymSolveVector {
     Set<Integer> fixedIndices = new HashSet<Integer>();
 
     /**
-     * Returns the partial vector representation of this vector. i.e. symbolic
-     * values are encoded with -1.
-     *
-     * @return A clone of the partial vector representation.
-     */
-    public int[] getPartialVector() {
-        return this.partialVector.clone();
-    }
-
-    /**
-     * Returns the concrete vector representation of this vector. i.e. symbolic
-     * values are encoded with 0.
-     *
-     * @return A clone of the concrete vector representation.
-     */
-    public int[] getConcreteVector() {
-        return this.concreteVector.clone();
-    }
-    
-    public void setConcreteVector(int[] newConcreteVector) {
-        this.concreteVector = newConcreteVector;
-    }
-
-    /**
-     * Returns the set of Fixed indices in this vector.
-     *
-     * @return A clone of the fixed indices of this vector.
-     */
-    public Set<Integer> getFixedIndices() {
-        return new HashSet<Integer>(this.fixedIndices);
-    }
-
-    /**
      * Creates a vector a SymKoratVector instance holding the vector
      * representations.
      *
      * @param concreteVector The concrete vector representation (Symbolic fields
      *                       represented with 0).
-     * @param partialVector  The partial vector representation (Symbolic fields
-     *                       represented with -1).
      * @param fixedIndices   The set of Fixed indices in this vector.
      */
     public SymSolveVector(int[] concreteVector, Set<Integer> fixedIndices) {
@@ -85,6 +49,12 @@ public class SymSolveVector {
         return partialVector;
     }
 
+    public SymSolveVector(int vectorSize) {
+        this.size = vectorSize;
+        this.concreteVector = new int[vectorSize];
+        this.partialVector = createPartialVector();
+    }
+
     /**
      * Creates a vector a SymKoratVector instance by calculating the different
      * vector representations from a string partial representation (symbolic fields
@@ -99,7 +69,7 @@ public class SymSolveVector {
         this.concreteVector = new int[size];
         this.partialVector = new int[size];
         for (int i = 0; i < size; i++) {
-            int elem = Integer.parseInt(vectorValues[i]);
+            int elem = Integer.parseInt(vectorValues[i].trim());
             this.partialVector[i] = elem;
             if (elem == SymSolveVector.SYMBOLIC) {
                 this.concreteVector[i] = SymSolveVector.NULL;
@@ -108,6 +78,39 @@ public class SymSolveVector {
                 this.fixedIndices.add(i);
             }
         }
+    }
+
+    /**
+     * Returns the partial vector representation of this vector. i.e. symbolic
+     * values are encoded with -1.
+     *
+     * @return A clone of the partial vector representation.
+     */
+    public int[] getPartialVector() {
+        return this.partialVector.clone();
+    }
+
+    /**
+     * Returns the concrete vector representation of this vector. i.e. symbolic
+     * values are encoded with 0.
+     *
+     * @return A clone of the concrete vector representation.
+     */
+    public int[] getConcreteVector() {
+        return this.concreteVector.clone();
+    }
+
+    public void setConcreteVector(int[] newConcreteVector) {
+        this.concreteVector = newConcreteVector;
+    }
+
+    /**
+     * Returns the set of Fixed indices in this vector.
+     *
+     * @return A clone of the fixed indices of this vector.
+     */
+    public Set<Integer> getFixedIndices() {
+        return new HashSet<Integer>(this.fixedIndices);
     }
 
     public boolean isSymbolicIndex(int index) {

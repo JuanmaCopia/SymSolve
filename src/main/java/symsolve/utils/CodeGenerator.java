@@ -1,70 +1,36 @@
 package symsolve.utils;
 
+import korat.finitization.impl.*;
+
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
-import korat.finitization.impl.BooleanSet;
-import korat.finitization.impl.ByteSet;
-import korat.finitization.impl.CVElem;
-import korat.finitization.impl.DoubleSet;
-import korat.finitization.impl.FieldDomain;
-import korat.finitization.impl.FloatSet;
-import korat.finitization.impl.IntSet;
-import korat.finitization.impl.LongSet;
-import korat.finitization.impl.ObjSet;
-import korat.finitization.impl.ShortSet;
-import korat.finitization.impl.StateSpace;
-import korat.finitization.impl.StringSet;
-
 public class CodeGenerator {
 
-    Class<?> rootClass;
+
     HashMap<Class<?>, Integer> maxIdMap = new HashMap<Class<?>, Integer>();
     HashMap<String, String> fieldVariableValues = new HashMap<String, String>();
 
-    public CodeGenerator(Class<?> rootClass) {
+    StateSpace stateSpace;
+
+    Class<?> rootClass;
+
+
+    public CodeGenerator(StateSpace stateSpace, Class<?> rootClass) {
+        this.stateSpace = stateSpace;
         this.rootClass = rootClass;
     }
 
-    public String generateStructureCode(StateSpace stateSpace, int[] vector) {
-        calculateFieldValues(stateSpace, vector);
+    public String generateStructureCode(int[] vector) {
+        calculateFieldValues(vector);
         String result = createCodeOfObjectDefinitions();
         result += createCodeOfFieldAssignations();
         return result;
     }
 
-    private String createCodeOfFieldAssignations() {
-        String result = "";
-        for (Entry<String, String> entry : fieldVariableValues.entrySet()) {
-            String field = entry.getKey();
-            String fieldValue = entry.getValue();
-            result += String.format("%s = %s;\n", field, fieldValue);
-        }
-        return result;
-    }
-
-    private String createCodeOfObjectDefinitions() {
-        String result = "";
-        for (Entry<Class<?>, Integer> entry : maxIdMap.entrySet()) {
-            Class<?> cls = entry.getKey();
-            Integer maxId = entry.getValue();
-            result += createCodeDefinitionsForClass(cls, maxId);
-        }
-        return result;
-    }
-
-    private String createCodeDefinitionsForClass(Class<?> cls, Integer maxId) {
-        String result = "";
-        String className = cls.getSimpleName();
-        for (int i = 0; i <= maxId; i++) {
-            result += createCodeOfConstructorCall(className, i);
-        }
-        return result;
-    }
-
-    private void calculateFieldValues(StateSpace stateSpace, int[] vector) {
+    private void calculateFieldValues(int[] vector) {
         this.fieldVariableValues.clear();
         this.maxIdMap.clear();
         this.maxIdMap.put(rootClass, 0);
@@ -81,7 +47,7 @@ public class CodeGenerator {
             Class<? extends Object> currentClass = currentObject.getClass();
             String currentClassName = currentClass.getSimpleName();
             String objectVariableName = createVariableName(currentClassName, objId);
-            
+
 //            System.out.println("\nCurrent object:" + objectVariableName);
 
             int[] fieldIndices = stateSpace.getFieldIndicesFor(currentObject);
@@ -92,13 +58,13 @@ public class CodeGenerator {
                 FieldDomain fieldDomain = elem.getFieldDomain();
                 Class<?> clsOfField = fieldDomain.getClassOfField();
 
-                
+
                 String fieldTypeName = clsOfField.getSimpleName();
                 String stringFieldValue = "";
-                
+
                 String fieldName = elem.getFieldName();
                 String fieldVariableName = createFieldAccessString(objectVariableName, fieldName);
-                
+
 //                System.out.println("\tVisiting:" + fieldVariableName);
 
                 if (!fieldDomain.isPrimitiveType() && !fieldDomain.isArrayType()) {
@@ -129,12 +95,40 @@ public class CodeGenerator {
                 } else {
                     stringFieldValue = getStrigValueOfPrimitiveField(fieldDomain, fieldDomainIndex);
                 }
-                
+
                 fieldVariableValues.put(fieldVariableName, stringFieldValue);
             }
         }
     }
-    
+
+    private String createCodeOfObjectDefinitions() {
+        String result = "";
+        for (Entry<Class<?>, Integer> entry : maxIdMap.entrySet()) {
+            Class<?> cls = entry.getKey();
+            Integer maxId = entry.getValue();
+            result += createCodeDefinitionsForClass(cls, maxId);
+        }
+        return result;
+    }
+
+    private String createCodeOfFieldAssignations() {
+        String result = "";
+        for (Entry<String, String> entry : fieldVariableValues.entrySet()) {
+            String field = entry.getKey();
+            String fieldValue = entry.getValue();
+            result += String.format("%s = %s;\n", field, fieldValue);
+        }
+        return result;
+    }
+
+    private String createVariableName(String className, int id) {
+        return className.toLowerCase() + "_" + id;
+    }
+
+    private String createFieldAccessString(String ownerObject, String fieldName) {
+        return ownerObject + "." + fieldName;
+    }
+
     private String getStrigValueOfPrimitiveField(FieldDomain fieldDomain, int fieldDomainIndex) {
         Class<?> clsOfField = fieldDomain.getClassOfField();
         if (clsOfField == int.class) {
@@ -148,13 +142,13 @@ public class CodeGenerator {
             BooleanSet set = (BooleanSet) fieldDomain;
             boolean value = set.getBoolean(fieldDomainIndex);
             return Boolean.toString(value);
-        
+
         } else if (clsOfField == String.class) {
 
             StringSet set = (StringSet) fieldDomain;
             String value = set.getString(fieldDomainIndex);
             return String.format("\"%s\"", value);
-            
+
         } else if (clsOfField == byte.class) {
 
             ByteSet set = (ByteSet) fieldDomain;
@@ -186,17 +180,18 @@ public class CodeGenerator {
             return Short.toString(value);
 
         } else {
-            assert(false);
+            assert (false);
         }
         return null;
     }
 
-    private String createFieldAccessString(String ownerObject, String fieldName) {
-        return ownerObject + "." + fieldName;
-    }
-
-    private String createVariableName(String className, int id) {
-        return className.toLowerCase() + "_" + id;
+    private String createCodeDefinitionsForClass(Class<?> cls, Integer maxId) {
+        String result = "";
+        String className = cls.getSimpleName();
+        for (int i = 0; i <= maxId; i++) {
+            result += createCodeOfConstructorCall(className, i);
+        }
+        return result;
     }
 
     private String createCodeOfConstructorCall(String className, int id) {
