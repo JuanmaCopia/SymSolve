@@ -1,10 +1,9 @@
 package symsolve.bounds;
 
-import korat.finitization.impl.CVElem;
 import korat.finitization.impl.Finitization;
-import korat.finitization.impl.StateSpace;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,14 +30,11 @@ public class Bounds {
         }
     }
 
-    public void recordBounds(int[] vector) {
-        StateSpace stateSpace = finitization.getStateSpace();
-        for (int i = 0; i < vector.length; i++) {
-            CVElem cvElem = stateSpace.getCVElem(i);
-            Object ownerObj = cvElem.getObj();
-            int value = vector[i];
-            //addBound(cvElem, vector[i]);
-        }
+    public List<Integer> getAllowedValues(Class<?> cls, String fieldName, Integer ownerObjectID) {
+        ClassBound classBound = classBoundMap.get(cls);
+        assert (classBound != null);
+        FieldBound fieldBounds = classBound.getFieldBounds(fieldName);
+        return fieldBounds.getAllowedValues(ownerObjectID);
     }
 
 /*    HashMap<String, HashSet<Integer>> bounds = new HashMap<>();

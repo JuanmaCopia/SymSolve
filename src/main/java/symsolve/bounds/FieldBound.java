@@ -1,15 +1,16 @@
 package symsolve.bounds;
 
-import symsolve.utils.InmutablePair;
-
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FieldBound {
 
     String fieldName;
     ClassBound classBound;
-    Set<InmutablePair<Integer, Integer>> relation = new HashSet<>();
+
+    Map<Integer, List<Integer>> fieldBounds = new HashMap<>();
 
 
     public FieldBound(String fieldName, ClassBound classBound) {
@@ -17,9 +18,17 @@ public class FieldBound {
         this.classBound = classBound;
     }
 
-    public void addBound(int src, int dest) {
-        InmutablePair<Integer, Integer> bound = new InmutablePair<>(src, dest);
-        relation.add(bound);
+    public void addBound(int ownerObjectID, int fieldValue) {
+        if (!fieldBounds.containsKey(ownerObjectID))
+            fieldBounds.put(ownerObjectID, new ArrayList<>());
+        List<Integer> fieldValues = fieldBounds.get(ownerObjectID);
+        fieldValues.add(fieldValue);
+    }
+
+    public List<Integer> getAllowedValues(int ownerObjectID) {
+        List<Integer> fieldValues = fieldBounds.get(ownerObjectID);
+        assert (fieldValues != null);
+        return fieldValues;
     }
 
 }

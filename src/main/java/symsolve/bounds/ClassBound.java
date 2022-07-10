@@ -29,4 +29,10 @@ public class ClassBound {
         }
     }
 
+    public FieldBound getFieldBounds(String fieldName) {
+        FieldBound fieldBound = fieldBoundMap.get(fieldName);
+        assert (fieldBound != null);
+        return fieldBound;
+    }
+
 }
