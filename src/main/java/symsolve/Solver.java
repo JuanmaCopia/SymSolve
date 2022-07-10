@@ -8,13 +8,15 @@ import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
+import symsolve.bounds.Bounds;
+import symsolve.candidates.CandidateBuilder;
+import symsolve.candidates.PredicateChecker;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.VectorStateSpaceExplorerFactory;
 import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 import symsolve.utils.CodeGenerator;
 import symsolve.utils.Helper;
-import symsolve.utils.Utils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -87,7 +89,7 @@ public class Solver {
     public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
-        Utils.printVectorFormat(vector, stateSpace.getStructureList());
+        /*        Utils.printVectorFormat(vector, stateSpace.getStructureList());*/
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))
@@ -129,8 +131,8 @@ public class Solver {
         return solutions;
     }
 
-    /*public Bounds calculateBounds() throws CannotInvokePredicateException {
-        Bounds bounds = new Bounds(stateSpace);
+    public Bounds calculateBounds() throws CannotInvokePredicateException {
+        Bounds bounds = new Bounds(finitization);
         SymSolveVector initialVector = new SymSolveVector(stateSpace.getTotalNumberOfFields());
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
@@ -141,7 +143,7 @@ public class Solver {
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return bounds;
-    }*/
+    }
 
     public HashMap<String, Integer> getScopes() {
         HashMap<String, Integer> bounds = new HashMap<>();

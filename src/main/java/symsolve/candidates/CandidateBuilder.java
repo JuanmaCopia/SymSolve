@@ -1,4 +1,4 @@
-package symsolve;
+package symsolve.candidates;
 
 import korat.finitization.impl.*;
 import korat.instrumentation.Setter;

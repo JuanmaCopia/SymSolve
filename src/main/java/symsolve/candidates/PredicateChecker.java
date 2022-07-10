@@ -1,4 +1,4 @@
-package symsolve;
+package symsolve.candidates;
 
 import korat.testing.ITester;
 import korat.testing.impl.CannotFindPredicateException;
@@ -9,7 +9,7 @@ import symsolve.utils.Helper;
 import java.lang.reflect.Method;
 
 public class PredicateChecker implements ITester {
-    
+
     private static final PredicateChecker instance = new PredicateChecker();
     Class<?> rootClass;
     IIntList accessedIndices;

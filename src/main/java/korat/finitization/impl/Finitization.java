@@ -88,7 +88,7 @@ public class Finitization implements IFinitization {
     }
 
     @Override
-    public Class<?> getFinClass() {
+    public Class<?> getRootClass() {
         return rootClass;
     }
 
@@ -215,6 +215,11 @@ public class Finitization implements IFinitization {
         } else if (fieldDomain instanceof ObjSet) {
             objSets.add((ObjSet) fieldDomain);
         }
+    }
+
+    @Override
+    public Object getRootObject() {
+        return stateSpace.getRootObject();
     }
 
     public Set<Class<?>> getClasses() {

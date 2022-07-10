@@ -35,4 +35,14 @@ public class ClassBound {
         return fieldBound;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, FieldBound> e : fieldBoundMap.entrySet()) {
+            sb.append(String.format("\tField: %s: \n", e.getKey()));
+            sb.append(e.getValue().toString());
+        }
+        return sb.toString();
+    }
+
 }

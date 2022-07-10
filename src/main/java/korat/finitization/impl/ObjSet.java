@@ -2,7 +2,7 @@ package korat.finitization.impl;
 
 import korat.finitization.IObjSet;
 import korat.testing.ITester;
-import symsolve.PredicateChecker;
+import symsolve.candidates.PredicateChecker;
 
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
@@ -88,6 +88,16 @@ public class ObjSet extends FieldDomain implements IObjSet {
     }
 
     @Override
+    public boolean isNullAllowed() {
+        return includesNull;
+    }
+
+    @Override
+    public void setNullAllowed(boolean allowed) {
+        assert (false);
+    }
+
+    @Override
     public Class<?> getClassOfField() {
         return classOfField;
     }
@@ -129,16 +139,6 @@ public class ObjSet extends FieldDomain implements IObjSet {
     @Override
     public boolean isArrayType() {
         return false;
-    }
-
-    @Override
-    public void setNullAllowed(boolean allowed) {
-        assert (false);
-    }
-
-    @Override
-    public boolean isNullAllowed() {
-        return includesNull;
     }
 
 }
