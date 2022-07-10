@@ -9,13 +9,13 @@ import java.util.*;
 
 public class Finitization implements IFinitization {
 
-    protected static ClassLoader classLoader = new InstrumentingClassLoader();
+    private static final ClassLoader classLoader = new InstrumentingClassLoader();
     private final Class<?> rootClass;
-    private final Map<Class<?>, Map<String, IFieldDomain>> clsDomainsMap = new HashMap<>();
+    private final Map<Class<?>, Map<String, IFieldDomain>> domainsMap = new HashMap<>();
     private final Set<ObjSet> objSets = new LinkedHashSet<>();
     private final List<CVElem> vectorDescriptor = new ArrayList<>();
     private final StateSpace stateSpace = new StateSpace();
-    private final Map<String, IntSet> integerFieldsMinMax = new HashMap<String, IntSet>();
+    private final Map<String, IntSet> integerFieldsMinMax = new HashMap<>();
     boolean isInitialized = false;
     ObjSet rootObjSet;
 
@@ -24,26 +24,15 @@ public class Finitization implements IFinitization {
         this.rootClass = rootClass;
         rootObjSet = new ObjSet(rootClass, 1, false);
         objSets.add(rootObjSet);
-        clsDomainsMap.put(rootClass, new LinkedHashMap<>());
+        domainsMap.put(rootClass, new LinkedHashMap<>());
     }
 
     public static ClassLoader getClassLoader() {
         return classLoader;
     }
 
-    public static void setClassLoader(ClassLoader classLoader2) {
-        classLoader = classLoader2;
-    }
-
     private String createFieldName(Class<?> cls, String fieldName) {
         return cls.getSimpleName() + "." + fieldName;
-    }
-
-    public int[] getInitialCandidateVector() {
-
-        int size = getStateSpace().getTotalNumberOfFields();
-        return new int[size];
-
     }
 
     public StateSpace getStateSpace() {
@@ -65,113 +54,8 @@ public class Finitization implements IFinitization {
         stateSpace.initialize();
     }
 
-    @Override
-    public Class<?> getFinClass() {
-        return rootClass;
-    }
-
-    public IIntSet createIntSet(int min, int diff, int max) {
-        return new IntSet(min, diff, max);
-    }
-
-    public IIntSet createIntSet(int min, int max) {
-        return new IntSet(min, max);
-    }
-
-    public IIntSet createIntSet(int singleValue) {
-        return new IntSet(singleValue);
-    }
-
-    public IBooleanSet createBooleanSet() {
-        return new BooleanSet();
-    }
-
-    public IByteSet createByteSet(byte min, byte diff, byte max) {
-        return new ByteSet(min, diff, max);
-    }
-
-    public IByteSet createByteSet(byte min, byte max) {
-        return new ByteSet(min, max);
-    }
-
-    public IByteSet createByteSet(byte singleValue) {
-        return new ByteSet(singleValue);
-    }
-
-    public IShortSet createShortSet(short min, short diff, short max) {
-        return new ShortSet(min, diff, max);
-    }
-
-    public IShortSet createShortSet(short min, short max) {
-        return new ShortSet(min, max);
-    }
-
-    public IShortSet createShortSet(short singleValue) {
-        return new ShortSet(singleValue);
-    }
-
-    public ILongSet createLongSet(long min, long diff, long max) {
-        return new LongSet(min, diff, max);
-    }
-
-    public ILongSet createLongSet(long min, long max) {
-        return new LongSet(min, max);
-    }
-
-    public ILongSet createLongSet(long singleValue) {
-        return new LongSet(singleValue);
-    }
-
-    public IDoubleSet createDoubleSet(double min, double diff, double max) {
-        return new DoubleSet(min, diff, max);
-    }
-
-    public IDoubleSet createDoubleSet(double min, double max) {
-        return new DoubleSet(min, max);
-    }
-
-    public IDoubleSet createDoubleSet(double singleValue) {
-        return new DoubleSet(singleValue);
-    }
-
-    public IFloatSet createFloatSet(float min, float diff, float max) {
-        return new FloatSet(min, diff, max);
-    }
-
-    public IFloatSet createFloatSet(float min, float max) {
-        return new FloatSet(min, max);
-    }
-
-    public IFloatSet createFloatSet(float singleValue) {
-        return new FloatSet(singleValue);
-    }
-
-    public StringSet createRandomStringSet(int setSize, int minLength, int maxLength) {
-        return new StringSet(RandomStrings.generateRandomStringSet(setSize, minLength, maxLength));
-    }
-
-    @Override
-    public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances, boolean includeNull) {
-        return new ObjSet(fieldBaseClass, numOfInstances, includeNull);
-    }
-
-    public void set(Class<?> cls, String fieldName, IFieldDomain fieldDomain) {
-        if (!clsDomainsMap.containsKey(cls))
-            clsDomainsMap.put(cls, new LinkedHashMap<>());
-
-        Map<String, IFieldDomain> fieldsMap = clsDomainsMap.get(cls);
-
-        fieldsMap.put(fieldName, fieldDomain);
-
-        if (fieldDomain instanceof IntSet) {
-            this.integerFieldsMinMax.put(createFieldName(cls, fieldName), (IntSet) fieldDomain);
-        } else if (fieldDomain instanceof ObjSet) {
-            objSets.add((ObjSet) fieldDomain);
-        }
-    }
-
     public IFieldDomain getFieldDomain(Class<?> cls, String fieldName) {
-        Map<String, IFieldDomain> fieldsMap = clsDomainsMap.get(cls);
+        Map<String, IFieldDomain> fieldsMap = domainsMap.get(cls);
         if (fieldsMap == null)
             return null;
         return fieldsMap.get(fieldName);
@@ -191,12 +75,11 @@ public class Finitization implements IFinitization {
 
     private void addFieldsToVectorDescriptor(Object obj) {
         Class<?> cls = obj.getClass();
-        Map<String, IFieldDomain> fieldsMap = clsDomainsMap.get(cls);
+        Map<String, IFieldDomain> fieldsMap = domainsMap.get(cls);
         if (fieldsMap != null) {
             for (Map.Entry<String, IFieldDomain> e : fieldsMap.entrySet()) {
                 String fieldName = e.getKey();
                 IFieldDomain fd = e.getValue();
-                System.out.println("\nFieldDomain class: " + fd.getClass());
                 FieldDomain fieldDomain = (FieldDomain) e.getValue();
                 CVElem elem = new CVElem(obj, fieldName, fieldDomain, stateSpace);
                 vectorDescriptor.add(elem);
@@ -204,24 +87,147 @@ public class Finitization implements IFinitization {
         }
     }
 
-
-    /*public StringSet createRandomStringSet(int setSize, int minLength, int maxLength) {
-        return new StringSet(RandomStrings.generateRandomStringSet(setSize, minLength, maxLength));
+    @Override
+    public Class<?> getFinClass() {
+        return rootClass;
     }
 
+    @Override
+    public IIntSet createIntSet(int min, int diff, int max) {
+        return new IntSet(min, diff, max);
+    }
+
+    @Override
+    public IIntSet createIntSet(int min, int max) {
+        return new IntSet(min, max);
+    }
+
+    @Override
+    public IIntSet createIntSet(int singleValue) {
+        return new IntSet(singleValue);
+    }
+
+    @Override
+    public IBooleanSet createBooleanSet() {
+        return new BooleanSet();
+    }
+
+    @Override
+    public IByteSet createByteSet(byte min, byte diff, byte max) {
+        return new ByteSet(min, diff, max);
+    }
+
+    @Override
+    public IByteSet createByteSet(byte min, byte max) {
+        return new ByteSet(min, max);
+    }
+
+    @Override
+    public IByteSet createByteSet(byte singleValue) {
+        return new ByteSet(singleValue);
+    }
+
+    @Override
+    public IShortSet createShortSet(short min, short diff, short max) {
+        return new ShortSet(min, diff, max);
+    }
+
+    @Override
+    public IShortSet createShortSet(short min, short max) {
+        return new ShortSet(min, max);
+    }
+
+    @Override
+    public IShortSet createShortSet(short singleValue) {
+        return new ShortSet(singleValue);
+    }
+
+    @Override
+    public ILongSet createLongSet(long min, long diff, long max) {
+        return new LongSet(min, diff, max);
+    }
+
+    @Override
+    public ILongSet createLongSet(long min, long max) {
+        return new LongSet(min, max);
+    }
+
+    @Override
+    public ILongSet createLongSet(long singleValue) {
+        return new LongSet(singleValue);
+    }
+
+    @Override
+    public IDoubleSet createDoubleSet(double min, double diff, double max) {
+        return new DoubleSet(min, diff, max);
+    }
+
+    @Override
+    public IDoubleSet createDoubleSet(double min, double max) {
+        return new DoubleSet(min, max);
+    }
+
+    @Override
+    public IDoubleSet createDoubleSet(double singleValue) {
+        return new DoubleSet(singleValue);
+    }
+
+    @Override
+    public IFloatSet createFloatSet(float min, float diff, float max) {
+        return new FloatSet(min, diff, max);
+    }
+
+    @Override
+    public IFloatSet createFloatSet(float min, float max) {
+        return new FloatSet(min, max);
+    }
+
+    @Override
+    public IFloatSet createFloatSet(float singleValue) {
+        return new FloatSet(singleValue);
+    }
+
+    @Override
     public StringSet createStringSet(Set<String> set) {
         return new StringSet(set);
     }
 
+    @Override
+    public StringSet createRandomStringSet(int setSize, int minLength, int maxLength) {
+        return new StringSet(RandomStrings.generateRandomStringSet(setSize, minLength, maxLength));
+    }
+
+    @Override
+    public IObjSet createObjSet(Class<?> fieldBaseClass, int numOfInstances, boolean includeNull) {
+        return new ObjSet(fieldBaseClass, numOfInstances, includeNull);
+    }
+
+    public void set(Class<?> cls, String fieldName, IFieldDomain fieldDomain) {
+        if (!domainsMap.containsKey(cls))
+            domainsMap.put(cls, new LinkedHashMap<>());
+
+        Map<String, IFieldDomain> fieldsMap = domainsMap.get(cls);
+
+        fieldsMap.put(fieldName, fieldDomain);
+
+        if (fieldDomain instanceof IntSet) {
+            this.integerFieldsMinMax.put(createFieldName(cls, fieldName), (IntSet) fieldDomain);
+        } else if (fieldDomain instanceof ObjSet) {
+            objSets.add((ObjSet) fieldDomain);
+        }
+    }
+
     public Set<Class<?>> getClasses() {
-        return classDomains.keySet();
+        return domainsMap.keySet();
     }
 
     public List<String> getFieldNames(Class<?> cls) {
-        Map<String, IFieldDomain> fieldDomains = clsDomainsMap.get(cls);
-        Set<String> fieldNames = fieldDomains.keySet();
-        return new ArrayList<String>(fieldNames);
-    }*/
+        Map<String, IFieldDomain> fieldDomains = domainsMap.get(cls);
+        if (fieldDomains == null)
+            return new ArrayList<>();
 
+        Set<String> fieldNames = fieldDomains.keySet();
+        return new ArrayList<>(fieldNames);
+    }
 
 }

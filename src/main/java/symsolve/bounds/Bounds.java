@@ -6,6 +6,7 @@ import korat.finitization.impl.StateSpace;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Bounds {
 
@@ -17,16 +18,18 @@ public class Bounds {
     public Bounds(Finitization finitization, Class<?> rootClass) {
         this.finitization = finitization;
         this.rootClass = rootClass;
-        //initializeClassBoundMap();
+        initializeClassBoundMap();
     }
 
-/*    private void initializeClassBoundMap() {
+    private void initializeClassBoundMap() {
         Set<Class<?>> classes = finitization.getClasses();
-        for (Class<?> cls : classes) {
-            if (!classBoundMap.containsKey(cls))
-                classBoundMap.put(cls, new ClassBound(cls, finitization));
+        if (classes != null) {
+            for (Class<?> cls : classes) {
+                if (!classBoundMap.containsKey(cls))
+                    classBoundMap.put(cls, new ClassBound(cls, finitization));
+            }
         }
-    }*/
+    }
 
     public void recordBounds(int[] vector) {
         StateSpace stateSpace = finitization.getStateSpace();

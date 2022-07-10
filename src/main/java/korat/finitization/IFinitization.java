@@ -2,6 +2,8 @@ package korat.finitization;
 
 import korat.finitization.impl.StringSet;
 
+import java.util.Set;
+
 /**
  * The <code>IFinitization</code> interface is used to set up the bounds
  * for the search.  The <code>Finitization</code> class uses these bounds
@@ -214,6 +216,8 @@ public interface IFinitization {
      * @see #createFloatSet(float, float, float)
      */
     IFloatSet createFloatSet(float singleValue);
+
+    StringSet createStringSet(Set<String> set);
 
     StringSet createRandomStringSet(int setSize, int minLength, int maxLength);
 

@@ -85,8 +85,6 @@ public class Solver {
     }
 
     public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
-        System.out.println("\nStarting search for vector: ");
-
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         Utils.printVectorFormat(vector, stateSpace.getStructureList());
