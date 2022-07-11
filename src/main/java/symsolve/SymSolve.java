@@ -8,7 +8,6 @@ import korat.testing.impl.CannotInvokePredicateException;
 import symsolve.bounds.Bounds;
 import symsolve.candidates.PredicateChecker;
 import symsolve.config.ConfigParameters;
-import symsolve.explorers.impl.SymmetryBreakStrategy;
 import symsolve.solver.Solver;
 import symsolve.vector.SymSolveVector;
 
@@ -37,43 +36,12 @@ public class SymSolve {
         this(new ConfigParameters(className, finitizationArgs));
     }
 
-    private SymSolve(ConfigParameters config) {
+    public SymSolve(ConfigParameters config) {
         try {
             solver = new Solver(config);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Creates a SymSolve instance that decides satisfiability of partially symbolic
-     * heaps, represented as vectors, for the specified class and bounds. The search
-     * of the state space of vectors is performed using the specified strategy.
-     *
-     * @param className             fully qualified name of the class.
-     * @param finitizationArgs      arguments to be passed to the finitization
-     *                              method.
-     * @param symmetryBreakStrategy symmetry break strategy to be used by the
-     *                              solver.
-     */
-    public SymSolve(String className, String finitizationArgs, SymmetryBreakStrategy symmetryBreakStrategy) {
-        this(new ConfigParameters(className, finitizationArgs, symmetryBreakStrategy));
-    }
-
-    /**
-     * Creates a SymSolve instance that decides satisfiability of partially symbolic
-     * heaps, represented as vectors, for the specified class and bounds. The search
-     * of the state space of vectors is performed using the specified strategy.
-     *
-     * @param className             fully qualified name of the class.
-     * @param finitizationArgs      arguments to be passed to the finitization
-     *                              method.
-     * @param symmetryBreakStrategy symmetry break strategy to be used by the
-     *                              solver.
-     * @param predicateName         name of the predicate method.
-     */
-    public SymSolve(String className, String finitizationArgs, SymmetryBreakStrategy symmetryBreakStrategy, String predicateName) {
-        this(new ConfigParameters(className, finitizationArgs, symmetryBreakStrategy, predicateName));
     }
 
     /**

@@ -19,14 +19,16 @@ public class SymbolicVectorExplorerFactory implements VectorStateSpaceExplorerFa
         this.changedFields = changedFields;
     }
 
-    public VectorStateSpaceExplorer makeSymoblicVectorExplorer(SymmetryBreakStrategy strategy) {
+    public VectorStateSpaceExplorer makeSymbolicVectorExplorer(SymmetryBreakStrategy strategy) {
         switch (strategy) {
             case SYMMETRY_BREAK:
-                return new SymmetryBreakingExplorer(this.stateSpace, accessedIndices, changedFields);
+                return new SymmetryBreakingExplorer(stateSpace, accessedIndices, changedFields);
             case SYMMETRY_BREAK_REVERSE:
-                return new ReverseSymmetryBreakingExplorer(this.stateSpace, accessedIndices, changedFields);
+                return new ReverseSymmetryBreakingExplorer(stateSpace, accessedIndices, changedFields);
             case NO_SYMMETRY_BREAK:
-                return new NoSymmetryBreakingExplorer(this.stateSpace, accessedIndices, changedFields);
+                return new NoSymmetryBreakingExplorer(stateSpace, accessedIndices, changedFields);
+/*            case SYMMETRY_BREAK_BOUNDED:
+                return new SymmetryBreakingExplorerBounded(stateSpace, accessedIndices, changedFields);*/
             default:
                 throw new IllegalArgumentException(strategy.name() + " is not a valid Exploration Strategy ");
         }

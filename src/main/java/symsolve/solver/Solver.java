@@ -61,7 +61,7 @@ public class Solver {
 
         VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(stateSpace, accessedIndices, changedFields);
         SymmetryBreakStrategy strategy = params.getsymmetryBreakStretegy();
-        symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymoblicVectorExplorer(strategy);
+        symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(strategy);
     }
 
     public int[] getCandidateVector() {

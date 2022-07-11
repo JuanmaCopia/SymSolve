@@ -4,6 +4,6 @@ import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 public interface VectorStateSpaceExplorerFactory {
 
-    public VectorStateSpaceExplorer makeSymoblicVectorExplorer(SymmetryBreakStrategy strategy);
+    VectorStateSpaceExplorer makeSymbolicVectorExplorer(SymmetryBreakStrategy strategy);
 
 }

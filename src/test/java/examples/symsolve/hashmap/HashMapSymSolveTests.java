@@ -2,18 +2,18 @@ package examples.symsolve.hashmap;
 
 import org.junit.jupiter.api.Test;
 import symsolve.SymSolve;
+import symsolve.config.ConfigParameters;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HashMapSymSolveTests {
-
-    SymSolve symSolve = new SymSolve("examples.symsolve.hashmap.HashMap", "2",
-            SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
-
+    
     @Test
     public void test0() {
+        ConfigParameters config = new ConfigParameters("examples.symsolve.hashmap.HashMap", "2", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        SymSolve symSolve = new SymSolve(config);
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));

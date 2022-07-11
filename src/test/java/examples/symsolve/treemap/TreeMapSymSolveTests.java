@@ -2,6 +2,7 @@ package examples.symsolve.treemap;
 
 import org.junit.jupiter.api.Test;
 import symsolve.SymSolve;
+import symsolve.config.ConfigParameters;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -9,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TreeMapSymSolveTests {
 
-    SymSolve symSolve = new SymSolve("examples.symsolve.treemap.TreeMap", "5",
-            SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
-
     @Test
     public void test0() {
+        String className = "examples.symsolve.treemap.TreeMap";
+        ConfigParameters config = new ConfigParameters(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        SymSolve symSolve = new SymSolve(config);
         assertTrue(symSolve.isSatisfiable("0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertFalse(symSolve.isSatisfiable("1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));

@@ -2,6 +2,7 @@ package symsolve;
 
 import symsolve.bounds.Bounds;
 import symsolve.bounds.Helper;
+import symsolve.config.ConfigParameters;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 import symsolve.utils.Utils;
 
@@ -24,7 +25,8 @@ public class BoundCalculator {
 
     private static Bounds calculateBounds(String className, String scope) {
         System.out.printf("\nCalculating bounds for %s, Scope = %s ...\n%n", className, scope);
-        SymSolve symSolve = new SymSolve(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        ConfigParameters config = new ConfigParameters(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        SymSolve symSolve = new SymSolve(config);
         return symSolve.calculateBounds();
     }
 
