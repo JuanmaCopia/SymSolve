@@ -1,5 +1,6 @@
 package symsolve.config;
 
+import symsolve.bounds.Bounds;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 public class ConfigParameters {
@@ -12,21 +13,23 @@ public class ConfigParameters {
     String finitizationName;
     String predicateName;
     SymmetryBreakStrategy symmetryBreakStrategy;
+    Bounds bounds;
 
-    public ConfigParameters(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, String predicateName) {
+    public ConfigParameters(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, Bounds bounds, String predicateName) {
         this.fullClassName = fullClassName;
         this.finitizationArgs = finitizationArgs.split(",");
         this.finitizationName = calculateFinitizationName(fullClassName);
         this.symmetryBreakStrategy = symmetryBreakingStrategy;
         this.predicateName = predicateName;
+        this.bounds = bounds;
     }
 
     public ConfigParameters(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy) {
-        this(fullClassName, finitizationArgs, symmetryBreakingStrategy, DEFAULT_PREDICATE_NAME);
+        this(fullClassName, finitizationArgs, symmetryBreakingStrategy, null, DEFAULT_PREDICATE_NAME);
     }
 
     public ConfigParameters(String fullClassName, String finitizationArgs) {
-        this(fullClassName, finitizationArgs, DEFAULT_SBREAK_STRATEGY, DEFAULT_PREDICATE_NAME);
+        this(fullClassName, finitizationArgs, DEFAULT_SBREAK_STRATEGY, null, DEFAULT_PREDICATE_NAME);
     }
 
     public String[] getFinitizationArgs() {
@@ -45,7 +48,11 @@ public class ConfigParameters {
         return this.predicateName;
     }
 
-    public SymmetryBreakStrategy getsymmetryBreakStretegy() {
+    public Bounds getBounds() {
+        return bounds;
+    }
+
+    public SymmetryBreakStrategy getSymmetryBreakStretegy() {
         return this.symmetryBreakStrategy;
     }
 

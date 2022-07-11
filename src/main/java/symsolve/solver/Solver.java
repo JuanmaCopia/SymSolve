@@ -16,7 +16,6 @@ import symsolve.config.ConfigParameters;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.VectorStateSpaceExplorerFactory;
 import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
-import symsolve.explorers.impl.SymmetryBreakStrategy;
 import symsolve.utils.CodeGenerator;
 import symsolve.utils.Helper;
 import symsolve.vector.SymSolveVector;
@@ -36,9 +35,9 @@ public class Solver {
     IIntList accessedIndices;
     Class<?> rootClass;
     Finitization finitization;
-
     PredicateChecker predicateChecker;
 
+    
     public Solver(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
 
@@ -60,8 +59,7 @@ public class Solver {
         codeGenerator = new CodeGenerator(stateSpace, rootClass);
 
         VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(stateSpace, accessedIndices, changedFields);
-        SymmetryBreakStrategy strategy = params.getsymmetryBreakStretegy();
-        symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(strategy);
+        symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(params);
     }
 
     public int[] getCandidateVector() {
