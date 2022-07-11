@@ -1,6 +1,9 @@
 package symsolve.candidates.traversals;
 
-import korat.finitization.impl.*;
+import korat.finitization.impl.CVElem;
+import korat.finitization.impl.FieldDomain;
+import korat.finitization.impl.ObjSet;
+import korat.finitization.impl.StateSpace;
 import symsolve.candidates.traversals.visitors.CandidateVisitor;
 
 import java.util.HashMap;
@@ -13,10 +16,12 @@ public class BFSCandidateTraverser implements CandidateTraverser {
     Class<?> rootClass;
     Object rootObject;
 
-    public BFSCandidateTraverser(Finitization finitization) {
-        stateSpace = finitization.getStateSpace();
-        rootClass = finitization.getRootClass();
-        rootObject = finitization.getRootObject();
+    public BFSCandidateTraverser(StateSpace stateSpace) {
+        if (stateSpace == null)
+            throw new IllegalArgumentException();
+        this.stateSpace = stateSpace;
+        rootObject = stateSpace.getRootObject();
+        rootClass = rootObject.getClass();
     }
 
     public void traverse(int[] vector, CandidateVisitor visitor) {
@@ -31,11 +36,12 @@ public class BFSCandidateTraverser implements CandidateTraverser {
         worklist.add(rootObject);
 
         while (!worklist.isEmpty()) {
-            Object currentOwner = worklist.removeFirst();
-            int currentOwnerID = idMap.get(currentOwner);
-            Class<?> currentOwnerClass = currentOwner.getClass();
+            Object currentOwnerObject = worklist.removeFirst();
+            int currentOwnerID = idMap.get(currentOwnerObject);
 
-            int[] fieldIndices = stateSpace.getFieldIndicesFor(currentOwner);
+            visitor.setCurrentOwner(currentOwnerObject, currentOwnerID);
+
+            int[] fieldIndices = stateSpace.getFieldIndicesFor(currentOwnerObject);
 
             for (int i : fieldIndices) {
                 CVElem elem = structureList[i];
@@ -45,28 +51,27 @@ public class BFSCandidateTraverser implements CandidateTraverser {
                 Class<?> clsOfField = fieldDomain.getClassOfField();
 
                 if (fieldDomain.isPrimitiveType()) {
-                    visitor.visited(currentOwnerClass, fieldName, currentOwnerID, indexInFieldDomain);
+                    visitor.accessedPrimitiveField(fieldName, indexInFieldDomain);
                 } else {  // The field is of reference type
                     ObjSet set = (ObjSet) fieldDomain;
-                    Object fieldValue = set.getObject(indexInFieldDomain);
+                    Object fieldObject = set.getObject(indexInFieldDomain);
 
-                    if (fieldValue == null) {
-                        visitor.visited(currentOwnerClass, fieldName, currentOwnerID, indexInFieldDomain);
-
-                    } else if (idMap.containsKey(fieldValue)) {
-                        int fieldValueID = idMap.get(fieldValue);
-                        visitor.visited(currentOwnerClass, fieldName, currentOwnerID, fieldValueID + 1);
-
+                    if (fieldObject == null) {
+                        visitor.accessedNullReferenceField(fieldName, indexInFieldDomain);
+                    } else if (idMap.containsKey(fieldObject)) {
+                        int fieldObjectID = idMap.get(fieldObject) + 1;
+                        visitor.accessedVisitedReferenceField(fieldName, fieldObject, fieldObjectID);
                     } else {
-                        int fieldValueID = 0;
+                        int fieldObjectID = 0;
                         if (maxIdMap.containsKey(clsOfField))
-                            fieldValueID = maxIdMap.get(clsOfField) + 1;
-                        maxIdMap.put(clsOfField, fieldValueID);
-                        idMap.put(fieldValue, fieldValueID);
+                            fieldObjectID = maxIdMap.get(clsOfField) + 1;
+                        maxIdMap.put(clsOfField, fieldObjectID);
+                        idMap.put(fieldObject, fieldObjectID);
 
-                        visitor.visited(currentOwnerClass, fieldName, currentOwnerID, fieldValueID + 1);
+                        fieldObjectID = fieldObjectID + 1;
+                        visitor.accessedNewReferenceField(fieldName, fieldObject, fieldObjectID);
 
-                        worklist.add(fieldValue);
+                        worklist.add(fieldObject);
                     }
                 }
             }
