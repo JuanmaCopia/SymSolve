@@ -3,21 +3,41 @@ package symsolve;
 import symsolve.bounds.Bounds;
 import symsolve.bounds.Helper;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
+import symsolve.utils.Utils;
+
+import java.io.File;
 
 public class CalculateBounds {
 
-    public static void main(String[] args) {
-        SymSolve symSolve = new SymSolve("examples.symsolve.treemap.TreeMap", "5",
-                SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+    private static final String BOUNDS_FOLDER = "output/bounds/";
 
-        Bounds bounds = symSolve.calculateBounds();
-        System.out.println("Calculated bounds for TreeMap, Scope = 5\n");
-        /*System.out.println(bounds.toString());*/
+    private static void generateBounds(String className, String scope) {
+        Bounds bounds = calculateBounds(className, scope);
+
         String jsonStringBounds = Helper.boundsToJson(bounds);
-        System.out.println(jsonStringBounds);
-
         Bounds recoveredBounds = Helper.boundsFromJson(jsonStringBounds);
+        assert (bounds.equals(recoveredBounds));
 
-        System.out.println(recoveredBounds);
+        storeBoundsInDisk(createBoundsFileName(className, scope, "txt"), bounds.toString());
+        storeBoundsInDisk(createBoundsFileName(className, scope, "json"), jsonStringBounds);
+    }
+
+    private static Bounds calculateBounds(String className, String scope) {
+        System.out.printf("\nCalculating bounds for %s, Scope = %s ...\n%n", className, scope);
+        SymSolve symSolve = new SymSolve(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        return symSolve.calculateBounds();
+    }
+
+    private static void storeBoundsInDisk(String fullPathFileName, String boundsString) {
+        File file = Utils.createFileAndFolders(fullPathFileName, true);
+        Utils.appendToFile(file, boundsString);
+    }
+
+    private static String createBoundsFileName(String className, String scope, String extension) {
+        return String.format("%s%s.%s.%s", BOUNDS_FOLDER, className, scope, extension);
+    }
+
+    public static void main(String[] args) {
+        generateBounds("examples.symsolve.treemap.TreeMap", "5");
     }
 }
