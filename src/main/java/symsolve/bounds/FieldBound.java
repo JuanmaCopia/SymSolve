@@ -7,15 +7,14 @@ import java.util.Set;
 
 public class FieldBound {
 
-    String fieldName;
-    ClassBound classBound;
-
+    private transient final String fieldName;
+    private transient final ClassBound belongingClassBound;
     Map<Integer, Set<Integer>> fieldBounds = new HashMap<>();
 
 
-    public FieldBound(String fieldName, ClassBound classBound) {
+    public FieldBound(String fieldName, ClassBound belongingClassBound) {
         this.fieldName = fieldName;
-        this.classBound = classBound;
+        this.belongingClassBound = belongingClassBound;
     }
 
     public void addBound(int ownerObjectID, int fieldValue) {
@@ -26,9 +25,7 @@ public class FieldBound {
     }
 
     public Set<Integer> getAllowedValues(int ownerObjectID) {
-        Set<Integer> fieldValues = fieldBounds.get(ownerObjectID);
-        assert (fieldValues != null);
-        return fieldValues;
+        return fieldBounds.get(ownerObjectID);
     }
 
     @Override

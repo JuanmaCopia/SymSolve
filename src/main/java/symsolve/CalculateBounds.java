@@ -1,6 +1,7 @@
 package symsolve;
 
 import symsolve.bounds.Bounds;
+import symsolve.bounds.Helper;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 public class CalculateBounds {
@@ -11,6 +12,12 @@ public class CalculateBounds {
 
         Bounds bounds = symSolve.calculateBounds();
         System.out.println("Calculated bounds for TreeMap, Scope = 5\n");
-        System.out.println(bounds.toString());
+        /*System.out.println(bounds.toString());*/
+        String jsonStringBounds = Helper.boundsToJson(bounds);
+        System.out.println(jsonStringBounds);
+
+        Bounds recoveredBounds = Helper.boundsFromJson(jsonStringBounds);
+
+        System.out.println(recoveredBounds);
     }
 }

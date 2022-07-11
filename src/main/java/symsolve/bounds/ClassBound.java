@@ -1,26 +1,23 @@
 package symsolve.bounds;
 
-import korat.finitization.impl.Finitization;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+
 
 public class ClassBound {
 
+    private transient final Class<?> cls;
     Map<String, FieldBound> fieldBoundMap = new HashMap<>();
-    Class<?> cls;
-    Finitization finitization;
 
 
-    public ClassBound(Class<?> cls, Finitization finitization) {
+    public ClassBound(Class<?> cls, List<String> fieldNames) {
         this.cls = cls;
-        this.finitization = finitization;
-        initializeFieldBoundMap();
+        initializeFieldBoundMap(fieldNames);
     }
 
-    private void initializeFieldBoundMap() {
-        List<String> fieldNames = finitization.getFieldNames(cls);
+    private void initializeFieldBoundMap(List<String> fieldNames) {
         if (fieldNames != null) {
             for (String fieldName : fieldNames) {
                 if (!fieldBoundMap.containsKey(fieldName))
@@ -29,10 +26,15 @@ public class ClassBound {
         }
     }
 
-    public FieldBound getFieldBounds(String fieldName) {
+    public void addBound(String fieldName, int ownerObjectID, int fieldValue) {
         FieldBound fieldBound = fieldBoundMap.get(fieldName);
-        assert (fieldBound != null);
-        return fieldBound;
+        fieldBound.addBound(ownerObjectID, fieldValue);
+    }
+
+    public FieldBound getFieldBounds(String fieldName) {
+        if (!fieldBoundMap.containsKey(fieldName))
+            throw new NoSuchElementException(String.format("The field %s is not in bounds of class %s", fieldName, cls.getName()));
+        return fieldBoundMap.get(fieldName);
     }
 
     @Override

@@ -8,6 +8,7 @@ import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
+import symsolve.bounds.BoundRecorder;
 import symsolve.bounds.Bounds;
 import symsolve.candidates.CandidateBuilder;
 import symsolve.candidates.PredicateChecker;
@@ -132,17 +133,17 @@ public class Solver {
     }
 
     public Bounds calculateBounds() throws CannotInvokePredicateException {
-        Bounds bounds = new Bounds(finitization);
+        BoundRecorder boundsRecorder = new BoundRecorder(finitization);
         SymSolveVector initialVector = new SymSolveVector(stateSpace.getTotalNumberOfFields());
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))
-                bounds.recordBounds(vector);
+                boundsRecorder.recordBounds(vector);
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
-        return bounds;
+        return boundsRecorder.getBounds();
     }
 
     public HashMap<String, Integer> getScopes() {
