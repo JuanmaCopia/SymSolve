@@ -1,4 +1,4 @@
-package symsolve;
+package symsolve.vector;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,17 +38,6 @@ public class SymSolveVector {
         this.partialVector = createPartialVector();
     }
 
-    private int[] createPartialVector() {
-        int[] partialVector = new int[this.size];
-        for (int i = 0; i < this.size; i++) {
-            if (this.fixedIndices.contains(i))
-                partialVector[i] = this.concreteVector[i];
-            else
-                partialVector[i] = SYMBOLIC;
-        }
-        return partialVector;
-    }
-
     public SymSolveVector(int vectorSize) {
         this.size = vectorSize;
         this.concreteVector = new int[vectorSize];
@@ -78,6 +67,17 @@ public class SymSolveVector {
                 this.fixedIndices.add(i);
             }
         }
+    }
+
+    private int[] createPartialVector() {
+        int[] partialVector = new int[this.size];
+        for (int i = 0; i < this.size; i++) {
+            if (this.fixedIndices.contains(i))
+                partialVector[i] = this.concreteVector[i];
+            else
+                partialVector[i] = SYMBOLIC;
+        }
+        return partialVector;
     }
 
     /**

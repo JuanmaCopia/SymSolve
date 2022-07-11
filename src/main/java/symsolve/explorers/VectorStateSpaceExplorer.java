@@ -1,6 +1,6 @@
 package symsolve.explorers;
 
-import symsolve.SymSolveVector;
+import symsolve.vector.SymSolveVector;
 
 public interface VectorStateSpaceExplorer {
 

@@ -4,8 +4,8 @@ import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
-import symsolve.SymSolveVector;
 import symsolve.explorers.VectorStateSpaceExplorer;
+import symsolve.vector.SymSolveVector;
 
 import java.util.IdentityHashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package symsolve;
+package symsolve.solver;
 
 
 import korat.finitization.impl.*;
@@ -12,12 +12,14 @@ import symsolve.bounds.BoundRecorder;
 import symsolve.bounds.Bounds;
 import symsolve.candidates.CandidateBuilder;
 import symsolve.candidates.PredicateChecker;
+import symsolve.config.ConfigParameters;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.VectorStateSpaceExplorerFactory;
 import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 import symsolve.utils.CodeGenerator;
 import symsolve.utils.Helper;
+import symsolve.vector.SymSolveVector;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

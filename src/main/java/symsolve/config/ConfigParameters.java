@@ -1,9 +1,9 @@
-package symsolve;
+package symsolve.config;
 
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 public class ConfigParameters {
-    
+
     static final String DEFAULT_PREDICATE_NAME = "repOK";
     static final SymmetryBreakStrategy DEFAULT_SBREAK_STRATEGY = SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE;
 
@@ -12,7 +12,7 @@ public class ConfigParameters {
     String finitizationName;
     String predicateName;
     SymmetryBreakStrategy symmetryBreakStrategy;
-    
+
     public ConfigParameters(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, String predicateName) {
         this.fullClassName = fullClassName;
         this.finitizationArgs = finitizationArgs.split(",");
@@ -40,7 +40,7 @@ public class ConfigParameters {
     public String getFullyQualifiedClassName() {
         return this.fullClassName;
     }
-    
+
     public String getPredicateName() {
         return this.predicateName;
     }

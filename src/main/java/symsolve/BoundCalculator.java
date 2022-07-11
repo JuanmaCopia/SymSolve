@@ -7,7 +7,7 @@ import symsolve.utils.Utils;
 
 import java.io.File;
 
-public class CalculateBounds {
+public class BoundCalculator {
 
     private static final String BOUNDS_FOLDER = "output/bounds/";
 

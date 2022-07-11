@@ -7,7 +7,10 @@ import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokePredicateException;
 import symsolve.bounds.Bounds;
 import symsolve.candidates.PredicateChecker;
+import symsolve.config.ConfigParameters;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
+import symsolve.solver.Solver;
+import symsolve.vector.SymSolveVector;
 
 import java.util.HashMap;
 import java.util.Map;
