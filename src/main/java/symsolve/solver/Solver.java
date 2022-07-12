@@ -37,7 +37,7 @@ public class Solver {
     Finitization finitization;
     PredicateChecker predicateChecker;
 
-    
+
     public Solver(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
 
@@ -102,7 +102,6 @@ public class Solver {
 
     public boolean searchOtherSolution(SymSolveVector initialVector) throws CannotInvokePredicateException {
         runRepOK(initialVector);
-        this.symbolicVectorSpaceExplorer.setInitializedFields();
         int[] vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);

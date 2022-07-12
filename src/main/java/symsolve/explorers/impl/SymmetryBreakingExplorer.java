@@ -13,23 +13,15 @@ import java.util.Set;
 
 public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
 
+    private final int[] maxInstances;
     protected StateSpace stateSpace;
-
     protected int[] candidateVector;
-
     protected int vectorSize;
-
-    protected int[] maxInstances;
-
-    protected boolean[] initializedFields;
-
     protected IIntList accessedIndices;
-
     protected IIntList changedFields;
-
     protected IIntList fixedIndices;
 
-    protected Map<FieldDomain, Integer> maxFixedInstancePerReferenceFieldDomain = new IdentityHashMap<FieldDomain, Integer>();
+    protected Map<FieldDomain, Integer> maxFixedInstancePerReferenceFieldDomain = new IdentityHashMap<>();
 
     public SymmetryBreakingExplorer(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields) {
         this.stateSpace = stateSpace;
@@ -37,7 +29,6 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
         this.changedFields = changedFields;
         vectorSize = accessedIndices.getLength();
         fixedIndices = new IntListAI(vectorSize);
-        initializedFields = new boolean[vectorSize];
         maxInstances = new int[vectorSize];
     }
 
@@ -46,9 +37,9 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
     }
 
     public void initialize(SymSolveVector vector) {
-        resetExplorerState();
         setCandidateVector(vector);
         calculateMaxFixedInstancePerReferenceFieldDomain(vector.getFixedIndices());
+        setUpExplorerState();
     }
 
     public int[] getNextCandidate() {
@@ -65,10 +56,14 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
         return null;
     }
 
-    public void setInitializedFields() {
-        for (int i = 0; i < this.vectorSize; i++) {
+    public void setUpExplorerState() {
+        for (int i = 0; i < vectorSize; i++) {
+            changedFields.add(i);
             if (!fixedIndices.contains(i) && candidateVector[i] > 0) {
-                this.initializedFields[i] = true;
+                FieldDomain fieldDomain = stateSpace.getFieldDomain(i);
+                maxInstances[i] = maxFixedInstancePerReferenceFieldDomain.get(fieldDomain);
+            } else {
+                maxInstances[i] = -1;
             }
         }
     }
@@ -77,14 +72,6 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
         this.candidateVector = vector.getConcreteVector();
         if (vectorSize != this.candidateVector.length)
             throw new IllegalArgumentException(String.format("Wrong vector size! Expected: %d, but got: %d", vectorSize, this.candidateVector.length));
-    }
-
-    private void resetExplorerState() {
-        for (int i = 0; i < vectorSize; i++) {
-            maxInstances[i] = -1;
-            initializedFields[i] = false;
-            changedFields.add(i);
-        }
     }
 
     private void calculateMaxFixedInstancePerReferenceFieldDomain(Set<Integer> fixedIndices) {

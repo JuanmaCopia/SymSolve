@@ -1,7 +1,6 @@
 package symsolve.explorers.impl;
 
 import korat.finitization.impl.CVElem;
-import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import symsolve.bounds.Bounds;
@@ -20,36 +19,28 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
     public SymmetryBreakingExplorerBounded(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields, Bounds bounds) {
         super(stateSpace, accessedIndices, changedFields);
         this.bounds = bounds;
-        initializeBoundList();
-    }
-
-    private void initializeBoundList() {
         boundList = new ArrayList<>(vectorSize);
     }
 
-    protected boolean setNextValue(int lastAccessedFieldIndex) {
-        FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
-        int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
-        int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
-
-        if (currentInstanceIndex >= maxInstanceIndexForFieldDomain)
-            return false;
-
-        if (lastAccessedFD.isPrimitiveType()) { // TODO: Check bounds here!
-            candidateVector[lastAccessedFieldIndex]++;
-            return true;
+    @Override
+    public void setUpExplorerState() {
+        for (int i = 0; i < vectorSize; i++) {
+            changedFields.add(i);
+            if (!fixedIndices.contains(i) && candidateVector[i] > 0) {
+                List<Integer> possibleValues = getPossibleValuesForCurrentField(i);
+                removeAlreadyExploredValues(possibleValues, candidateVector[i]);
+                boundList.set(i, possibleValues);
+            } else {
+                boundList.set(i, null);
+            }
         }
+    }
 
-        // Is a reference field
+    @Override
+    protected boolean setNextValue(int lastAccessedFieldIndex) {
         List<Integer> possibleValues = boundList.get(lastAccessedFieldIndex);
         if (possibleValues == null) {
-            CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
-            Object ownerObject = cvElem.getObj();
-            Class<?> cls = ownerObject.getClass();
-            String fieldName = cvElem.getFieldName();
-            int ownerId = getObjectID(ownerObject);
-            Set<Integer> boundValues = bounds.getAllowedValues(cls, fieldName, ownerId);
-            possibleValues = new ArrayList<>(boundValues);
+            possibleValues = getPossibleValuesForCurrentField(lastAccessedFieldIndex);
             boundList.set(lastAccessedFieldIndex, possibleValues);
         }
 
@@ -60,9 +51,20 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
         return false;
     }
 
+    @Override
     protected void backtrack(int lastAccessedFieldIndex) {
         candidateVector[lastAccessedFieldIndex] = 0;
-        maxInstances[lastAccessedFieldIndex] = -1;
+        boundList.set(lastAccessedFieldIndex, null);
+    }
+
+    private List<Integer> getPossibleValuesForCurrentField(int fieldIndex) {
+        CVElem cvElem = stateSpace.getCVElem(fieldIndex);
+        Object ownerObject = cvElem.getObj();
+        Class<?> cls = ownerObject.getClass();
+        String fieldName = cvElem.getFieldName();
+        int ownerId = getObjectID(ownerObject);
+        Set<Integer> boundValues = bounds.getAllowedValues(cls, fieldName, ownerId);
+        return new ArrayList<>(boundValues);
     }
 
     private int getObjectID(Object object) {
@@ -71,4 +73,15 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
         assert (objectIDs.containsKey(object));
         return objectIDs.get(object);
     }
+
+    private void removeAlreadyExploredValues(List<Integer> possibleValues, int currentValue) {
+        int numOfRemovals = 1;
+        for (Integer value : possibleValues) {
+            if (value != currentValue)
+                numOfRemovals++;
+        }
+        for (int i = 0; i < numOfRemovals; i++)
+            possibleValues.remove(0);
+    }
+
 }
