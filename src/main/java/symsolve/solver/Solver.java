@@ -8,11 +8,9 @@ import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
 import korat.utils.IntListAI;
-import symsolve.bounds.BoundRecorder;
-import symsolve.bounds.Bounds;
 import symsolve.candidates.CandidateBuilder;
 import symsolve.candidates.PredicateChecker;
-import symsolve.config.ConfigParameters;
+import symsolve.config.SymSolveConfig;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.VectorStateSpaceExplorerFactory;
 import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
@@ -38,7 +36,7 @@ public class Solver {
     PredicateChecker predicateChecker;
 
 
-    public Solver(ConfigParameters params) throws ClassNotFoundException, CannotFindFinitizationException,
+    public Solver(SymSolveConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
 
         rootClass = Finitization.getClassLoader().loadClass(params.getFullyQualifiedClassName());
@@ -129,20 +127,6 @@ public class Solver {
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return solutions;
-    }
-
-    public Bounds calculateBounds() throws CannotInvokePredicateException {
-        BoundRecorder boundsRecorder = new BoundRecorder(finitization);
-        SymSolveVector initialVector = new SymSolveVector(stateSpace.getTotalNumberOfFields());
-        symbolicVectorSpaceExplorer.initialize(initialVector);
-        int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
-        while (vector != null) {
-            Object candidate = candidateBuilder.buildCandidate(vector);
-            if (predicateChecker.checkPredicate(candidate))
-                boundsRecorder.recordBounds(vector);
-            vector = symbolicVectorSpaceExplorer.getNextCandidate();
-        }
-        return boundsRecorder.getBounds();
     }
 
     public HashMap<String, Integer> getScopes() {

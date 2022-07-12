@@ -1,9 +1,9 @@
 package symsolve.explorers;
 
-import symsolve.config.ConfigParameters;
+import symsolve.config.SymSolveConfig;
 
 public interface VectorStateSpaceExplorerFactory {
 
-    VectorStateSpaceExplorer makeSymbolicVectorExplorer(ConfigParameters config);
+    VectorStateSpaceExplorer makeSymbolicVectorExplorer(SymSolveConfig config);
 
 }

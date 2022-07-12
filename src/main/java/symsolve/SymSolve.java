@@ -5,9 +5,8 @@ import korat.finitization.impl.IntSet;
 import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokePredicateException;
-import symsolve.bounds.Bounds;
 import symsolve.candidates.PredicateChecker;
-import symsolve.config.ConfigParameters;
+import symsolve.config.SolverConfig;
 import symsolve.solver.Solver;
 import symsolve.vector.SymSolveVector;
 
@@ -33,10 +32,10 @@ public class SymSolve {
      * @param finitizationArgs arguments to be passed to the finitization method.
      */
     public SymSolve(String className, String finitizationArgs) {
-        this(new ConfigParameters(className, finitizationArgs));
+        this(new SolverConfig(className, finitizationArgs));
     }
 
-    public SymSolve(ConfigParameters config) {
+    public SymSolve(SolverConfig config) {
         try {
             solver = new Solver(config);
         } catch (Exception e) {
@@ -123,16 +122,6 @@ public class SymSolve {
             e.printStackTrace(System.err);
         }
         return vectorSolutions;
-    }
-
-    public Bounds calculateBounds() {
-        Bounds bounds = null;
-        try {
-            bounds = solver.calculateBounds();
-        } catch (CannotInvokePredicateException e) {
-            e.printStackTrace(System.err);
-        }
-        return bounds;
     }
 
     /**

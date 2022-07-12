@@ -2,13 +2,13 @@ package symsolve;
 
 import symsolve.bounds.Bounds;
 import symsolve.bounds.Helper;
-import symsolve.config.ConfigParameters;
+import symsolve.config.BoundCalculatorConfig;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 import symsolve.utils.Utils;
 
 import java.io.File;
 
-public class BoundCalculator {
+public class CalculateBoundsMain {
 
     private static final String BOUNDS_FOLDER = "output/bounds/";
 
@@ -25,9 +25,9 @@ public class BoundCalculator {
 
     private static Bounds calculateBounds(String className, String scope) {
         System.out.printf("\nCalculating bounds for %s, Scope = %s ...\n%n", className, scope);
-        ConfigParameters config = new ConfigParameters(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
-        SymSolve symSolve = new SymSolve(config);
-        return symSolve.calculateBounds();
+        BoundCalculatorConfig config = new BoundCalculatorConfig(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        SymSolveBoundCalculator symSolveBoundCalculator = new SymSolveBoundCalculator(config);
+        return symSolveBoundCalculator.calculateBounds();
     }
 
     private static void storeBoundsInDisk(String fullPathFileName, String boundsString) {

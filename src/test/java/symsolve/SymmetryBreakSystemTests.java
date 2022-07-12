@@ -1,7 +1,7 @@
 package symsolve;
 
 import org.junit.jupiter.api.Test;
-import symsolve.config.ConfigParameters;
+import symsolve.config.SolverConfig;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,7 +11,7 @@ public class SymmetryBreakSystemTests {
 
     @Test
     public void isSatisfiableHashMapTest() {
-        ConfigParameters config = new ConfigParameters("examples.symsolve.hashmap.HashMap", "2", SymmetryBreakStrategy.SYMMETRY_BREAK);
+        SolverConfig config = new SolverConfig("examples.symsolve.hashmap.HashMap", "2", SymmetryBreakStrategy.SYMMETRY_BREAK);
         SymSolve symSolve = new SymSolve(config);
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
@@ -147,7 +147,7 @@ public class SymmetryBreakSystemTests {
     @Test
     public void isSatisfiableTreeMapTest() {
         String className = "examples.symsolve.treemap.TreeMap";
-        ConfigParameters config = new ConfigParameters(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK);
+        SolverConfig config = new SolverConfig(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK);
         SymSolve symSolve = new SymSolve(config);
         assertTrue(symSolve.isSatisfiable("0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
@@ -731,7 +731,7 @@ public class SymmetryBreakSystemTests {
     @Test
     public void isSatisfiableScheduleTest() {
         String className = "examples.symsolve.schedule.Schedule";
-        ConfigParameters config = new ConfigParameters(className, "4", SymmetryBreakStrategy.SYMMETRY_BREAK);
+        SolverConfig config = new SolverConfig(className, "4", SymmetryBreakStrategy.SYMMETRY_BREAK);
         SymSolve symSolve = new SymSolve(config);
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));

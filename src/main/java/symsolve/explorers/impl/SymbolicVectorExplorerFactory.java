@@ -2,7 +2,8 @@ package symsolve.explorers.impl;
 
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
-import symsolve.config.ConfigParameters;
+import symsolve.config.SolverConfig;
+import symsolve.config.SymSolveConfig;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.VectorStateSpaceExplorerFactory;
 
@@ -11,7 +12,7 @@ public class SymbolicVectorExplorerFactory implements VectorStateSpaceExplorerFa
     StateSpace stateSpace;
     IIntList accessedIndices;
     IIntList changedFields;
-    
+
 
     public SymbolicVectorExplorerFactory(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields) {
         this.stateSpace = stateSpace;
@@ -19,7 +20,7 @@ public class SymbolicVectorExplorerFactory implements VectorStateSpaceExplorerFa
         this.changedFields = changedFields;
     }
 
-    public VectorStateSpaceExplorer makeSymbolicVectorExplorer(ConfigParameters config) {
+    public VectorStateSpaceExplorer makeSymbolicVectorExplorer(SymSolveConfig config) {
         SymmetryBreakStrategy strategy = config.getSymmetryBreakStretegy();
         switch (strategy) {
             case SYMMETRY_BREAK:
@@ -29,7 +30,8 @@ public class SymbolicVectorExplorerFactory implements VectorStateSpaceExplorerFa
             case NO_SYMMETRY_BREAK:
                 return new NoSymmetryBreakingExplorer(stateSpace, accessedIndices, changedFields);
             case SYMMETRY_BREAK_BOUNDED:
-                return new SymmetryBreakingExplorerBounded(stateSpace, accessedIndices, changedFields, config.getBounds());
+                SolverConfig solverConf = (SolverConfig) config;
+                return new SymmetryBreakingExplorerBounded(stateSpace, accessedIndices, changedFields, solverConf.getBounds());
             default:
                 throw new IllegalArgumentException(strategy.name() + " is not a valid Exploration Strategy ");
         }
