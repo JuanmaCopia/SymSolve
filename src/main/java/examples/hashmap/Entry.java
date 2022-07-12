@@ -1,4 +1,4 @@
-package examples.symsolve.hashmap;
+package examples.hashmap;
 
 
 public class Entry {
@@ -41,20 +41,20 @@ public class Entry {
         return false;
     }
 
-    public int getKey() {
-        return key;
+    public String toString() {
+        return getKey() + "=" + getValue();
     }
 
-    public Object getValue() {
-        return value;
+    public int getKey() {
+        return key;
     }
 
     // public int hashCode() {
     // return key ^ (value == null ? 0 : value.hashCode());
     // }
 
-    public String toString() {
-        return getKey() + "=" + getValue();
+    public Object getValue() {
+        return value;
     }
 
     /**

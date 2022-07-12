@@ -1,4 +1,4 @@
-package examples.symsolve.treemap;
+package examples.treemap;
 
 public class Entry {
 
@@ -23,6 +23,14 @@ public class Entry {
     }
 
     /**
+     * Test two values for equality. Differs from o1.equals(o2) only in that it
+     * copes with with <tt>null</tt> o1 properly.
+     */
+    private static boolean valEquals(Object o1, Object o2) {
+        return (o1 == null ? o2 == null : o1.equals(o2));
+    }
+
+    /**
      * Replaces the value currently associated with the key with the given value.
      *
      * @return the value associated with the key before this method was called.
@@ -41,12 +49,8 @@ public class Entry {
         return valEquals(key, e.getKey()) && valEquals(value, e.getValue());
     }
 
-    /**
-     * Test two values for equality. Differs from o1.equals(o2) only in that it
-     * copes with with <tt>null</tt> o1 properly.
-     */
-    private static boolean valEquals(Object o1, Object o2) {
-        return (o1 == null ? o2 == null : o1.equals(o2));
+    public String toString() {
+        return key + "=" + value;
     }
 
     /**
@@ -58,6 +62,12 @@ public class Entry {
         return key;
     }
 
+    // public int hashCode() {
+    // int keyHash = key;
+    // int valueHash = (value == null ? 0 : value.hashCode());
+    // return keyHash ^ valueHash;
+    // }
+
     /**
      * Returns the value associated with the key.
      *
@@ -65,16 +75,6 @@ public class Entry {
      */
     public Object getValue() {
         return value;
-    }
-
-    // public int hashCode() {
-    // int keyHash = key;
-    // int valueHash = (value == null ? 0 : value.hashCode());
-    // return keyHash ^ valueHash;
-    // }
-
-    public String toString() {
-        return key + "=" + value;
     }
 
 }

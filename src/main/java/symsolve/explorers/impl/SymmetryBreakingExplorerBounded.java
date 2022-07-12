@@ -14,12 +14,12 @@ import java.util.Set;
 public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
 
     Bounds bounds;
-    List<List<Integer>> boundList;
+    List<Integer>[] boundList;
 
     public SymmetryBreakingExplorerBounded(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields, Bounds bounds) {
         super(stateSpace, accessedIndices, changedFields);
         this.bounds = bounds;
-        boundList = new ArrayList<>(vectorSize);
+        boundList = new ArrayList[vectorSize];
     }
 
     @Override
@@ -29,23 +29,36 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
             if (!fixedIndices.contains(i) && candidateVector[i] > 0) {
                 List<Integer> possibleValues = getPossibleValuesForCurrentField(i);
                 removeAlreadyExploredValues(possibleValues, candidateVector[i]);
-                boundList.set(i, possibleValues);
+                boundList[i] = possibleValues;
             } else {
-                boundList.set(i, null);
+                boundList[i] = null;
             }
         }
     }
 
     @Override
     protected boolean setNextValue(int lastAccessedFieldIndex) {
-        List<Integer> possibleValues = boundList.get(lastAccessedFieldIndex);
+        List<Integer> possibleValues = boundList[lastAccessedFieldIndex];
         if (possibleValues == null) {
             possibleValues = getPossibleValuesForCurrentField(lastAccessedFieldIndex);
-            boundList.set(lastAccessedFieldIndex, possibleValues);
+            boundList[lastAccessedFieldIndex] = possibleValues;
         }
 
         if (!possibleValues.isEmpty()) {
+            /*System.out.println("\n\nVector: ");
+            Utils.printVectorFormat(candidateVector, stateSpace.getStructureList());
+            CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
+            Object ownerObject = cvElem.getObj();
+            Class<?> cls = ownerObject.getClass();
+            String fieldName = cvElem.getFieldName();
+            int ownerId = getObjectID(ownerObject);
+
+            System.out.println("\nField: " + cls.getSimpleName() + "." + fieldName);
+            System.out.println("Owner ID: " + ownerId);
+            System.out.println("Current possible values: " + possibleValues);*/
             candidateVector[lastAccessedFieldIndex] = possibleValues.remove(0);
+            /*System.out.println("setted value for index " + lastAccessedFieldIndex + " == " + candidateVector[lastAccessedFieldIndex]);
+            Utils.printVectorFormat(candidateVector, stateSpace.getStructureList());*/
             return true;
         }
         return false;
@@ -54,7 +67,7 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
     @Override
     protected void backtrack(int lastAccessedFieldIndex) {
         candidateVector[lastAccessedFieldIndex] = 0;
-        boundList.set(lastAccessedFieldIndex, null);
+        boundList[lastAccessedFieldIndex] = null;
     }
 
     private List<Integer> getPossibleValuesForCurrentField(int fieldIndex) {
@@ -63,7 +76,11 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
         Class<?> cls = ownerObject.getClass();
         String fieldName = cvElem.getFieldName();
         int ownerId = getObjectID(ownerObject);
+
+        /*System.out.println("\nField: " + cls.getSimpleName() + "." + fieldName);
+        System.out.println("Owner ID: " + ownerId);*/
         Set<Integer> boundValues = bounds.getAllowedValues(cls, fieldName, ownerId);
+        //System.out.println("Bounds: " + boundValues.toString());
         return new ArrayList<>(boundValues);
     }
 

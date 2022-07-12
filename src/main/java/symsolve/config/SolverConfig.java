@@ -16,6 +16,10 @@ public class SolverConfig extends SymSolveConfig {
         this.bounds = bounds;
     }
 
+    public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, Bounds bounds) {
+        this(fullClassName, finitizationArgs, symmetryBreakingStrategy, bounds, DEFAULT_PREDICATE_NAME);
+    }
+
     public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy) {
         this(fullClassName, finitizationArgs, symmetryBreakingStrategy, null, DEFAULT_PREDICATE_NAME);
     }

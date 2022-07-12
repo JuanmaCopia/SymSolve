@@ -11,7 +11,7 @@ public class SymmetryBreakReverseSystemTests {
 
     @Test
     public void isSatisfiableHashMapTest() {
-        SolverConfig config = new SolverConfig("examples.symsolve.hashmap.HashMap", "2", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        SolverConfig config = new SolverConfig("examples.hashmap.HashMap", "2", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
         SymSolve symSolve = new SymSolve(config);
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
@@ -146,7 +146,7 @@ public class SymmetryBreakReverseSystemTests {
 
     @Test
     public void isSatisfiableTreeMapTest() {
-        String className = "examples.symsolve.treemap.TreeMap";
+        String className = "examples.treemap.TreeMap";
         SolverConfig config = new SolverConfig(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
         SymSolve symSolve = new SymSolve(config);
         assertTrue(symSolve.isSatisfiable("0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
@@ -730,7 +730,7 @@ public class SymmetryBreakReverseSystemTests {
 
     @Test
     public void isSatisfiableScheduleTest() {
-        String className = "examples.symsolve.schedule.Schedule";
+        String className = "examples.schedule.Schedule";
         SolverConfig config = new SolverConfig(className, "4", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
         SymSolve symSolve = new SymSolve(config);
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));

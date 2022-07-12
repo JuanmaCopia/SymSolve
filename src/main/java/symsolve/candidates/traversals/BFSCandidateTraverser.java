@@ -39,7 +39,7 @@ public class BFSCandidateTraverser implements CandidateTraverser {
             Object currentOwnerObject = worklist.removeFirst();
             int currentOwnerID = idMap.get(currentOwnerObject);
 
-            visitor.setCurrentOwner(currentOwnerObject, currentOwnerID);
+            visitor.setCurrentOwner(currentOwnerObject, currentOwnerID + 1);
 
             int[] fieldIndices = stateSpace.getFieldIndicesFor(currentOwnerObject);
 

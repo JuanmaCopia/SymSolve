@@ -1,4 +1,4 @@
-package examples.symsolve.schedule;
+package examples.schedule;
 
 public class Job {
     public Job next;

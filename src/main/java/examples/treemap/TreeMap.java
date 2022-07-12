@@ -1,4 +1,4 @@
-package examples.symsolve.treemap;
+package examples.treemap;
 
 import korat.finitization.IFinitization;
 import korat.finitization.IObjSet;

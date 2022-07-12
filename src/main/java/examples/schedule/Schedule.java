@@ -1,4 +1,4 @@
-package examples.symsolve.schedule;
+package examples.schedule;
 
 import korat.finitization.IFinitization;
 import korat.finitization.IObjSet;

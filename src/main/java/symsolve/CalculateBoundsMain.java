@@ -25,7 +25,7 @@ public class CalculateBoundsMain {
 
     private static Bounds calculateBounds(String className, String scope) {
         System.out.printf("\nCalculating bounds for %s, Scope = %s ...\n%n", className, scope);
-        BoundCalculatorConfig config = new BoundCalculatorConfig(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        BoundCalculatorConfig config = new BoundCalculatorConfig(className, scope, SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
         SymSolveBoundCalculator symSolveBoundCalculator = new SymSolveBoundCalculator(config);
         return symSolveBoundCalculator.calculateBounds();
     }
@@ -40,6 +40,8 @@ public class CalculateBoundsMain {
     }
 
     public static void main(String[] args) {
-        generateBounds("examples.symsolve.treemap.TreeMap", "5");
+        generateBounds("examples.treemap.TreeMap", "5");
+        generateBounds("examples.hashmap.HashMap", "2");
+        generateBounds("examples.schedule.Schedule", "4");
     }
 }

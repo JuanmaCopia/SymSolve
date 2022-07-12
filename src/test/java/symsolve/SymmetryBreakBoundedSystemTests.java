@@ -1,6 +1,7 @@
 package symsolve;
 
 import org.junit.jupiter.api.Test;
+import symsolve.bounds.Bounds;
 import symsolve.config.SolverConfig;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
@@ -11,7 +12,11 @@ public class SymmetryBreakBoundedSystemTests {
 
     @Test
     public void isSatisfiableHashMapTest() {
-        SolverConfig config = new SolverConfig("examples.symsolve.hashmap.HashMap", "2", SymmetryBreakStrategy.SYMMETRY_BREAK_BOUNDED);
+        String className = "examples.hashmap.HashMap";
+        String finitizationArgs = "2";
+        SymSolveBoundCalculator boundCalculator = new SymSolveBoundCalculator(className, finitizationArgs);
+        Bounds bounds = boundCalculator.calculateBounds();
+        SolverConfig config = new SolverConfig(className, finitizationArgs, SymmetryBreakStrategy.SYMMETRY_BREAK_BOUNDED, bounds);
         SymSolve symSolve = new SymSolve(config);
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
@@ -146,9 +151,14 @@ public class SymmetryBreakBoundedSystemTests {
 
     @Test
     public void isSatisfiableTreeMapTest() {
-        String className = "examples.symsolve.treemap.TreeMap";
-        SolverConfig config = new SolverConfig(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_BOUNDED);
+
+        String className = "examples.treemap.TreeMap";
+        String finitizationArgs = "5";
+        SymSolveBoundCalculator boundCalculator = new SymSolveBoundCalculator(className, finitizationArgs);
+        Bounds bounds = boundCalculator.calculateBounds();
+        SolverConfig config = new SolverConfig(className, finitizationArgs, SymmetryBreakStrategy.SYMMETRY_BREAK_BOUNDED, bounds);
         SymSolve symSolve = new SymSolve(config);
+
         assertTrue(symSolve.isSatisfiable("0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertFalse(symSolve.isSatisfiable("1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
@@ -730,9 +740,14 @@ public class SymmetryBreakBoundedSystemTests {
 
     @Test
     public void isSatisfiableScheduleTest() {
-        String className = "examples.symsolve.schedule.Schedule";
-        SolverConfig config = new SolverConfig(className, "4", SymmetryBreakStrategy.SYMMETRY_BREAK_BOUNDED);
+
+        String className = "examples.schedule.Schedule";
+        String finitizationArgs = "4";
+        SymSolveBoundCalculator boundCalculator = new SymSolveBoundCalculator(className, finitizationArgs);
+        Bounds bounds = boundCalculator.calculateBounds();
+        SolverConfig config = new SolverConfig(className, finitizationArgs, SymmetryBreakStrategy.SYMMETRY_BREAK_BOUNDED, bounds);
         SymSolve symSolve = new SymSolve(config);
+
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
