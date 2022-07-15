@@ -1,7 +1,6 @@
 package symsolve.bounds;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class Bounds {
@@ -12,13 +11,10 @@ public class Bounds {
         this.classBoundMap = classBoundMap;
     }
 
-
-    public Set<Integer> getAllowedValues(Class<?> ownerClass, String fieldName, Integer ownerObjectID) {
-        if (!classBoundMap.containsKey(ownerClass.getName()))
-            throw new NoSuchElementException(String.format("The class %s is not in Bounds", ownerClass.getName()));
+    public Set<Integer> getTargets(Class<?> ownerClass, String fieldName, Set<Integer> ids) {
         ClassBound classBound = classBoundMap.get(ownerClass.getName());
         FieldBound fieldBounds = classBound.getFieldBounds(fieldName);
-        return fieldBounds.getAllowedValues(ownerObjectID);
+        return fieldBounds.getAllowedValues(ids);
     }
 
     @Override

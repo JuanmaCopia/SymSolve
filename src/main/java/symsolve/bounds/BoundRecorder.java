@@ -3,21 +3,17 @@ package symsolve.bounds;
 import korat.finitization.impl.Finitization;
 import symsolve.candidates.traversals.BFSCandidateTraverser;
 import symsolve.candidates.traversals.CandidateTraverser;
-import symsolve.candidates.traversals.visitors.CandidateVisitor;
+import symsolve.candidates.traversals.visitors.GenericCandidateVisitor;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class BoundRecorder implements CandidateVisitor {
+public class BoundRecorder extends GenericCandidateVisitor {
 
     private final transient Finitization finitization;
     Map<String, ClassBound> classBoundMap = new HashMap<>();
 
-    Class<?> currentOwnerClass;
-    String currentOwnerClassName;
-    Object currentOwnerObject;
-    int currentOwnerID;
 
     public BoundRecorder(Finitization finitization) {
         this.finitization = finitization;
@@ -45,29 +41,33 @@ public class BoundRecorder implements CandidateVisitor {
         currentOwnerClass = currentOwnerObject.getClass();
         currentOwnerClassName = currentOwnerClass.getName();
         this.currentOwnerObject = currentOwnerObject;
-        this.currentOwnerID = currentOwnerID;
+        if (currentOwnerObject == rootObject)
+            this.currentOwnerID = rootID;
+        else
+            this.currentOwnerID = currentOwnerID;
+    }
+
+
+    @Override
+    public void accessedVisitedReferenceField(String fieldName, Object fieldObject, int fieldObjectID, int indexInVector) {
+        accessedNewReferenceField(fieldName, fieldObject, fieldObjectID, indexInVector);
     }
 
     @Override
-    public void accessedVisitedReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
-        accessedNewReferenceField(fieldName, fieldObject, fieldObjectID);
+    public void accessedNullReferenceField(String fieldName, int fieldObjectID, int indexInVector) {
+        accessedNewReferenceField(fieldName, null, fieldObjectID, indexInVector);
     }
 
     @Override
-    public void accessedNullReferenceField(String fieldName, int fieldObjectID) {
-        accessedNewReferenceField(fieldName, null, fieldObjectID);
-    }
-
-    @Override
-    public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
+    public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID, int indexInVector) {
         ClassBound classBound = classBoundMap.get(currentOwnerClassName);
         assert (classBound != null);
         classBound.addBound(fieldName, currentOwnerID, fieldObjectID);
     }
 
     @Override
-    public void accessedPrimitiveField(String fieldName, int fieldObjectID) {
-        accessedNewReferenceField(fieldName, null, fieldObjectID);
+    public void accessedPrimitiveField(String fieldName, int fieldObjectID, int indexInVector) {
+        accessedNewReferenceField(fieldName, null, fieldObjectID, indexInVector);
     }
 
     public Bounds getBounds() {

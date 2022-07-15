@@ -24,8 +24,12 @@ public class FieldBound {
         fieldValues.add(fieldValue);
     }
 
-    public Set<Integer> getAllowedValues(int ownerObjectID) {
-        return fieldBounds.get(ownerObjectID);
+    public Set<Integer> getAllowedValues(Set<Integer> ids) {
+        Set<Integer> allowedValues = new HashSet<>();
+        for (Integer id : ids) {
+            allowedValues.addAll(fieldBounds.get(id));
+        }
+        return allowedValues;
     }
 
     @Override

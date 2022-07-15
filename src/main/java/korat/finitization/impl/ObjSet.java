@@ -60,7 +60,7 @@ public class ObjSet extends FieldDomain implements IObjSet {
         }
     }
 
-    public List<Object> getObjects() {
+    public List<Object> getAllInstances() {
         return objects;
     }
 
@@ -75,26 +75,20 @@ public class ObjSet extends FieldDomain implements IObjSet {
         return objects.get(0);
     }
 
-    @Override
-    public Object[] getAllObjects() {
-        assert (false);
-        return objects.toArray();
-    }
-
-    @Override
-    public Object[] getObjectsOfClass(Class<?> cls) {
-        assert (false);
-        return objects.toArray();
-    }
 
     @Override
     public boolean isNullAllowed() {
         return includesNull;
     }
 
+
     @Override
-    public void setNullAllowed(boolean allowed) {
-        assert (false);
+    public void replaceFirstObject(Object rootObject) {
+        objects.set(0, rootObject);
+        if (includesNull)
+            fieldDomainValues[1] = rootObject;
+        else
+            fieldDomainValues[0] = rootObject;
     }
 
     @Override

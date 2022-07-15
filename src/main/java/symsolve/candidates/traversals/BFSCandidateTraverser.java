@@ -35,6 +35,8 @@ public class BFSCandidateTraverser implements CandidateTraverser {
         LinkedList<Object> worklist = new LinkedList<Object>();
         worklist.add(rootObject);
 
+        visitor.setRoot(rootObject, idMap.get(rootObject)); // root ObjSet does not include null, so we don't add 1 to the ID
+
         while (!worklist.isEmpty()) {
             Object currentOwnerObject = worklist.removeFirst();
             int currentOwnerID = idMap.get(currentOwnerObject);
@@ -51,16 +53,16 @@ public class BFSCandidateTraverser implements CandidateTraverser {
                 Class<?> clsOfField = fieldDomain.getClassOfField();
 
                 if (fieldDomain.isPrimitiveType()) {
-                    visitor.accessedPrimitiveField(fieldName, indexInFieldDomain);
+                    visitor.accessedPrimitiveField(fieldName, indexInFieldDomain, i);
                 } else {  // The field is of reference type
                     ObjSet set = (ObjSet) fieldDomain;
                     Object fieldObject = set.getObject(indexInFieldDomain);
 
                     if (fieldObject == null) {
-                        visitor.accessedNullReferenceField(fieldName, indexInFieldDomain);
+                        visitor.accessedNullReferenceField(fieldName, indexInFieldDomain, i);
                     } else if (idMap.containsKey(fieldObject)) {
                         int fieldObjectID = idMap.get(fieldObject) + 1;
-                        visitor.accessedVisitedReferenceField(fieldName, fieldObject, fieldObjectID);
+                        visitor.accessedVisitedReferenceField(fieldName, fieldObject, fieldObjectID, i);
                     } else {
                         int fieldObjectID = 0;
                         if (maxIdMap.containsKey(clsOfField))
@@ -69,7 +71,7 @@ public class BFSCandidateTraverser implements CandidateTraverser {
                         idMap.put(fieldObject, fieldObjectID);
 
                         fieldObjectID = fieldObjectID + 1;
-                        visitor.accessedNewReferenceField(fieldName, fieldObject, fieldObjectID);
+                        visitor.accessedNewReferenceField(fieldName, fieldObject, fieldObjectID, i);
 
                         worklist.add(fieldObject);
                     }

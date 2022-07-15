@@ -17,13 +17,15 @@ public class Finitization implements IFinitization {
     private final StateSpace stateSpace = new StateSpace();
     private final Map<String, IntSet> integerFieldsMinMax = new HashMap<>();
     boolean isInitialized = false;
-    ObjSet rootObjSet;
+    ObjSet rootObjectSet;
+    Object rootObject;
 
 
     public Finitization(Class<?> rootClass) {
         this.rootClass = rootClass;
-        rootObjSet = new ObjSet(rootClass, 1, false);
-        objSets.add(rootObjSet);
+        rootObjectSet = new ObjSet(rootClass, 1, false);
+        rootObject = rootObjectSet.getFirstObject();
+        objSets.add(rootObjectSet);
         domainsMap.put(rootClass, new LinkedHashMap<>());
     }
 
@@ -49,7 +51,6 @@ public class Finitization implements IFinitization {
 
     private void createStateSpace() {
         stateSpace.setStructureList(vectorDescriptor.toArray(new CVElem[0]));
-        Object rootObject = rootObjSet.getFirstObject();
         stateSpace.setRootObject(rootObject);
         stateSpace.initialize();
     }
@@ -67,7 +68,7 @@ public class Finitization implements IFinitization {
 
     private void addObjectsToVectorDescriptor() {
         for (ObjSet objectSet : objSets) {
-            for (Object obj : objectSet.getObjects()) {
+            for (Object obj : objectSet.getAllInstances()) {
                 addFieldsToVectorDescriptor(obj);
             }
         }
@@ -233,6 +234,10 @@ public class Finitization implements IFinitization {
 
         Set<String> fieldNames = fieldDomains.keySet();
         return new ArrayList<>(fieldNames);
+    }
+
+    public void includeRootObjectInObjectSet(ObjSet objSet) {
+        objSet.replaceFirstObject(rootObject);
     }
 
 }
