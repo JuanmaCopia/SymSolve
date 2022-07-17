@@ -58,11 +58,6 @@ public class CalculateNodesLabelSetVisitor extends GenericCandidateVisitor {
         CandidateTraverser traverser = new BFSCandidateTraverser(stateSpace);
         traverser.traverse(vector, this);
         return labelSets;
-/*        for (Map.Entry<Object, Set<Integer>> e : labelSets.entrySet()) {
-            System.out.println("\nObject of class: " + e.getKey().getClass().getSimpleName());
-            System.out.println("Labels: " + e.getValue().toString());
-        }
-        System.out.println("\n");*/
     }
 
 }

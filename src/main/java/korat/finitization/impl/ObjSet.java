@@ -6,17 +6,19 @@ import symsolve.candidates.PredicateChecker;
 
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class ObjSet extends FieldDomain implements IObjSet {
 
+    private final Map<Object, Integer> objectToIndex = new HashMap<>();
     Class<?> classOfField;
     int numOfObjects;
     Object[] fieldDomainValues;
     List<Object> objects = new LinkedList<>();
     boolean includesNull;
-
 
     public ObjSet(Class<?> classOfField, int numOfObjects, boolean includesNull) {
         super(classOfField);
@@ -29,6 +31,7 @@ public class ObjSet extends FieldDomain implements IObjSet {
     private void initializeFieldDomain() {
         allocateObjects();
         setUpFieldDomain();
+        createObjectToIndexMap();
     }
 
     private void allocateObjects() {
@@ -60,6 +63,14 @@ public class ObjSet extends FieldDomain implements IObjSet {
         }
     }
 
+    private void createObjectToIndexMap() {
+        for (int i = 0; i < fieldDomainValues.length; i++) {
+            Object obj = fieldDomainValues[i];
+            if (obj != null)
+                objectToIndex.put(obj, i);
+        }
+    }
+
     public List<Object> getAllInstances() {
         return objects;
     }
@@ -67,6 +78,10 @@ public class ObjSet extends FieldDomain implements IObjSet {
     public Object getObject(int index) {
         return fieldDomainValues[index];
         /*return objects.get(index);*/
+    }
+
+    public int getIndexInFieldDomain(Object obj) {
+        return objectToIndex.get(obj);
     }
 
     public Object getFirstObject() {
