@@ -20,7 +20,7 @@ public class ReverseSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
             initializedFields[i] = !fixedIndices.contains(i) && candidateVector[i] > 0;
         }
     }
-    
+
     @Override
     protected boolean setNextValue(int lastAccessedFieldIndex) {
         FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
@@ -38,7 +38,7 @@ public class ReverseSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
 
         if (!initializedFields[lastAccessedFieldIndex]) {
             initializedFields[lastAccessedFieldIndex] = true;
-            int maxInstanceIndexInVector = getMaxInstanceInVector(lastAccessedFD, currentInstanceIndex);
+            int maxInstanceIndexInVector = getMaxInstanceInVector(lastAccessedFD);
             if (maxInstanceIndexInVector >= maxInstanceIndexForFieldDomain) {
                 candidateVector[lastAccessedFieldIndex] = maxInstanceIndexInVector;
             } else {

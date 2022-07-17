@@ -16,7 +16,6 @@ import symsolve.explorers.VectorStateSpaceExplorerFactory;
 import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
 import symsolve.utils.CodeGenerator;
 import symsolve.utils.Helper;
-import symsolve.utils.Utils;
 import symsolve.vector.SymSolveVector;
 
 import java.lang.reflect.Method;
@@ -89,9 +88,9 @@ public class Solver {
     public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
-        System.out.println("\n\nStarting search...");
+/*        System.out.println("\n\nStarting search...");
         Utils.printVectorFormat(vector, stateSpace.getStructureList());
-        Utils.printVectorFormat(initialVector.getPartialVector(), stateSpace.getStructureList());
+        Utils.printVectorFormat(initialVector.getPartialVector(), stateSpace.getStructureList());*/
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))

@@ -7,8 +7,6 @@ import korat.utils.IntListAI;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.vector.SymSolveVector;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
 import java.util.Set;
 
 public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
@@ -20,8 +18,6 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
     protected IIntList accessedIndices;
     protected IIntList changedFields;
     protected IIntList fixedIndices;
-
-    protected Map<FieldDomain, Integer> maxFixedInstancePerReferenceFieldDomain = new IdentityHashMap<>();
 
     public SymmetryBreakingExplorer(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields) {
         this.stateSpace = stateSpace;
@@ -38,7 +34,7 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
 
     public void initialize(SymSolveVector vector) {
         setCandidateVector(vector);
-        calculateMaxFixedInstancePerReferenceFieldDomain(vector.getFixedIndices());
+        setFixedIndices(vector.getFixedIndices());
         setUpExplorerState();
     }
 
@@ -59,9 +55,10 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
     public void setUpExplorerState() {
         for (int i = 0; i < vectorSize; i++) {
             changedFields.add(i);
-            if (!fixedIndices.contains(i) && candidateVector[i] > 0) {
+            if (candidateVector[i] > 0) {
                 FieldDomain fieldDomain = stateSpace.getFieldDomain(i);
-                maxInstances[i] = maxFixedInstancePerReferenceFieldDomain.get(fieldDomain);
+                if (!fieldDomain.isPrimitiveType())
+                    maxInstances[i] = getMaxInstanceInVector(fieldDomain);
             } else {
                 maxInstances[i] = -1;
             }
@@ -74,20 +71,11 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
             throw new IllegalArgumentException(String.format("Wrong vector size! Expected: %d, but got: %d", vectorSize, this.candidateVector.length));
     }
 
-    private void calculateMaxFixedInstancePerReferenceFieldDomain(Set<Integer> fixedIndices) {
-        this.maxFixedInstancePerReferenceFieldDomain.clear();
+    private void setFixedIndices(Set<Integer> fixedIndices) {
         this.fixedIndices.clear();
         for (Integer index : fixedIndices) {
             this.fixedIndices.add(index);
-            FieldDomain fieldDomain = stateSpace.getFieldDomain(index);
-            if (!fieldDomain.isPrimitiveType()) {
-                int value = candidateVector[index];
-                Integer currentMaxFDInstance = this.maxFixedInstancePerReferenceFieldDomain.get(fieldDomain);
-                if (currentMaxFDInstance == null || value > currentMaxFDInstance)
-                    this.maxFixedInstancePerReferenceFieldDomain.put(fieldDomain, value);
-            }
         }
-
     }
 
     protected boolean setNextValue(int lastAccessedFieldIndex) {
@@ -105,7 +93,7 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
 
         // Is a reference field
         if (maxInstances[lastAccessedFieldIndex] == -1) {
-            maxInstances[lastAccessedFieldIndex] = getMaxInstanceInVector(lastAccessedFD, currentInstanceIndex);
+            maxInstances[lastAccessedFieldIndex] = getMaxInstanceInVector(lastAccessedFD);
         }
         if (currentInstanceIndex <= maxInstances[lastAccessedFieldIndex]) {
             candidateVector[lastAccessedFieldIndex]++;
@@ -114,19 +102,12 @@ public class SymmetryBreakingExplorer implements VectorStateSpaceExplorer {
         return false;
     }
 
-    protected int getMaxInstanceInVector(FieldDomain fieldDomain, int currentInstanceIndex) {
-        Integer maxInstance = this.maxFixedInstancePerReferenceFieldDomain.get(fieldDomain);
-        if (maxInstance == null)
-            maxInstance = 0;
-        if (currentInstanceIndex > maxInstance)
-            maxInstance = currentInstanceIndex;
-        for (int i = 0; i < accessedIndices.numberOfElements(); i++) {
-            int index = accessedIndices.get(i);
-            if (!this.fixedIndices.contains(index) && stateSpace.getFieldDomain(index) == fieldDomain) {
-                int value = candidateVector[index];
-                if (value > maxInstance)
-                    maxInstance = value;
-            }
+    protected int getMaxInstanceInVector(FieldDomain fieldDomain) {
+        int maxInstance = 0;
+        for (Integer index : stateSpace.getIndicesOfFieldDomain(fieldDomain)) {
+            int value = candidateVector[index];
+            if (value > maxInstance)
+                maxInstance = value;
         }
         return maxInstance;
     }
