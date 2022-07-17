@@ -1,16 +1,8 @@
 package symsolve;
 
-import org.junit.jupiter.api.Test;
-import symsolve.bounds.Bounds;
-import symsolve.config.SolverConfig;
-import symsolve.explorers.impl.SymmetryBreakStrategy;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class SymmetryBreakBoundedSystemTests {
 
-    @Test
+/*    @Test
     public void isSatisfiableHashMapTest() {
         String className = "examples.hashmap.HashMap";
         String finitizationArgs = "2";
@@ -829,5 +821,5 @@ public class SymmetryBreakBoundedSystemTests {
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 0, -1, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 0, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
-    }
+    }*/
 }
