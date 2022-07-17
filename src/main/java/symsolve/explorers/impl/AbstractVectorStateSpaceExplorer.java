@@ -79,6 +79,9 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
 
     abstract void backtrack(int lastAccessedFieldIndex);
 
-    abstract void setUpExplorerState();
-    
+    void setUpExplorerState() {
+        for (int i = 0; i < vectorSize; i++)
+            changedFields.add(i);
+    }
+
 }
