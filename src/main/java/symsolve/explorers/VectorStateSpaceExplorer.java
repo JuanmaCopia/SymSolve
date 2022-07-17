@@ -10,6 +10,4 @@ public interface VectorStateSpaceExplorer {
 
     int[] getNextCandidate();
 
-    void setUpExplorerState();
-
 }
