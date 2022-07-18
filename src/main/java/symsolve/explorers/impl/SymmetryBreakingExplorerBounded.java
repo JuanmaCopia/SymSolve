@@ -5,32 +5,28 @@ import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import symsolve.bounds.Bounds;
-
-import java.util.HashSet;
-import java.util.Set;
+import symsolve.bounds.LabelSets;
+import symsolve.candidates.traversals.visitors.CollectLabelSetsVisitor;
+import symsolve.vector.SymSolveVector;
 
 public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExplorer {
 
     private final int[] maxInstances;
-    Bounds bounds;
+    LabelSets labelSets;
 
-/*
-    CalculateNodesLabelSetVisitor labelSetCalculator;
-    Map<Object, Set<Integer>> labelSets;
-*/
 
     public SymmetryBreakingExplorerBounded(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields, Bounds bounds) {
         super(stateSpace, accessedIndices, changedFields);
         maxInstances = new int[vectorSize];
-        this.bounds = bounds;
+        labelSets = new LabelSets(bounds);
     }
 
-/*    @Override
+    @Override
     public void initialize(SymSolveVector vector) {
         super.initialize(vector);
-        labelSetCalculator = new CalculateNodesLabelSetVisitor(stateSpace, bounds);
-        labelSets = labelSetCalculator.calculateLabelSets(candidateVector);
-    }*/
+        CollectLabelSetsVisitor collectLabelSetsVisitor = new CollectLabelSetsVisitor(stateSpace, labelSets);
+        collectLabelSetsVisitor.collectLabelSetsForVector(vector.getConcreteVector());
+    }
 
     @Override
     boolean setNextValue(int lastAccessedFieldIndex) {
@@ -111,12 +107,6 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
 
     private boolean newValueIsInBounds(IObjSet newValueobjectSet, int indexInVector, int newValue) {
         return true;
-    }
-
-    private boolean isNonEmptyIntersection(Set<Integer> thisLabelSet, Set<Integer> newValueLabelSet) {
-        Set<Integer> intersection = new HashSet<>(thisLabelSet);
-        intersection.retainAll(newValueLabelSet);
-        return !intersection.isEmpty();
     }
 
 
