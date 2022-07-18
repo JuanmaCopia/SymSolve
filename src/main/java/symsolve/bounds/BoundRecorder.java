@@ -37,37 +37,25 @@ public class BoundRecorder extends GenericCandidateVisitor {
     }
 
     @Override
-    public void setCurrentOwner(Object currentOwnerObject, int currentOwnerID) {
-        currentOwnerClass = currentOwnerObject.getClass();
-        currentOwnerClassName = currentOwnerClass.getName();
-        this.currentOwnerObject = currentOwnerObject;
-        if (currentOwnerObject == rootObject)
-            this.currentOwnerID = rootID;
-        else
-            this.currentOwnerID = currentOwnerID;
-    }
-
-
-    @Override
-    public void accessedVisitedReferenceField(String fieldName, Object fieldObject, int fieldObjectID, int indexInVector) {
-        accessedNewReferenceField(fieldName, fieldObject, fieldObjectID, indexInVector);
+    public void accessedVisitedReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
+        accessedNewReferenceField(fieldName, fieldObject, fieldObjectID);
     }
 
     @Override
-    public void accessedNullReferenceField(String fieldName, int fieldObjectID, int indexInVector) {
-        accessedNewReferenceField(fieldName, null, fieldObjectID, indexInVector);
+    public void accessedNullReferenceField(String fieldName, int fieldObjectID) {
+        accessedNewReferenceField(fieldName, null, fieldObjectID);
     }
 
     @Override
-    public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID, int indexInVector) {
+    public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
         ClassBound classBound = classBoundMap.get(currentOwnerClassName);
         assert (classBound != null);
         classBound.addBound(fieldName, currentOwnerID, fieldObjectID);
     }
 
     @Override
-    public void accessedPrimitiveField(String fieldName, int fieldObjectID, int indexInVector) {
-        accessedNewReferenceField(fieldName, null, fieldObjectID, indexInVector);
+    public void accessedPrimitiveField(String fieldName, int fieldObjectID) {
+        accessedNewReferenceField(fieldName, null, fieldObjectID);
     }
 
     public Bounds getBounds() {

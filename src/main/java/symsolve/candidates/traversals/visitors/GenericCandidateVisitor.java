@@ -28,19 +28,19 @@ public class GenericCandidateVisitor implements CandidateVisitor {
     }
 
     @Override
-    public void accessedVisitedReferenceField(String fieldName, Object fieldObject, int fieldObjectID, int indexInVector) {
+    public void accessedVisitedReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
     }
 
     @Override
-    public void accessedNullReferenceField(String fieldName, int fieldObjectID, int indexInVector) {
+    public void accessedNullReferenceField(String fieldName, int fieldObjectID) {
     }
 
     @Override
-    public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID, int indexInVector) {
+    public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
     }
 
     @Override
-    public void accessedPrimitiveField(String fieldName, int fieldObjectID, int indexInVector) {
+    public void accessedPrimitiveField(String fieldName, int fieldObjectID) {
     }
 
 }

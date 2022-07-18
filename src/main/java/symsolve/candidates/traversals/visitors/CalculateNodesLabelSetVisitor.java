@@ -1,12 +1,7 @@
 package symsolve.candidates.traversals.visitors;
 
-import korat.finitization.IFieldDomain;
-import korat.finitization.IObjSet;
-import korat.finitization.impl.ObjSet;
 import korat.finitization.impl.StateSpace;
 import symsolve.bounds.Bounds;
-import symsolve.candidates.traversals.BFSCandidateTraverser;
-import symsolve.candidates.traversals.CandidateTraverser;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,31 +28,11 @@ public class CalculateNodesLabelSetVisitor extends GenericCandidateVisitor {
     }
 
     @Override
-    public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID, int indexInVector) {
-        labelSets.put(fieldObject, calculateTargetLabelSet(currentOwnerObject, fieldName, indexInVector));
+    public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
     }
 
-    public Set<Integer> calculateTargetLabelSet(Object ownerObject, String fieldName, int indexInVector) {
-        Set<Integer> ownerLabelSet = labelSets.get(ownerObject);
-        assert (ownerLabelSet != null);
-        Set<Integer> targetLabelSet = bounds.getTargets(ownerObject.getClass(), fieldName, ownerLabelSet);
-
-        IFieldDomain fieldDomain = stateSpace.getFieldDomain(indexInVector);
-        if (fieldDomain.isPrimitiveType())
-            return targetLabelSet;
-
-        IObjSet objSet = (ObjSet) fieldDomain;
-        if (objSet.isNullAllowed())
-            targetLabelSet.remove(0);
-
-        return targetLabelSet;
-    }
-
-
-    public HashMap<Object, Set<Integer>> calculateLabelSets(int[] vector) {
-        CandidateTraverser traverser = new BFSCandidateTraverser(stateSpace);
-        traverser.traverse(vector, this);
-        return labelSets;
+    public Set<Integer> calculateTargetLabelSet() {
+        return null;
     }
 
 }
