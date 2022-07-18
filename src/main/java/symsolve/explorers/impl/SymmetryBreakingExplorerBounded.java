@@ -1,13 +1,18 @@
 package symsolve.explorers.impl;
 
+import korat.finitization.IFieldDomain;
 import korat.finitization.IObjSet;
+import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
+import korat.finitization.impl.ObjSet;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import symsolve.bounds.Bounds;
 import symsolve.bounds.LabelSets;
 import symsolve.candidates.traversals.visitors.CollectLabelSetsVisitor;
 import symsolve.vector.SymSolveVector;
+
+import java.util.Set;
 
 public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExplorer {
 
@@ -47,9 +52,9 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
             maxInstances[lastAccessedFieldIndex] = getMaxInstanceInVector(lastAccessedFD);
         }
 
-        while (currentInstanceIndex <= maxInstances[lastAccessedFieldIndex]) {
+        while (currentInstanceIndex < maxInstances[lastAccessedFieldIndex]) {
             currentInstanceIndex++;
-            if (newValueIsInBounds((IObjSet) lastAccessedFD, currentInstanceIndex, currentInstanceIndex)) {
+            if (newValueIsInBounds(lastAccessedFD, currentInstanceIndex, lastAccessedFieldIndex)) {
                 candidateVector[lastAccessedFieldIndex] = currentInstanceIndex;
                 return true;
             }
@@ -60,12 +65,12 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
 
     @Override
     void backtrack(int lastAccessedFieldIndex) {
-/*        CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
+        CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
         IFieldDomain fieldDomain = cvElem.getFieldDomain();
         if (!fieldDomain.isPrimitiveType()) {
             IObjSet objSet = (ObjSet) fieldDomain;
             labelSets.remove(objSet.getObject(candidateVector[lastAccessedFieldIndex]));
-        }*/
+        }
         candidateVector[lastAccessedFieldIndex] = 0;
         maxInstances[lastAccessedFieldIndex] = -1;
     }
@@ -84,28 +89,18 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
         }
     }
 
-    /*private boolean newValueIsInBounds(IObjSet newValueobjectSet, int indexInVector, int newValue) {
-        Object newValueObject = newValueobjectSet.getObject(newValue);
+    private boolean newValueIsInBounds(IFieldDomain fieldDomain, int indexInFieldDomainOfNewValue, int lastAccessedFieldIndex) {
+        CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
+        Object ownerObject = cvElem.getObj();
+        Object newValueObject = ((IObjSet) fieldDomain).getObject(indexInFieldDomainOfNewValue);
+        if (labelSets.contains(newValueObject))
+            return labelSets.haveNonEmptyLabelSetIntersection(ownerObject, newValueObject);
 
-        CVElem cvElem = stateSpace.getCVElem(indexInVector);
-        Object thisObject = cvElem.getObj();
-        Set<Integer> thisLabelSet = labelSets.get(thisObject);
+        Set<Integer> thisLabelSet = labelSets.calculateTargetLabelSet(ownerObject, cvElem.getFieldName());
+        if (thisLabelSet.isEmpty())
+            return false;
 
-        if (labelSets.containsKey(newValueObject)) { // The new value is an assigned object of the structure
-            Set<Integer> newValueLabelSet = labelSets.get(newValueObject);
-            return isNonEmptyIntersection(thisLabelSet, newValueLabelSet);
-        } else { // The new value is a not assigned object
-            Set<Integer> targetLabelSet = labelSetCalculator.getTargetLabelSet(thisObject, cvElem.getFieldName());
-            if (!targetLabelSet.isEmpty()) {
-                labelSets.put(newValueObject, targetLabelSet);
-                return true;
-            }
-        }
-
-        return false;
-    }*/
-
-    private boolean newValueIsInBounds(IObjSet newValueobjectSet, int indexInVector, int newValue) {
+        labelSets.put(newValueObject, thisLabelSet);
         return true;
     }
 
