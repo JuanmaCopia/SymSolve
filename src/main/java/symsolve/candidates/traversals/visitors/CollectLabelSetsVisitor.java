@@ -2,21 +2,23 @@ package symsolve.candidates.traversals.visitors;
 
 import korat.finitization.impl.StateSpace;
 import symsolve.bounds.Bounds;
+import symsolve.bounds.LabelSets;
+import symsolve.candidates.traversals.BFSCandidateTraverser;
+import symsolve.candidates.traversals.CandidateTraverser;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CalculateNodesLabelSetVisitor extends GenericCandidateVisitor {
+public class CollectLabelSetsVisitor extends GenericCandidateVisitor {
 
-    Bounds bounds;
-    HashMap<Object, Set<Integer>> labelSets = new HashMap<>();
+
+    LabelSets labelSets;
     StateSpace stateSpace;
 
 
-    public CalculateNodesLabelSetVisitor(StateSpace stateSpace, Bounds bounds) {
-        this.bounds = bounds;
+    public CollectLabelSetsVisitor(StateSpace stateSpace, Bounds bounds) {
         this.stateSpace = stateSpace;
+        labelSets = new LabelSets(bounds);
     }
 
     @Override
@@ -29,16 +31,15 @@ public class CalculateNodesLabelSetVisitor extends GenericCandidateVisitor {
 
     @Override
     public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
-        Set<Integer> targetLabelSet = calculateTargetLabelSet(currentOwnerObject, fieldName);
+        Set<Integer> targetLabelSet = labelSets.calculateTargetLabelSet(currentOwnerObject, fieldName);
         if (!targetLabelSet.isEmpty())
             labelSets.put(fieldObject, targetLabelSet);
     }
-
-    public Set<Integer> calculateTargetLabelSet(Object thisObject, String fieldName) {
-        Set<Integer> thisLabelSet = labelSets.get(thisObject);
-        Set<Integer> targetLabelSet = bounds.getTargets(thisObject.getClass(), fieldName, thisLabelSet);
-        targetLabelSet.remove(0);
-        return targetLabelSet;
+    
+    public LabelSets collectLabelSets(int[] vector) {
+        CandidateTraverser traverser = new BFSCandidateTraverser(stateSpace);
+        traverser.traverse(vector, this);
+        return labelSets;
     }
 
 }
