@@ -29,10 +29,16 @@ public class CalculateNodesLabelSetVisitor extends GenericCandidateVisitor {
 
     @Override
     public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
+        Set<Integer> targetLabelSet = calculateTargetLabelSet(currentOwnerObject, fieldName);
+        if (!targetLabelSet.isEmpty())
+            labelSets.put(fieldObject, targetLabelSet);
     }
 
-    public Set<Integer> calculateTargetLabelSet() {
-        return null;
+    public Set<Integer> calculateTargetLabelSet(Object thisObject, String fieldName) {
+        Set<Integer> thisLabelSet = labelSets.get(thisObject);
+        Set<Integer> targetLabelSet = bounds.getTargets(thisObject.getClass(), fieldName, thisLabelSet);
+        targetLabelSet.remove(0);
+        return targetLabelSet;
     }
 
 }
