@@ -13,4 +13,6 @@ public interface IObjSet extends IFieldDomain {
 
 
     void replaceFirstObject(Object rootObject);
+
+    Object getObject(int index);
 }

@@ -1,6 +1,7 @@
 package korat.finitization.impl;
 
 import korat.finitization.IFieldDomain;
+import korat.finitization.IObjSet;
 import korat.instrumentation.Setter;
 
 import java.util.*;
@@ -17,6 +18,7 @@ public class StateSpace {
     private static final int[] zeroSizeInt = new int[0];
     protected static StateSpace lastInstance = null;
     protected Object rootObject;
+    protected IObjSet rootObjectSet;
     protected boolean initialized;
     protected CVElem[] structureList;
     protected Map<IFieldDomain, Set<Integer>> indicesPerFieldDomain = new IdentityHashMap<>();
@@ -103,6 +105,14 @@ public class StateSpace {
      */
     public void setRootObject(Object root) {
         rootObject = root;
+    }
+
+    public IObjSet getRootObjectSet() {
+        return rootObjectSet;
+    }
+
+    public void setRootObjectSet(IObjSet objset) {
+        rootObjectSet = objset;
     }
 
     /**

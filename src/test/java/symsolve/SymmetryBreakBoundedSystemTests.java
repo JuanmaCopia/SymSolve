@@ -149,7 +149,7 @@ public class SymmetryBreakBoundedSystemTests {
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, 2, -1, -1, 0"));
     }
 
-    @Test
+/*    @Test
     public void isSatisfiableTreeMapTest() {
 
         String className = "examples.treemap.TreeMap";
@@ -829,5 +829,5 @@ public class SymmetryBreakBoundedSystemTests {
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 0, -1, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 0, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
-    }
+    }*/
 }

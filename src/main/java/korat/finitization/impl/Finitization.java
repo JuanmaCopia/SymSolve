@@ -52,6 +52,7 @@ public class Finitization implements IFinitization {
     private void createStateSpace() {
         stateSpace.setStructureList(vectorDescriptor.toArray(new CVElem[0]));
         stateSpace.setRootObject(rootObject);
+        stateSpace.setRootObjectSet(rootObjectSet);
         stateSpace.initialize();
     }
 
