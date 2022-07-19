@@ -38,27 +38,18 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
         FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
         int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
         int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
-
         if (currentInstanceIndex >= maxInstanceIndexForFieldDomain)
             return false;
 
-        if (lastAccessedFD.isPrimitiveType()) {
-            candidateVector[lastAccessedFieldIndex]++;
-            return true;
-        }
+        Set<Integer> targetLabelSet = calculateTargerLabelSet(lastAccessedFieldIndex);
+        if (targetLabelSet.isEmpty())
+            return false;
 
-        // Is a reference field
-        if (maxInstances[lastAccessedFieldIndex] == -1) {
-            maxInstances[lastAccessedFieldIndex] = getMaxInstanceInVector(lastAccessedFD);
-        }
-        while (currentInstanceIndex <= maxInstances[lastAccessedFieldIndex] && currentInstanceIndex < maxInstanceIndexForFieldDomain) {
-            currentInstanceIndex++;
-            if (newValueIsInBounds(lastAccessedFD, currentInstanceIndex, lastAccessedFieldIndex)) {
-                candidateVector[lastAccessedFieldIndex] = currentInstanceIndex;
-                return true;
-            }
-        }
-        return false;
+        if (lastAccessedFD.isPrimitiveType())
+            return setNextValueForPrimitiveType(lastAccessedFieldIndex, targetLabelSet, maxInstanceIndexForFieldDomain);
+
+        return setNextValueForReferenceType(lastAccessedFieldIndex, targetLabelSet, maxInstanceIndexForFieldDomain, lastAccessedFD);
+        
     }
 
     @Override
@@ -87,13 +78,7 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
         }
     }
 
-    private boolean newValueIsInBounds(IFieldDomain fieldDomain, int indexInFieldDomainOfNewValue, int lastAccessedFieldIndex) {
-        CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
-        Object ownerObject = cvElem.getObj();
-        Set<Integer> targetLabelSet = labelSets.calculateTargetLabelSet(ownerObject, cvElem.getFieldName());
-        if (targetLabelSet.isEmpty())
-            return false;
-
+    private boolean newValueIsInBounds(IFieldDomain fieldDomain, int indexInFieldDomainOfNewValue, Set<Integer> targetLabelSet) {
         Object newValueObject = ((IObjSet) fieldDomain).getObject(indexInFieldDomainOfNewValue);
         if (!labelSets.contains(newValueObject)) {
             labelSets.put(newValueObject, targetLabelSet);
@@ -103,6 +88,39 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
         if (result)
             labelSets.increaseRefCount(newValueObject);
         return result;
+    }
+
+    private Set<Integer> calculateTargerLabelSet(int lastAccessedFieldIndex) {
+        CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
+        Object ownerObject = cvElem.getObj();
+        return labelSets.calculateTargetLabelSet(ownerObject, cvElem.getFieldName());
+    }
+
+    private boolean setNextValueForPrimitiveType(int lastAccessedFieldIndex, Set<Integer> targetLabelSet, int maxInstanceIndexForFieldDomain) {
+        int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
+        while (currentInstanceIndex < maxInstanceIndexForFieldDomain) {
+            currentInstanceIndex++;
+            if (targetLabelSet.contains(currentInstanceIndex)) {
+                candidateVector[lastAccessedFieldIndex] = currentInstanceIndex;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean setNextValueForReferenceType(int lastAccessedFieldIndex, Set<Integer> targetLabelSet, int maxInstanceIndexForFieldDomain, FieldDomain lastAccessedFD) {
+        if (maxInstances[lastAccessedFieldIndex] == -1) {
+            maxInstances[lastAccessedFieldIndex] = getMaxInstanceInVector(lastAccessedFD);
+        }
+        int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
+        while (currentInstanceIndex <= maxInstances[lastAccessedFieldIndex] && currentInstanceIndex < maxInstanceIndexForFieldDomain) {
+            currentInstanceIndex++;
+            if (newValueIsInBounds(lastAccessedFD, currentInstanceIndex, targetLabelSet)) {
+                candidateVector[lastAccessedFieldIndex] = currentInstanceIndex;
+                return true;
+            }
+        }
+        return false;
     }
 
 }
