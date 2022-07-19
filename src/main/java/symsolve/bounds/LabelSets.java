@@ -53,10 +53,10 @@ public class LabelSets {
         return targetLabelSet;
     }
 
-    public boolean isNonEmptyIntersection(Set<Integer> thisLabelSet, Set<Integer> newValueLabelSet) {
+    public Set<Integer> calculateSetIntersection(Set<Integer> thisLabelSet, Set<Integer> newValueLabelSet) {
         Set<Integer> intersection = new HashSet<>(thisLabelSet);
         intersection.retainAll(newValueLabelSet);
-        return !intersection.isEmpty();
+        return intersection;
     }
 
     public void clear() {

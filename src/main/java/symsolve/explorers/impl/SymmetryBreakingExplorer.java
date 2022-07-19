@@ -6,7 +6,7 @@ import korat.utils.IIntList;
 
 public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
 
-    private final int[] maxInstances;
+    protected int[] maxInstances;
 
 
     public SymmetryBreakingExplorer(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields) {
@@ -57,15 +57,15 @@ public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
         return false;
     }
 
-    private boolean isCurrentFieldInitialized() {
+    protected boolean isCurrentFieldInitialized() {
         return maxInstances[currentIndex] != -1;
     }
 
-    private void setFieldAsNotInitialized(int index) {
+    protected void setFieldAsNotInitialized(int index) {
         maxInstances[index] = -1;
     }
 
-    private void initializeField(int index, FieldDomain fieldDomain) {
+    protected void initializeField(int index, FieldDomain fieldDomain) {
         maxInstances[index] = getMaxInstanceInVector(fieldDomain);
     }
 
