@@ -1,6 +1,5 @@
 package symsolve.explorers.impl;
 
-import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 
@@ -11,23 +10,17 @@ public class NoSymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer
     }
 
     @Override
-    protected boolean setNextValue(int lastAccessedFieldIndex) {
-        FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
-        int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
-
-        changedFields.add(lastAccessedFieldIndex);
-
-        int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
-        if (currentInstanceIndex >= maxInstanceIndexForFieldDomain)
+    protected boolean setNextValue() {
+        if (currentValue >= currentMaxFieldDomainIndex)
             return false;
 
-        candidateVector[lastAccessedFieldIndex]++;
+        increaseCurrentFieldValue();
         return true;
     }
 
     @Override
-    protected void backtrack(int lastAccessedFieldIndex) {
-        candidateVector[lastAccessedFieldIndex] = 0;
+    protected void backtrack() {
+        resetCurrentFieldValue();
     }
 
 }

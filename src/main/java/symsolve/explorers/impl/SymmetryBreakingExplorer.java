@@ -15,48 +15,58 @@ public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
     }
 
     @Override
-    boolean setNextValue(int lastAccessedFieldIndex) {
-        FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
-        int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
-        int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
-
-        if (currentInstanceIndex >= maxInstanceIndexForFieldDomain)
+    boolean setNextValue() {
+        if (currentValue >= currentMaxFieldDomainIndex)
             return false;
 
-        if (lastAccessedFD.isPrimitiveType()) {
-            candidateVector[lastAccessedFieldIndex]++;
+        if (isCurrentFieldPrimitive) {
+            increaseCurrentFieldValue();
             return true;
         }
-
-        // Is a reference field
-        if (maxInstances[lastAccessedFieldIndex] == -1) {
-            maxInstances[lastAccessedFieldIndex] = getMaxInstanceInVector(lastAccessedFD);
-        }
-        if (currentInstanceIndex <= maxInstances[lastAccessedFieldIndex]) {
-            candidateVector[lastAccessedFieldIndex]++;
-            return true;
-        }
-        return false;
+        return setNextReferenceTypeValue();
     }
 
     @Override
-    void backtrack(int lastAccessedFieldIndex) {
-        candidateVector[lastAccessedFieldIndex] = 0;
-        maxInstances[lastAccessedFieldIndex] = -1;
+    void backtrack() {
+        resetCurrentFieldValue();
+        setFieldAsNotInitialized(currentIndex);
     }
 
     @Override
     void setUpExplorerState() {
         for (int i = 0; i < vectorSize; i++) {
-            changedFields.add(i);
-            if (!fixedIndices.contains(i) && candidateVector[i] > 0) {
+            setIndexAsChanged(i);
+            if (isIndexFixed(i) && candidateVector[i] > 0) {
                 FieldDomain fieldDomain = stateSpace.getFieldDomain(i);
                 if (!fieldDomain.isPrimitiveType())
-                    maxInstances[i] = getMaxInstanceInVector(fieldDomain);
+                    initializeField(i, fieldDomain);
             } else {
-                maxInstances[i] = -1;
+                setFieldAsNotInitialized(i);
             }
         }
+    }
+
+    protected boolean setNextReferenceTypeValue() {
+        if (!isCurrentFieldInitialized()) {
+            initializeField(currentIndex, currentFieldDomain);
+        }
+        if (currentValue <= maxInstances[currentIndex]) {
+            increaseCurrentFieldValue();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isCurrentFieldInitialized() {
+        return maxInstances[currentIndex] != -1;
+    }
+
+    private void setFieldAsNotInitialized(int index) {
+        maxInstances[index] = -1;
+    }
+
+    private void initializeField(int index, FieldDomain fieldDomain) {
+        maxInstances[index] = getMaxInstanceInVector(fieldDomain);
     }
 
 }
