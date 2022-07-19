@@ -36,6 +36,7 @@ public class CollectLabelSetsVisitor extends GenericCandidateVisitor {
     }
 
     public void collectLabelSetsForVector(int[] vector) {
+        labelSets.clear();
         CandidateTraverser traverser = new BFSCandidateTraverser(stateSpace);
         traverser.traverse(vector, this);
     }

@@ -10,6 +10,8 @@ public class LabelSets {
     Bounds bounds;
     Map<Object, Set<Integer>> labelSetMap = new HashMap<>();
 
+    Map<Object, Integer> referenceCount = new HashMap<>();
+
 
     public LabelSets(Bounds bounds) {
         this.bounds = bounds;
@@ -21,6 +23,11 @@ public class LabelSets {
 
     public void put(Object object, Set<Integer> labelSet) {
         labelSetMap.put(object, labelSet);
+        if (referenceCount.containsKey(object)) {
+            referenceCount.put(object, referenceCount.get(object) + 1);
+        } else {
+            referenceCount.put(object, 1);
+        }
     }
 
     public boolean contains(Object object) {
@@ -28,7 +35,15 @@ public class LabelSets {
     }
 
     public void remove(Object object) {
-        labelSetMap.remove(object);
+        if (referenceCount.containsKey(object)) {
+            int refCount = referenceCount.get(object);
+            if (refCount > 1)
+                referenceCount.put(object, referenceCount.get(object) - 1);
+            else {
+                labelSetMap.remove(object);
+                referenceCount.remove(object);
+            }
+        }
     }
 
     public Set<Integer> calculateTargetLabelSet(Object thisObject, String fieldName) {
@@ -38,16 +53,18 @@ public class LabelSets {
         return targetLabelSet;
     }
 
-    public boolean haveNonEmptyLabelSetIntersection(Object thisObject, Object newValueObject) {
-        Set<Integer> thisLabelSet = labelSetMap.get(thisObject);
-        Set<Integer> newValueLabelSet = labelSetMap.get(newValueObject);
-        return isNonEmptyIntersection(thisLabelSet, newValueLabelSet);
-    }
-
     public boolean isNonEmptyIntersection(Set<Integer> thisLabelSet, Set<Integer> newValueLabelSet) {
         Set<Integer> intersection = new HashSet<>(thisLabelSet);
         intersection.retainAll(newValueLabelSet);
         return !intersection.isEmpty();
     }
 
+    public void clear() {
+        labelSetMap.clear();
+        referenceCount.clear();
+    }
+
+    public void increaseRefCount(Object object) {
+        referenceCount.put(object, referenceCount.get(object) + 1);
+    }
 }

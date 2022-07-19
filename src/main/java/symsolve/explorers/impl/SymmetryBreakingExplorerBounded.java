@@ -4,6 +4,7 @@ import korat.finitization.IFieldDomain;
 import korat.finitization.IObjSet;
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
+import korat.finitization.impl.ObjSet;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import symsolve.bounds.Bounds;
@@ -62,12 +63,12 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
 
     @Override
     void backtrack(int lastAccessedFieldIndex) {
-        /*CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
+        CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
         IFieldDomain fieldDomain = cvElem.getFieldDomain();
         if (!fieldDomain.isPrimitiveType()) {
             IObjSet objSet = (ObjSet) fieldDomain;
             labelSets.remove(objSet.getObject(candidateVector[lastAccessedFieldIndex]));
-        }*/
+        }
         candidateVector[lastAccessedFieldIndex] = 0;
         maxInstances[lastAccessedFieldIndex] = -1;
     }
@@ -98,7 +99,10 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
             labelSets.put(newValueObject, targetLabelSet);
             return true;
         }
-        return labelSets.isNonEmptyIntersection(targetLabelSet, labelSets.get(newValueObject));
+        boolean result = labelSets.isNonEmptyIntersection(targetLabelSet, labelSets.get(newValueObject));
+        if (result)
+            labelSets.increaseRefCount(newValueObject);
+        return result;
     }
 
 }
