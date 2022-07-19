@@ -24,10 +24,10 @@ public class FieldBound {
         fieldValues.add(fieldValue);
     }
 
-    public Set<Integer> getAllowedValues(Set<Integer> ids) {
+    public Set<Integer> getTargetLabelSet(Set<Integer> thisLabelSet) {
         Set<Integer> allowedValues = new HashSet<>();
-        for (Integer id : ids) {
-            allowedValues.addAll(fieldBounds.get(id));
+        for (Integer label : thisLabelSet) {
+            allowedValues.addAll(fieldBounds.get(label));
         }
         return allowedValues;
     }

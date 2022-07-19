@@ -10,7 +10,7 @@ public class LabelSets {
     Bounds bounds;
     Map<Object, Set<Integer>> labelSetMap = new HashMap<>();
 
-    
+
     public LabelSets(Bounds bounds) {
         this.bounds = bounds;
     }
@@ -33,7 +33,7 @@ public class LabelSets {
 
     public Set<Integer> calculateTargetLabelSet(Object thisObject, String fieldName) {
         Set<Integer> thisLabelSet = labelSetMap.get(thisObject);
-        Set<Integer> targetLabelSet = bounds.getTargets(thisObject.getClass(), fieldName, thisLabelSet);
+        Set<Integer> targetLabelSet = bounds.getTargetLabelSet(thisObject.getClass(), fieldName, thisLabelSet);
         targetLabelSet.remove(0);
         return targetLabelSet;
     }
@@ -44,7 +44,7 @@ public class LabelSets {
         return isNonEmptyIntersection(thisLabelSet, newValueLabelSet);
     }
 
-    private boolean isNonEmptyIntersection(Set<Integer> thisLabelSet, Set<Integer> newValueLabelSet) {
+    public boolean isNonEmptyIntersection(Set<Integer> thisLabelSet, Set<Integer> newValueLabelSet) {
         Set<Integer> intersection = new HashSet<>(thisLabelSet);
         intersection.retainAll(newValueLabelSet);
         return !intersection.isEmpty();

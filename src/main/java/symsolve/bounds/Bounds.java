@@ -11,10 +11,10 @@ public class Bounds {
         this.classBoundMap = classBoundMap;
     }
 
-    public Set<Integer> getTargets(Class<?> ownerClass, String fieldName, Set<Integer> ids) {
-        ClassBound classBound = classBoundMap.get(ownerClass.getName());
+    public Set<Integer> getTargetLabelSet(Class<?> thisClass, String fieldName, Set<Integer> thisLabelSet) {
+        ClassBound classBound = classBoundMap.get(thisClass.getName());
         FieldBound fieldBounds = classBound.getFieldBounds(fieldName);
-        return fieldBounds.getAllowedValues(ids);
+        return fieldBounds.getTargetLabelSet(thisLabelSet);
     }
 
     @Override

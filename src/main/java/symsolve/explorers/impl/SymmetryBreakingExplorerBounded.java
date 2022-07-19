@@ -4,7 +4,6 @@ import korat.finitization.IFieldDomain;
 import korat.finitization.IObjSet;
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
-import korat.finitization.impl.ObjSet;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import symsolve.bounds.Bounds;
@@ -51,26 +50,24 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
         if (maxInstances[lastAccessedFieldIndex] == -1) {
             maxInstances[lastAccessedFieldIndex] = getMaxInstanceInVector(lastAccessedFD);
         }
-
-        while (currentInstanceIndex < maxInstances[lastAccessedFieldIndex]) {
+        while (currentInstanceIndex <= maxInstances[lastAccessedFieldIndex] && currentInstanceIndex < maxInstanceIndexForFieldDomain) {
             currentInstanceIndex++;
             if (newValueIsInBounds(lastAccessedFD, currentInstanceIndex, lastAccessedFieldIndex)) {
                 candidateVector[lastAccessedFieldIndex] = currentInstanceIndex;
                 return true;
             }
         }
-
         return false;
     }
 
     @Override
     void backtrack(int lastAccessedFieldIndex) {
-        CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
+        /*CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
         IFieldDomain fieldDomain = cvElem.getFieldDomain();
         if (!fieldDomain.isPrimitiveType()) {
             IObjSet objSet = (ObjSet) fieldDomain;
             labelSets.remove(objSet.getObject(candidateVector[lastAccessedFieldIndex]));
-        }
+        }*/
         candidateVector[lastAccessedFieldIndex] = 0;
         maxInstances[lastAccessedFieldIndex] = -1;
     }
@@ -92,17 +89,16 @@ public class SymmetryBreakingExplorerBounded extends AbstractVectorStateSpaceExp
     private boolean newValueIsInBounds(IFieldDomain fieldDomain, int indexInFieldDomainOfNewValue, int lastAccessedFieldIndex) {
         CVElem cvElem = stateSpace.getCVElem(lastAccessedFieldIndex);
         Object ownerObject = cvElem.getObj();
-        Object newValueObject = ((IObjSet) fieldDomain).getObject(indexInFieldDomainOfNewValue);
-        if (labelSets.contains(newValueObject))
-            return labelSets.haveNonEmptyLabelSetIntersection(ownerObject, newValueObject);
-
-        Set<Integer> thisLabelSet = labelSets.calculateTargetLabelSet(ownerObject, cvElem.getFieldName());
-        if (thisLabelSet.isEmpty())
+        Set<Integer> targetLabelSet = labelSets.calculateTargetLabelSet(ownerObject, cvElem.getFieldName());
+        if (targetLabelSet.isEmpty())
             return false;
 
-        labelSets.put(newValueObject, thisLabelSet);
-        return true;
+        Object newValueObject = ((IObjSet) fieldDomain).getObject(indexInFieldDomainOfNewValue);
+        if (!labelSets.contains(newValueObject)) {
+            labelSets.put(newValueObject, targetLabelSet);
+            return true;
+        }
+        return labelSets.isNonEmptyIntersection(targetLabelSet, labelSets.get(newValueObject));
     }
-
 
 }
