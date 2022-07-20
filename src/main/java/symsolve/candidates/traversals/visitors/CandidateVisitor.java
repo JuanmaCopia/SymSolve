@@ -14,4 +14,6 @@ public interface CandidateVisitor {
 
     void accessedPrimitiveField(String fieldName, int fieldObjectID);
 
+    boolean isTraversalAborted();
+
 }

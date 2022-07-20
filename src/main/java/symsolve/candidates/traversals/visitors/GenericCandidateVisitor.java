@@ -43,4 +43,9 @@ public class GenericCandidateVisitor implements CandidateVisitor {
     public void accessedPrimitiveField(String fieldName, int fieldObjectID) {
     }
 
+    @Override
+    public boolean isTraversalAborted() {
+        return false;
+    }
+
 }

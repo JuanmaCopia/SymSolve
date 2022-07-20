@@ -35,14 +35,14 @@ public class BFSCandidateTraversal implements CandidateTraversal {
         initializeTraverserState(traversedVector, visitor);
         handleRoot();
 
-        while (!allNodesHaveBeenExplored()) {
+        while (!allNodesHaveBeenExplored() && !visitor.isTraversalAborted()) {
             Object currentNode = getNextNode();
             handleNode(currentNode);
             loopThroughFieldsOfNode(currentNode);
         }
     }
 
-    private void initializeTraverserState(int[] traversedVector, CandidateVisitor visitor) {
+    protected void initializeTraverserState(int[] traversedVector, CandidateVisitor visitor) {
         this.traversedVector = traversedVector;
         this.visitor = visitor;
 
@@ -55,15 +55,15 @@ public class BFSCandidateTraversal implements CandidateTraversal {
         queue.add(rootObject);
     }
 
-    private void handleRoot() {
+    protected void handleRoot() {
         visitor.setRoot(rootObject, idMap.get(rootObject)); // root ObjSet does not include null, so we don't add 1 to the ID
     }
 
-    private boolean allNodesHaveBeenExplored() {
+    protected boolean allNodesHaveBeenExplored() {
         return queue.isEmpty();
     }
 
-    private void handleNode(Object node) {
+    protected void handleNode(Object node) {
         int currentNodeID = idMap.get(node);
         if (node != rootObject)
             visitor.setCurrentOwner(node, currentNodeID + 1);
@@ -71,15 +71,18 @@ public class BFSCandidateTraversal implements CandidateTraversal {
             visitor.setCurrentOwner(node, currentNodeID);
     }
 
-    private Object getNextNode() {
+    protected Object getNextNode() {
         return queue.removeFirst();
     }
 
-    private void loopThroughFieldsOfNode(Object node) {
+    protected void loopThroughFieldsOfNode(Object node) {
         int[] fieldIndices = stateSpace.getFieldIndicesFor(node);
         CVElem[] structureList = stateSpace.getStructureList();
 
         for (int i : fieldIndices) {
+
+            if (visitor.isTraversalAborted())
+                break;
 
             int indexInFieldDomain = traversedVector[i];
             CVElem elem = structureList[i];
@@ -95,11 +98,11 @@ public class BFSCandidateTraversal implements CandidateTraversal {
         }
     }
 
-    private void handlePrimitiveField(String fieldName, int indexInFieldDomain) {
+    protected void handlePrimitiveField(String fieldName, int indexInFieldDomain) {
         visitor.accessedPrimitiveField(fieldName, indexInFieldDomain);
     }
 
-    private void handleReferenceField(Object fieldObject, String fieldName, int indexInFieldDomain) {
+    protected void handleReferenceField(Object fieldObject, String fieldName, int indexInFieldDomain) {
         if (fieldObject == null) {
             handleNullReferenceField(fieldName, indexInFieldDomain);
         } else if (idMap.containsKey(fieldObject)) {
@@ -109,16 +112,16 @@ public class BFSCandidateTraversal implements CandidateTraversal {
         }
     }
 
-    private void handleNullReferenceField(String fieldName, int indexInFieldDomain) {
+    protected void handleNullReferenceField(String fieldName, int indexInFieldDomain) {
         visitor.accessedNullReferenceField(fieldName, indexInFieldDomain);
     }
 
-    private void handleAlreadyVisitedReferenceField(String fieldName, Object fieldObject) {
+    protected void handleAlreadyVisitedReferenceField(String fieldName, Object fieldObject) {
         int fieldObjectID = idMap.get(fieldObject) + 1;
         visitor.accessedVisitedReferenceField(fieldName, fieldObject, fieldObjectID);
     }
 
-    private void handleNewReferenceField(String fieldName, Object fieldObject) {
+    protected void handleNewReferenceField(String fieldName, Object fieldObject) {
         int fieldObjectID = 0;
         Class<?> clsOfField = fieldObject.getClass();
         if (maxIdMap.containsKey(clsOfField))
@@ -132,7 +135,7 @@ public class BFSCandidateTraversal implements CandidateTraversal {
         addNodeToQueue(fieldObject);
     }
 
-    private void addNodeToQueue(Object node) {
+    protected void addNodeToQueue(Object node) {
         queue.add(node);
     }
 
