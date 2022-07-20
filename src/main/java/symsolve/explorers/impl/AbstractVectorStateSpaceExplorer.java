@@ -49,7 +49,7 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
         resetChangedFields();
         while (!accessedIndices.isEmpty()) {
             int lastAccessedIndex = accessedIndices.removeLast();
-            if (isIndexFixed(lastAccessedIndex)) {
+            if (!isIndexFixed(lastAccessedIndex)) {
                 setCurrentField(lastAccessedIndex);
                 setIndexAsChanged(lastAccessedIndex);
                 if (setNextValue())
@@ -134,7 +134,7 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     }
 
     boolean isIndexFixed(int index) {
-        return !fixedIndices.contains(index);
+        return fixedIndices.contains(index);
     }
 
     void setIndexAsChanged(int index) {

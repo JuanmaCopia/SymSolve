@@ -31,7 +31,7 @@ public class ReverseSymmetryBreakingExplorer extends AbstractVectorStateSpaceExp
     public void setUpExplorerState() {
         for (int i = 0; i < vectorSize; i++) {
             setIndexAsChanged(i);
-            initializedFields[i] = isIndexFixed(i) && candidateVector[i] > 0;
+            initializedFields[i] = !isIndexFixed(i) && candidateVector[i] > 0;
         }
     }
 
