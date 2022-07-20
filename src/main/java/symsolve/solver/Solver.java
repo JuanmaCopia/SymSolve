@@ -1,7 +1,9 @@
 package symsolve.solver;
 
 
-import korat.finitization.impl.*;
+import korat.finitization.impl.Finitization;
+import korat.finitization.impl.IntSet;
+import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
@@ -60,17 +62,9 @@ public class Solver {
         symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(params);
     }
 
-    public int[] getCandidateVector() {
-        return this.symbolicVectorSpaceExplorer.getCandidateVector().clone();
-    }
-
-    public StateSpace getStateSpace() {
-        return stateSpace;
-    }
-
     public boolean runAutoHybridRepok(SymSolveVector vector) throws CannotInvokePredicateException {
-        this.symbolicVectorSpaceExplorer.initialize(vector);
-        Object candidate = this.candidateBuilder.buildCandidate(vector.getConcreteVector());
+        symbolicVectorSpaceExplorer.initialize(vector);
+        Object candidate = candidateBuilder.buildCandidate(vector.getConcreteVector());
         if (predicateChecker.checkPredicate(candidate))
             return true;
         return areSymbolicFieldsAccessed(vector);
@@ -95,14 +89,14 @@ public class Solver {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))
                 return true;
-            vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+            vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return false;
     }
 
     public boolean searchOtherSolution(SymSolveVector initialVector) throws CannotInvokePredicateException {
         runRepOK(initialVector);
-        int[] vector = this.symbolicVectorSpaceExplorer.getNextCandidate();
+        int[] vector = symbolicVectorSpaceExplorer.getNextCandidate();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))
@@ -114,7 +108,7 @@ public class Solver {
 
     public boolean runRepOK(SymSolveVector vector) throws CannotInvokePredicateException {
         symbolicVectorSpaceExplorer.initialize(vector);
-        Object candidate = this.candidateBuilder.buildCandidate(vector.getConcreteVector());
+        Object candidate = candidateBuilder.buildCandidate(vector.getConcreteVector());
         return predicateChecker.checkPredicate(candidate);
     }
 
@@ -132,21 +126,7 @@ public class Solver {
     }
 
     public HashMap<String, Integer> getScopes() {
-        HashMap<String, Integer> bounds = new HashMap<>();
-        CVElem[] structureList = stateSpace.getStructureList();
-        for (CVElem cvElem : structureList) {
-            FieldDomain fieldDomain = cvElem.getFieldDomain();
-            if (!fieldDomain.isPrimitiveType()) {
-                String classSimpleName = fieldDomain.getClassOfField().getSimpleName();
-                if (!bounds.containsKey(classSimpleName)) {
-                    int bound = fieldDomain.getNumberOfElements();
-                    if (((ObjSet) fieldDomain).isNullAllowed())
-                        bound--;
-                    bounds.put(classSimpleName, bound);
-                }
-            }
-        }
-        return bounds;
+        return finitization.getScopes();
     }
 
     public String generateStructureCode(int[] vector) {
@@ -155,6 +135,14 @@ public class Solver {
 
     public Map<String, IntSet> getIntegerFieldsMinMaxMap() {
         return finitization.getIntegerFieldsMinMaxMap();
+    }
+
+    public int[] getCandidateVector() {
+        return this.symbolicVectorSpaceExplorer.getCandidateVector().clone();
+    }
+
+    public StateSpace getStateSpace() {
+        return stateSpace;
     }
 
 }
