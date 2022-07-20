@@ -31,7 +31,7 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
 
     @Override
     boolean setNextValue() {
-        if (currentValue >= currentMaxFieldDomainIndex)
+        if (currentValue >= maxFieldDomainValue)
             return false;
 
         Set<Integer> targetLabelSet = labelSets.calculateTargetLabelSet(currentFieldOwner, currentFieldName);
@@ -68,7 +68,7 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
 
     private boolean setNextValueForPrimitiveType(Set<Integer> targetLabelSet) {
         int nextValue = currentValue;
-        while (nextValue < currentMaxFieldDomainIndex) {
+        while (nextValue < maxFieldDomainValue) {
             nextValue++;
             if (targetLabelSet.contains(nextValue)) {
                 setCurrentFieldValue(nextValue);
@@ -79,11 +79,11 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
     }
 
     private boolean setNextValueForReferenceType(Set<Integer> targetLabelSet) {
-        if (!isCurrentFieldInitialized()) {
+        if (!isFieldInitialized(currentIndex)) {
             initializeField(currentIndex, currentFieldDomain);
         }
         int nextValue = currentValue;
-        while (nextValue <= maxInstances[currentIndex] && nextValue < currentMaxFieldDomainIndex) {
+        while (nextValue <= maxInstances[currentIndex] && nextValue < maxFieldDomainValue) {
             nextValue++;
             if (isNewValueInBounds(nextValue, targetLabelSet)) {
                 setCurrentFieldValue(nextValue);

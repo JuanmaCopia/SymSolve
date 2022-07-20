@@ -16,7 +16,7 @@ public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
 
     @Override
     boolean setNextValue() {
-        if (currentValue >= currentMaxFieldDomainIndex)
+        if (currentValue >= maxFieldDomainValue)
             return false;
 
         if (isCurrentFieldPrimitive) {
@@ -47,7 +47,7 @@ public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
     }
 
     protected boolean setNextReferenceTypeValue() {
-        if (!isCurrentFieldInitialized()) {
+        if (!isFieldInitialized(currentIndex)) {
             initializeField(currentIndex, currentFieldDomain);
         }
         if (currentValue <= maxInstances[currentIndex]) {
@@ -57,8 +57,8 @@ public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
         return false;
     }
 
-    protected boolean isCurrentFieldInitialized() {
-        return maxInstances[currentIndex] != -1;
+    protected boolean isFieldInitialized(int index) {
+        return maxInstances[index] != -1;
     }
 
     protected void setFieldAsNotInitialized(int index) {

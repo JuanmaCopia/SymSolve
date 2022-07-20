@@ -74,12 +74,12 @@ public class ReverseSymmetryBreakingExplorer extends AbstractVectorStateSpaceExp
     }
 
     private boolean lastPrimitiveValueReached() {
-        return currentValue >= currentMaxFieldDomainIndex;
+        return currentValue >= maxFieldDomainValue;
     }
 
     private int getFirstValue() {
         int maxIndexInVector = getMaxInstanceInVector(currentFieldDomain);
-        if (maxIndexInVector >= currentMaxFieldDomainIndex) {
+        if (maxIndexInVector >= maxFieldDomainValue) {
             return maxIndexInVector;
         }
         return maxIndexInVector + 1;

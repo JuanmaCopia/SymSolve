@@ -9,7 +9,6 @@ public class LabelSets {
 
     Bounds bounds;
     Map<Object, Set<Integer>> labelSetMap = new HashMap<>();
-
     Map<Object, Integer> referenceCount = new HashMap<>();
 
 

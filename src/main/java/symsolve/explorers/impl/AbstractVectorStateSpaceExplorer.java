@@ -25,7 +25,7 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     protected int currentValue;
 
     protected FieldDomain currentFieldDomain;
-    protected int currentMaxFieldDomainIndex;
+    protected int maxFieldDomainValue;
 
     protected Object currentFieldOwner;
     protected String currentFieldName;
@@ -40,14 +40,29 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
         fixedIndices = new IntListAI(vectorSize);
     }
 
-    public int[] getCandidateVector() {
-        return candidateVector;
-    }
 
     public void initialize(SymSolveVector vector) {
         setCandidateVector(vector);
         setFixedIndices(vector.getFixedIndices());
         setUpExplorerState();
+    }
+
+    private void setCandidateVector(SymSolveVector vector) {
+        this.candidateVector = vector.getConcreteVector();
+        if (vectorSize != this.candidateVector.length)
+            throw new IllegalArgumentException(String.format("Wrong vector size! Expected: %d, but got: %d", vectorSize, this.candidateVector.length));
+    }
+
+    private void setFixedIndices(Set<Integer> fixedIndices) {
+        this.fixedIndices.clear();
+        for (Integer index : fixedIndices) {
+            this.fixedIndices.add(index);
+        }
+    }
+
+    void setUpExplorerState() {
+        for (int i = 0; i < vectorSize; i++)
+            changedFields.add(i);
     }
 
     public int[] getNextCandidate() {
@@ -65,18 +80,15 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
         return null;
     }
 
-    private void setCandidateVector(SymSolveVector vector) {
-        this.candidateVector = vector.getConcreteVector();
-        if (vectorSize != this.candidateVector.length)
-            throw new IllegalArgumentException(String.format("Wrong vector size! Expected: %d, but got: %d", vectorSize, this.candidateVector.length));
-    }
+    abstract boolean setNextValue();
 
+    abstract void backtrack();
 
     private void setCurrentField(int lastAccessedIndex) {
         currentIndex = lastAccessedIndex;
         currentValue = candidateVector[lastAccessedIndex];
         currentFieldDomain = stateSpace.getFieldDomain(lastAccessedIndex);
-        currentMaxFieldDomainIndex = currentFieldDomain.getNumberOfElements() - 1;
+        maxFieldDomainValue = currentFieldDomain.getNumberOfElements() - 1;
         CVElem cvElem = stateSpace.getCVElem(currentIndex);
         currentFieldOwner = cvElem.getObj();
         currentFieldName = cvElem.getFieldName();
@@ -86,6 +98,29 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     boolean isIndexFixed(int index) {
         return !fixedIndices.contains(index);
     }
+
+    void setIndexAsChanged(int index) {
+        changedFields.add(index);
+    }
+
+    void resetChangedFields() {
+        changedFields.clear();
+    }
+
+    int getMaxInstanceInVector(FieldDomain fieldDomain) {
+        int maxInstance = 0;
+        for (Integer index : stateSpace.getIndicesOfFieldDomain(fieldDomain)) {
+            int value = candidateVector[index];
+            if (value > maxInstance)
+                maxInstance = value;
+        }
+        return maxInstance;
+    }
+
+    public int[] getCandidateVector() {
+        return candidateVector;
+    }
+
 
     void setCurrentFieldValue(int newValue) {
         candidateVector[currentIndex] = newValue;
@@ -101,41 +136,6 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
 
     void decreaseCurrentFieldValue() {
         candidateVector[currentIndex]--;
-    }
-
-    void setIndexAsChanged(int index) {
-        changedFields.add(index);
-    }
-
-    void resetChangedFields() {
-        changedFields.clear();
-    }
-
-
-    private void setFixedIndices(Set<Integer> fixedIndices) {
-        this.fixedIndices.clear();
-        for (Integer index : fixedIndices) {
-            this.fixedIndices.add(index);
-        }
-    }
-
-    int getMaxInstanceInVector(FieldDomain fieldDomain) {
-        int maxInstance = 0;
-        for (Integer index : stateSpace.getIndicesOfFieldDomain(fieldDomain)) {
-            int value = candidateVector[index];
-            if (value > maxInstance)
-                maxInstance = value;
-        }
-        return maxInstance;
-    }
-
-    abstract boolean setNextValue();
-
-    abstract void backtrack();
-
-    void setUpExplorerState() {
-        for (int i = 0; i < vectorSize; i++)
-            changedFields.add(i);
     }
 
 }

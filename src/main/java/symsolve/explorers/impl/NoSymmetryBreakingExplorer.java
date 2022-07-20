@@ -11,7 +11,7 @@ public class NoSymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer
 
     @Override
     protected boolean setNextValue() {
-        if (currentValue >= currentMaxFieldDomainIndex)
+        if (currentValue >= maxFieldDomainValue)
             return false;
 
         increaseCurrentFieldValue();
