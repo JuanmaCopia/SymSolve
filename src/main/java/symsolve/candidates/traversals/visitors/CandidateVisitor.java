@@ -6,13 +6,15 @@ public interface CandidateVisitor {
 
     void setCurrentOwner(Object currentOwnerObject, int currentOwnerID);
 
-    void accessedVisitedReferenceField(String fieldName, Object fieldObject, int fieldObjectID);
+    void setCurrentField(String fieldName, int fieldIndexInVector);
 
-    void accessedNullReferenceField(String fieldName, int fieldObjectID);
+    void accessedVisitedReferenceField(Object fieldObject, int fieldObjectID);
 
-    void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID);
+    void accessedNullReferenceField(int fieldObjectID);
 
-    void accessedPrimitiveField(String fieldName, int fieldObjectID);
+    void accessedNewReferenceField(Object fieldObject, int fieldObjectID);
+
+    void accessedPrimitiveField(int fieldObjectID);
 
     boolean isTraversalAborted();
 

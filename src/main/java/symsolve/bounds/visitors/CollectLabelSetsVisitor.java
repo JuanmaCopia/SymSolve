@@ -29,10 +29,8 @@ public class CollectLabelSetsVisitor extends GenericCandidateVisitor {
     }
 
     @Override
-    public void accessedNewReferenceField(String fieldName, Object fieldObject, int fieldObjectID) {
-        //System.out.println(String.format("Accessed new ref field: %s.%s", currentOwnerObject.getClass(), fieldName));
-        Set<Integer> targetLabelSet = labelSets.calculateTargetLabelSet(currentOwnerObject, fieldName);
-        //if (!targetLabelSet.isEmpty())
+    public void accessedNewReferenceField(Object fieldObject, int fieldObjectID) {
+        Set<Integer> targetLabelSet = labelSets.calculateTargetLabelSet(currentOwnerObject, currentFieldName);
         labelSets.put(fieldObject, targetLabelSet);
     }
 

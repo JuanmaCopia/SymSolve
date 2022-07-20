@@ -6,6 +6,7 @@ import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import symsolve.bounds.Bounds;
 import symsolve.bounds.LabelSets;
+import symsolve.bounds.visitors.BoundCheckerVisitor;
 import symsolve.bounds.visitors.CollectLabelSetsVisitor;
 import symsolve.vector.SymSolveVector;
 
@@ -15,11 +16,20 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
 
 
     private final LabelSets labelSets;
+    private final Bounds bounds;
 
 
     public SymmetryBreakingExplorerBounded(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields, Bounds bounds) {
         super(stateSpace, accessedIndices, changedFields);
         labelSets = new LabelSets(bounds);
+        this.bounds = bounds;
+    }
+
+    @Override
+    public boolean canBeDeterminedUnsat(SymSolveVector vector) {
+        BoundCheckerVisitor boundChecker = new BoundCheckerVisitor(stateSpace, bounds);
+        boundChecker.isVectorInBounds(vector);
+        return !boundChecker.isVectorInBounds(vector);
     }
 
     @Override

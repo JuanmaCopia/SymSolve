@@ -89,6 +89,8 @@ public class BFSCandidateTraversal implements CandidateTraversal {
             FieldDomain fieldDomain = elem.getFieldDomain();
             String fieldName = elem.getFieldName();
 
+            visitor.setCurrentField(fieldName, i);
+
             if (fieldDomain.isPrimitiveType()) {
                 handlePrimitiveField(fieldName, indexInFieldDomain);
             } else {
@@ -99,7 +101,7 @@ public class BFSCandidateTraversal implements CandidateTraversal {
     }
 
     protected void handlePrimitiveField(String fieldName, int indexInFieldDomain) {
-        visitor.accessedPrimitiveField(fieldName, indexInFieldDomain);
+        visitor.accessedPrimitiveField(indexInFieldDomain);
     }
 
     protected void handleReferenceField(Object fieldObject, String fieldName, int indexInFieldDomain) {
@@ -113,12 +115,12 @@ public class BFSCandidateTraversal implements CandidateTraversal {
     }
 
     protected void handleNullReferenceField(String fieldName, int indexInFieldDomain) {
-        visitor.accessedNullReferenceField(fieldName, indexInFieldDomain);
+        visitor.accessedNullReferenceField(indexInFieldDomain);
     }
 
     protected void handleAlreadyVisitedReferenceField(String fieldName, Object fieldObject) {
         int fieldObjectID = idMap.get(fieldObject) + 1;
-        visitor.accessedVisitedReferenceField(fieldName, fieldObject, fieldObjectID);
+        visitor.accessedVisitedReferenceField(fieldObject, fieldObjectID);
     }
 
     protected void handleNewReferenceField(String fieldName, Object fieldObject) {
@@ -130,7 +132,7 @@ public class BFSCandidateTraversal implements CandidateTraversal {
         idMap.put(fieldObject, fieldObjectID);
 
         fieldObjectID = fieldObjectID + 1;
-        visitor.accessedNewReferenceField(fieldName, fieldObject, fieldObjectID);
+        visitor.accessedNewReferenceField(fieldObject, fieldObjectID);
 
         addNodeToQueue(fieldObject);
     }
