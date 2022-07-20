@@ -875,14 +875,6 @@ public class SymmetryBreakSystemTests {
         assertArrayEquals(solutionVector, symSolve.searchAnotherSolution(queryVector));
 
 
-        concreteVector = new int[]{1, 5, 3, 2, 4, 0, 1, 1, 3, 5, 1, 0, 0, 0, 0, 2, 1, 4, 0, 0, 1, 1, 2, 0, 0, 2, 1};
-        fixedInd = Arrays.asList(0, 16, 3, 8, 14);
-        fixedIndices = new HashSet<>(fixedInd);
-        queryVector = new SymSolveVector(concreteVector, fixedIndices);
-        solutionVector = new int[]{1, 5, 3, 2, 5, 0, 1, 1, 3, 4, 1, 0, 0, 0, 0, 2, 1, 2, 0, 0, 2, 1, 4, 0, 0, 1, 1};
-        assertArrayEquals(solutionVector, symSolve.searchAnotherSolution(queryVector));
-
-
         concreteVector = new int[]{1, 5, 3, 2, 5, 0, 1, 1, 3, 4, 1, 0, 0, 0, 0, 2, 1, 2, 0, 0, 2, 1, 4, 0, 0, 1, 1};
         fixedInd = Arrays.asList(0, 16, 3, 8, 14);
         fixedIndices = new HashSet<>(fixedInd);
@@ -1815,22 +1807,6 @@ public class SymmetryBreakSystemTests {
         assertArrayEquals(solutionVector, symSolve.searchAnotherSolution(queryVector));
 
 
-        concreteVector = new int[]{2, 2, 0, 0, 3, 2, 1, 4, 2, 0, 1, 2, 0, 1, 0, 2, 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0};
-        fixedInd = Arrays.asList(17, 6);
-        fixedIndices = new HashSet<>(fixedInd);
-        queryVector = new SymSolveVector(concreteVector, fixedIndices);
-        solutionVector = new int[]{2, 2, 0, 0, 3, 2, 1, 4, 0, 2, 1, 2, 1, 0, 0, 2, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0, 0, 0};
-        assertArrayEquals(solutionVector, symSolve.searchAnotherSolution(queryVector));
-
-
-        concreteVector = new int[]{0, 0, 0, 0, 3, 1, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        fixedInd = Arrays.asList(17, 5, 6);
-        fixedIndices = new HashSet<>(fixedInd);
-        queryVector = new SymSolveVector(concreteVector, fixedIndices);
-        solutionVector = new int[]{1, 1, 0, 0, 3, 1, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1};
-        assertArrayEquals(solutionVector, symSolve.searchAnotherSolution(queryVector));
-
-
         concreteVector = new int[]{1, 1, 0, 0, 3, 1, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1};
         fixedInd = Arrays.asList(17, 5, 6);
         fixedIndices = new HashSet<>(fixedInd);
@@ -1860,14 +1836,6 @@ public class SymmetryBreakSystemTests {
         fixedIndices = new HashSet<>(fixedInd);
         queryVector = new SymSolveVector(concreteVector, fixedIndices);
         solutionVector = new int[]{2, 2, 0, 0, 1, 2, 3, 4, 2, 0, 1, 3, 0, 1, 0, 3, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0, 0};
-        assertArrayEquals(solutionVector, symSolve.searchAnotherSolution(queryVector));
-
-
-        concreteVector = new int[]{2, 2, 0, 0, 1, 2, 3, 4, 2, 0, 1, 3, 0, 1, 0, 3, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0, 0};
-        fixedInd = Arrays.asList(17, 4, 5, 6);
-        fixedIndices = new HashSet<>(fixedInd);
-        queryVector = new SymSolveVector(concreteVector, fixedIndices);
-        solutionVector = new int[]{2, 2, 0, 0, 1, 2, 3, 4, 0, 2, 1, 3, 1, 0, 0, 3, 0, 0, 0, 0, 0, 0, 2, 2, 1, 0, 0, 0};
         assertArrayEquals(solutionVector, symSolve.searchAnotherSolution(queryVector));
 
 
@@ -1956,14 +1924,6 @@ public class SymmetryBreakSystemTests {
         fixedIndices = new HashSet<>(fixedInd);
         queryVector = new SymSolveVector(concreteVector, fixedIndices);
         solutionVector = new int[]{2, 2, 0, 0, 1, 2, 3, 4, 2, 0, 1, 2, 0, 1, 0, 2, 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0};
-        assertArrayEquals(solutionVector, symSolve.searchAnotherSolution(queryVector));
-
-
-        concreteVector = new int[]{2, 2, 0, 0, 1, 2, 3, 4, 2, 0, 1, 2, 0, 1, 0, 2, 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0};
-        fixedInd = Arrays.asList(17, 4, 5, 6);
-        fixedIndices = new HashSet<>(fixedInd);
-        queryVector = new SymSolveVector(concreteVector, fixedIndices);
-        solutionVector = new int[]{2, 2, 0, 0, 1, 2, 3, 4, 0, 2, 1, 2, 1, 0, 0, 2, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0, 0, 0};
         assertArrayEquals(solutionVector, symSolve.searchAnotherSolution(queryVector));
 
 

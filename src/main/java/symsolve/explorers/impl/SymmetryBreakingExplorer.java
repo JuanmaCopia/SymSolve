@@ -36,7 +36,7 @@ public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
     void setUpExplorerState() {
         for (int i = 0; i < vectorSize; i++) {
             setIndexAsChanged(i);
-            if (isIndexFixed(i) && candidateVector[i] > 0) {
+            if (!isIndexFixed(i) && candidateVector[i] > 0) {
                 FieldDomain fieldDomain = stateSpace.getFieldDomain(i);
                 if (!fieldDomain.isPrimitiveType())
                     initializeField(i, fieldDomain);
