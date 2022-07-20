@@ -1,6 +1,7 @@
 package symsolve.bounds.visitors;
 
 import korat.finitization.impl.StateSpace;
+import symsolve.bounds.Bounds;
 import symsolve.bounds.LabelSets;
 import symsolve.candidates.traversals.BFSCandidateTraversal;
 import symsolve.candidates.traversals.CandidateTraversal;
@@ -9,16 +10,16 @@ import symsolve.candidates.traversals.visitors.GenericCandidateVisitor;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CollectLabelSetsVisitor extends GenericCandidateVisitor {
+public class LabelSetCalculator extends GenericCandidateVisitor {
 
 
     LabelSets labelSets;
     StateSpace stateSpace;
 
 
-    public CollectLabelSetsVisitor(StateSpace stateSpace, LabelSets labelSets) {
+    public LabelSetCalculator(StateSpace stateSpace, Bounds bounds) {
         this.stateSpace = stateSpace;
-        this.labelSets = labelSets;
+        this.labelSets = new LabelSets(bounds);
     }
 
     @Override
@@ -34,10 +35,11 @@ public class CollectLabelSetsVisitor extends GenericCandidateVisitor {
         labelSets.put(fieldObject, targetLabelSet);
     }
 
-    public void collectLabelSetsForVector(int[] vector) {
+    public LabelSets collectLabelSetsForVector(int[] vector) {
         labelSets.clear();
         CandidateTraversal traverser = new BFSCandidateTraversal(stateSpace);
         traverser.traverse(vector, this);
+        return labelSets;
     }
 
 }

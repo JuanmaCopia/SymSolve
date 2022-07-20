@@ -6,37 +6,36 @@ import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import symsolve.bounds.Bounds;
 import symsolve.bounds.LabelSets;
-import symsolve.bounds.visitors.BoundCheckerVisitor;
-import symsolve.bounds.visitors.CollectLabelSetsVisitor;
+import symsolve.bounds.visitors.BoundChecker;
+import symsolve.bounds.visitors.LabelSetCalculator;
 import symsolve.vector.SymSolveVector;
 
 import java.util.Set;
 
 public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
 
-
-    private final LabelSets labelSets;
-    private final Bounds bounds;
+    LabelSetCalculator labelSetCalculator;
+    LabelSets labelSets;
+    Bounds bounds;
 
 
     public SymmetryBreakingExplorerBounded(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields, Bounds bounds) {
         super(stateSpace, accessedIndices, changedFields);
-        labelSets = new LabelSets(bounds);
         this.bounds = bounds;
+        labelSets = new LabelSets(bounds);
+        labelSetCalculator = new LabelSetCalculator(stateSpace, bounds);
     }
 
     @Override
     public boolean canBeDeterminedUnsat(SymSolveVector vector) {
-        BoundCheckerVisitor boundChecker = new BoundCheckerVisitor(stateSpace, bounds);
-        boundChecker.isVectorInBounds(vector);
+        BoundChecker boundChecker = new BoundChecker(stateSpace, bounds);
         return !boundChecker.isVectorInBounds(vector);
     }
 
     @Override
     public void initialize(SymSolveVector vector) {
         super.initialize(vector);
-        CollectLabelSetsVisitor collectLabelSetsVisitor = new CollectLabelSetsVisitor(stateSpace, labelSets);
-        collectLabelSetsVisitor.collectLabelSetsForVector(vector.getConcreteVector());
+        labelSets = labelSetCalculator.collectLabelSetsForVector(vector.getConcreteVector());
     }
 
     @Override

@@ -11,16 +11,15 @@ import symsolve.vector.SymSolveVector;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BoundCheckerVisitor extends GenericCandidateVisitor {
+public class BoundChecker extends GenericCandidateVisitor {
 
     LabelSets labelSets;
     StateSpace stateSpace;
     Set<Integer> fixedIndices;
-
     boolean hasFieldOutOfBounds = false;
 
 
-    public BoundCheckerVisitor(StateSpace stateSpace, Bounds bounds) {
+    public BoundChecker(StateSpace stateSpace, Bounds bounds) {
         this.stateSpace = stateSpace;
         this.labelSets = new LabelSets(bounds);
     }
