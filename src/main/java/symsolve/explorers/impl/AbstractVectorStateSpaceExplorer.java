@@ -40,7 +40,38 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
         fixedIndices = new IntListAI(vectorSize);
     }
 
+    @Override
+    public int[] getNextCandidate() {
+        resetChangedFields();
+        while (!accessedIndices.isEmpty()) {
+            int lastAccessedIndex = accessedIndices.removeLast();
+            if (isIndexFixed(lastAccessedIndex)) {
+                setCurrentField(lastAccessedIndex);
+                setIndexAsChanged(lastAccessedIndex);
+                if (setNextValue())
+                    return candidateVector;
+                backtrack();
+            }
+        }
+        return null;
+    }
 
+    private void setCurrentField(int lastAccessedIndex) {
+        currentIndex = lastAccessedIndex;
+        currentValue = candidateVector[lastAccessedIndex];
+        currentFieldDomain = stateSpace.getFieldDomain(lastAccessedIndex);
+        maxFieldDomainValue = currentFieldDomain.getNumberOfElements() - 1;
+        CVElem cvElem = stateSpace.getCVElem(currentIndex);
+        currentFieldOwner = cvElem.getObj();
+        currentFieldName = cvElem.getFieldName();
+        isCurrentFieldPrimitive = currentFieldDomain.isPrimitiveType();
+    }
+
+    abstract boolean setNextValue();
+
+    abstract void backtrack();
+
+    @Override
     public void initialize(SymSolveVector vector) {
         setCandidateVector(vector);
         setFixedIndices(vector.getFixedIndices());
@@ -65,34 +96,24 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
             changedFields.add(i);
     }
 
-    public int[] getNextCandidate() {
-        resetChangedFields();
-        while (!accessedIndices.isEmpty()) {
-            int lastAccessedIndex = accessedIndices.removeLast();
-            if (isIndexFixed(lastAccessedIndex)) {
-                setCurrentField(lastAccessedIndex);
-                setIndexAsChanged(lastAccessedIndex);
-                if (setNextValue())
-                    return candidateVector;
-                backtrack();
-            }
-        }
-        return null;
+    @Override
+    public boolean canBeDeterminedUnsat(SymSolveVector vector) {
+        return false;
     }
 
-    abstract boolean setNextValue();
+    @Override
+    public int[] getCandidateVector() {
+        return candidateVector;
+    }
 
-    abstract void backtrack();
-
-    private void setCurrentField(int lastAccessedIndex) {
-        currentIndex = lastAccessedIndex;
-        currentValue = candidateVector[lastAccessedIndex];
-        currentFieldDomain = stateSpace.getFieldDomain(lastAccessedIndex);
-        maxFieldDomainValue = currentFieldDomain.getNumberOfElements() - 1;
-        CVElem cvElem = stateSpace.getCVElem(currentIndex);
-        currentFieldOwner = cvElem.getObj();
-        currentFieldName = cvElem.getFieldName();
-        isCurrentFieldPrimitive = currentFieldDomain.isPrimitiveType();
+    int getMaxInstanceInVector(FieldDomain fieldDomain) {
+        int maxInstance = 0;
+        for (Integer index : stateSpace.getIndicesOfFieldDomain(fieldDomain)) {
+            int value = candidateVector[index];
+            if (value > maxInstance)
+                maxInstance = value;
+        }
+        return maxInstance;
     }
 
     boolean isIndexFixed(int index) {
@@ -106,21 +127,6 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     void resetChangedFields() {
         changedFields.clear();
     }
-
-    int getMaxInstanceInVector(FieldDomain fieldDomain) {
-        int maxInstance = 0;
-        for (Integer index : stateSpace.getIndicesOfFieldDomain(fieldDomain)) {
-            int value = candidateVector[index];
-            if (value > maxInstance)
-                maxInstance = value;
-        }
-        return maxInstance;
-    }
-
-    public int[] getCandidateVector() {
-        return candidateVector;
-    }
-
 
     void setCurrentFieldValue(int newValue) {
         candidateVector[currentIndex] = newValue;

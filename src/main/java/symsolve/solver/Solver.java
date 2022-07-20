@@ -80,6 +80,8 @@ public class Solver {
     }
 
     public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
+        if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(initialVector))
+            return false;
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
 /*        System.out.println("\n\nStarting search...");
