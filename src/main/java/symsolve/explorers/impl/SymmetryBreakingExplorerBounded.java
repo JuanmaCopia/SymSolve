@@ -6,7 +6,7 @@ import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 import symsolve.bounds.Bounds;
 import symsolve.bounds.LabelSets;
-import symsolve.candidates.traversals.visitors.CollectLabelSetsVisitor;
+import symsolve.bounds.visitors.CollectLabelSetsVisitor;
 import symsolve.vector.SymSolveVector;
 
 import java.util.Set;

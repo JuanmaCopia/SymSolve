@@ -9,77 +9,131 @@ import symsolve.candidates.traversals.visitors.CandidateVisitor;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class BFSCandidateTraverser implements CandidateTraverser {
 
+    Map<Class<?>, Integer> maxIdMap = new HashMap<>();
+    Map<Object, Integer> idMap = new IdentityHashMap<>();
+    LinkedList<Object> queue = new LinkedList<>();
+
     StateSpace stateSpace;
-    Class<?> rootClass;
+
     Object rootObject;
+    int[] traversedVector;
+    CandidateVisitor visitor;
+
 
     public BFSCandidateTraverser(StateSpace stateSpace) {
         if (stateSpace == null)
             throw new IllegalArgumentException();
         this.stateSpace = stateSpace;
         rootObject = stateSpace.getRootObject();
-        rootClass = rootObject.getClass();
     }
 
-    public void traverse(int[] vector, CandidateVisitor visitor) {
-        HashMap<Class<?>, Integer> maxIdMap = new HashMap<Class<?>, Integer>();
-        IdentityHashMap<Object, Integer> idMap = new IdentityHashMap<Object, Integer>();
+    public void traverse(int[] traversedVector, CandidateVisitor visitor) {
+        initializeTraverserState(traversedVector, visitor);
+        handleRoot();
 
-        maxIdMap.put(rootClass, 0);
+        while (!allNodesHaveBeenExplored()) {
+            Object currentNode = getNextNode();
+            handleNode(currentNode);
+            loopThroughFieldsOfNode(currentNode);
+        }
+    }
+
+    private void initializeTraverserState(int[] traversedVector, CandidateVisitor visitor) {
+        this.traversedVector = traversedVector;
+        this.visitor = visitor;
+
+        maxIdMap.clear();
+        idMap.clear();
+        queue.clear();
+
+        maxIdMap.put(rootObject.getClass(), 0);
         idMap.put(rootObject, 0);
+        queue.add(rootObject);
+    }
 
-        CVElem[] structureList = stateSpace.getStructureList();
-        LinkedList<Object> worklist = new LinkedList<Object>();
-        worklist.add(rootObject);
-
+    private void handleRoot() {
         visitor.setRoot(rootObject, idMap.get(rootObject)); // root ObjSet does not include null, so we don't add 1 to the ID
+    }
 
-        while (!worklist.isEmpty()) {
-            Object currentOwnerObject = worklist.removeFirst();
-            int currentOwnerID = idMap.get(currentOwnerObject);
+    private boolean allNodesHaveBeenExplored() {
+        return queue.isEmpty();
+    }
 
-            if (currentOwnerObject != rootObject)
-                visitor.setCurrentOwner(currentOwnerObject, currentOwnerID + 1);
-            else
-                visitor.setCurrentOwner(currentOwnerObject, currentOwnerID);
+    private void handleNode(Object node) {
+        int currentNodeID = idMap.get(node);
+        if (node != rootObject)
+            visitor.setCurrentOwner(node, currentNodeID + 1);
+        else
+            visitor.setCurrentOwner(node, currentNodeID);
+    }
 
-            int[] fieldIndices = stateSpace.getFieldIndicesFor(currentOwnerObject);
+    private Object getNextNode() {
+        return queue.removeFirst();
+    }
 
-            for (int i : fieldIndices) {
-                CVElem elem = structureList[i];
-                int indexInFieldDomain = vector[i];
-                FieldDomain fieldDomain = elem.getFieldDomain();
-                String fieldName = elem.getFieldName();
-                Class<?> clsOfField = fieldDomain.getClassOfField();
+    private void loopThroughFieldsOfNode(Object node) {
+        int[] fieldIndices = stateSpace.getFieldIndicesFor(node);
+        CVElem[] structureList = stateSpace.getStructureList();
 
-                if (fieldDomain.isPrimitiveType()) {
-                    visitor.accessedPrimitiveField(fieldName, indexInFieldDomain);
-                } else {  // The field is of reference type
-                    ObjSet set = (ObjSet) fieldDomain;
-                    Object fieldObject = set.getObject(indexInFieldDomain);
+        for (int i : fieldIndices) {
 
-                    if (fieldObject == null) {
-                        visitor.accessedNullReferenceField(fieldName, indexInFieldDomain);
-                    } else if (idMap.containsKey(fieldObject)) {
-                        int fieldObjectID = idMap.get(fieldObject) + 1;
-                        visitor.accessedVisitedReferenceField(fieldName, fieldObject, fieldObjectID);
-                    } else {
-                        int fieldObjectID = 0;
-                        if (maxIdMap.containsKey(clsOfField))
-                            fieldObjectID = maxIdMap.get(clsOfField) + 1;
-                        maxIdMap.put(clsOfField, fieldObjectID);
-                        idMap.put(fieldObject, fieldObjectID);
+            int indexInFieldDomain = traversedVector[i];
+            CVElem elem = structureList[i];
+            FieldDomain fieldDomain = elem.getFieldDomain();
+            String fieldName = elem.getFieldName();
 
-                        fieldObjectID = fieldObjectID + 1;
-                        visitor.accessedNewReferenceField(fieldName, fieldObject, fieldObjectID);
-
-                        worklist.add(fieldObject);
-                    }
-                }
+            if (fieldDomain.isPrimitiveType()) {
+                handlePrimitiveField(fieldName, indexInFieldDomain);
+            } else {
+                Object fieldObject = ((ObjSet) fieldDomain).getObject(indexInFieldDomain);
+                handleReferenceField(fieldObject, fieldName, indexInFieldDomain);
             }
         }
     }
+
+    private void handlePrimitiveField(String fieldName, int indexInFieldDomain) {
+        visitor.accessedPrimitiveField(fieldName, indexInFieldDomain);
+    }
+
+    private void handleReferenceField(Object fieldObject, String fieldName, int indexInFieldDomain) {
+        if (fieldObject == null) {
+            handleNullReferenceField(fieldName, indexInFieldDomain);
+        } else if (idMap.containsKey(fieldObject)) {
+            handleAlreadyVisitedReferenceField(fieldName, fieldObject);
+        } else {
+            handleNewReferenceField(fieldName, fieldObject);
+        }
+    }
+
+    private void handleNullReferenceField(String fieldName, int indexInFieldDomain) {
+        visitor.accessedNullReferenceField(fieldName, indexInFieldDomain);
+    }
+
+    private void handleAlreadyVisitedReferenceField(String fieldName, Object fieldObject) {
+        int fieldObjectID = idMap.get(fieldObject) + 1;
+        visitor.accessedVisitedReferenceField(fieldName, fieldObject, fieldObjectID);
+    }
+
+    private void handleNewReferenceField(String fieldName, Object fieldObject) {
+        int fieldObjectID = 0;
+        Class<?> clsOfField = fieldObject.getClass();
+        if (maxIdMap.containsKey(clsOfField))
+            fieldObjectID = maxIdMap.get(clsOfField) + 1;
+        maxIdMap.put(clsOfField, fieldObjectID);
+        idMap.put(fieldObject, fieldObjectID);
+
+        fieldObjectID = fieldObjectID + 1;
+        visitor.accessedNewReferenceField(fieldName, fieldObject, fieldObjectID);
+
+        addNodeToQueue(fieldObject);
+    }
+
+    private void addNodeToQueue(Object node) {
+        queue.add(node);
+    }
+
 }

@@ -1,9 +1,10 @@
-package symsolve.candidates.traversals.visitors;
+package symsolve.bounds.visitors;
 
 import korat.finitization.impl.StateSpace;
 import symsolve.bounds.LabelSets;
 import symsolve.candidates.traversals.BFSCandidateTraverser;
 import symsolve.candidates.traversals.CandidateTraverser;
+import symsolve.candidates.traversals.visitors.GenericCandidateVisitor;
 
 import java.util.HashSet;
 import java.util.Set;
