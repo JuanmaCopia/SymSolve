@@ -1,8 +1,8 @@
 package symsolve.bounds;
 
 import korat.finitization.impl.Finitization;
-import symsolve.candidates.traversals.BFSCandidateTraverser;
-import symsolve.candidates.traversals.CandidateTraverser;
+import symsolve.candidates.traversals.BFSCandidateTraversal;
+import symsolve.candidates.traversals.CandidateTraversal;
 import symsolve.candidates.traversals.visitors.GenericCandidateVisitor;
 
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class BoundRecorder extends GenericCandidateVisitor {
     }
 
     public void recordBounds(int[] vector) {
-        CandidateTraverser traverser = new BFSCandidateTraverser(finitization.getStateSpace());
+        CandidateTraversal traverser = new BFSCandidateTraversal(finitization.getStateSpace());
         traverser.traverse(vector, this);
     }
 

@@ -2,8 +2,8 @@ package symsolve.bounds.visitors;
 
 import korat.finitization.impl.StateSpace;
 import symsolve.bounds.LabelSets;
-import symsolve.candidates.traversals.BFSCandidateTraverser;
-import symsolve.candidates.traversals.CandidateTraverser;
+import symsolve.candidates.traversals.BFSCandidateTraversal;
+import symsolve.candidates.traversals.CandidateTraversal;
 import symsolve.candidates.traversals.visitors.GenericCandidateVisitor;
 
 import java.util.HashSet;
@@ -38,7 +38,7 @@ public class CollectLabelSetsVisitor extends GenericCandidateVisitor {
 
     public void collectLabelSetsForVector(int[] vector) {
         labelSets.clear();
-        CandidateTraverser traverser = new BFSCandidateTraverser(stateSpace);
+        CandidateTraversal traverser = new BFSCandidateTraversal(stateSpace);
         traverser.traverse(vector, this);
     }
 

@@ -11,7 +11,7 @@ import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class BFSCandidateTraverser implements CandidateTraverser {
+public class BFSCandidateTraversal implements CandidateTraversal {
 
     Map<Class<?>, Integer> maxIdMap = new HashMap<>();
     Map<Object, Integer> idMap = new IdentityHashMap<>();
@@ -24,7 +24,7 @@ public class BFSCandidateTraverser implements CandidateTraverser {
     CandidateVisitor visitor;
 
 
-    public BFSCandidateTraverser(StateSpace stateSpace) {
+    public BFSCandidateTraversal(StateSpace stateSpace) {
         if (stateSpace == null)
             throw new IllegalArgumentException();
         this.stateSpace = stateSpace;
