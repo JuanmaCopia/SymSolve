@@ -23,35 +23,34 @@ public class ReverseSymmetryBreakingExplorer extends AbstractVectorStateSpaceExp
 
     @Override
     void backtrack() {
-        resetCurrentFieldValue();
+        candidateVector[currentIndex] = 0;
         setCurrentFieldAsNotInitialized();
     }
 
     @Override
-    public void setUpExplorerState() {
+    public void resetExplorerState() {
         for (int i = 0; i < vectorSize; i++) {
-            setIndexAsChanged(i);
-            initializedFields[i] = !isIndexFixed(i) && candidateVector[i] > 0;
+            changedFields.add(i);
+            initializedFields[i] = false;
         }
     }
 
     protected boolean setNextPrimitiveTypeValue() {
         if (lastPrimitiveValueReached())
             return false;
-        increaseCurrentFieldValue();
+        candidateVector[currentIndex]++;
         return true;
     }
 
     protected boolean setNextReferenceTypeValue() {
         if (!isCurrentFieldInitialized()) {
             initializeCurrentField();
-            int firstValue = getFirstValue();
-            setCurrentFieldValue(firstValue);
+            candidateVector[currentIndex] = getFirstValue();
             return true;
         }
 
         if (!lastReferenceValueReached()) {
-            decreaseCurrentFieldValue();
+            candidateVector[currentIndex]--;
             return true;
         }
         return false;

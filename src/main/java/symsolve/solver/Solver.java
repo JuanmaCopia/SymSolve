@@ -22,9 +22,7 @@ import symsolve.vector.SymSolveVector;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class Solver {
 
@@ -80,9 +78,8 @@ public class Solver {
     }
 
     public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
-        if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(initialVector)) {
+        if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(initialVector))
             return false;
-        }
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
@@ -92,45 +89,10 @@ public class Solver {
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return false;
-    }
-
-    public boolean searchOtherSolution(SymSolveVector initialVector) throws CannotInvokePredicateException {
-        runRepOK(initialVector);
-        int[] vector = symbolicVectorSpaceExplorer.getNextCandidate();
-        while (vector != null) {
-            Object candidate = candidateBuilder.buildCandidate(vector);
-            if (predicateChecker.checkPredicate(candidate))
-                return true;
-            vector = symbolicVectorSpaceExplorer.getNextCandidate();
-        }
-        return false;
-    }
-
-    public boolean runRepOK(SymSolveVector vector) throws CannotInvokePredicateException {
-        symbolicVectorSpaceExplorer.initialize(vector);
-        Object candidate = candidateBuilder.buildCandidate(vector.getConcreteVector());
-        return predicateChecker.checkPredicate(candidate);
-    }
-
-    public Set<int[]> getAllSolutions(SymSolveVector initialVector) throws CannotInvokePredicateException {
-        symbolicVectorSpaceExplorer.initialize(initialVector);
-        int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
-        Set<int[]> solutions = new HashSet<>();
-        while (vector != null) {
-            Object candidate = candidateBuilder.buildCandidate(vector);
-            if (predicateChecker.checkPredicate(candidate))
-                solutions.add(vector.clone());
-            vector = symbolicVectorSpaceExplorer.getNextCandidate();
-        }
-        return solutions;
     }
 
     public HashMap<String, Integer> getScopes() {
         return finitization.getScopes();
-    }
-
-    public String generateStructureCode(int[] vector) {
-        return codeGenerator.generateStructureCode(vector);
     }
 
     public Map<String, IntSet> getIntegerFieldsMinMaxMap() {
@@ -144,5 +106,11 @@ public class Solver {
     public StateSpace getStateSpace() {
         return stateSpace;
     }
+
+    /*    public boolean runRepOK(SymSolveVector vector) throws CannotInvokePredicateException {
+        symbolicVectorSpaceExplorer.initialize(vector);
+        Object candidate = candidateBuilder.buildCandidate(vector.getConcreteVector());
+        return predicateChecker.checkPredicate(candidate);
+    }*/
 
 }

@@ -12,7 +12,6 @@ import symsolve.vector.SymSolveVector;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * API for the SymSolve tool.
@@ -88,41 +87,6 @@ public class SymSolve {
         return null;
     }
 
-    /**
-     * Resumes the search where it was left off. If a new solution is found, it is
-     * returned.
-     *
-     * @return a solution vector if founded, null otherwise.
-     */
-    public int[] searchAnotherSolution(SymSolveVector vector) {
-        boolean isSat = false;
-        try {
-            isSat = solver.searchOtherSolution(vector);
-        } catch (CannotInvokePredicateException e) {
-            e.printStackTrace(System.err);
-        }
-        if (isSat)
-            return solver.getCandidateVector();
-        return null;
-    }
-
-    /**
-     * Returns All the solutions for the provided partially symbolic instance
-     * represented by vector.
-     *
-     * @param vector the vector representing a partially symbolic instance.
-     * @return All the solution vectors found for that partially symbolic vector. If
-     * no solution is found, an empty set is returned.
-     */
-    public Set<int[]> getAllSolutions(SymSolveVector vector) {
-        Set<int[]> vectorSolutions = null;
-        try {
-            vectorSolutions = solver.getAllSolutions(vector);
-        } catch (CannotInvokePredicateException e) {
-            e.printStackTrace(System.err);
-        }
-        return vectorSolutions;
-    }
 
     /**
      * Decides whether a partially symbolic instance represented by a string vector
@@ -135,17 +99,6 @@ public class SymSolve {
         boolean result = false;
         try {
             result = solver.runAutoHybridRepok(vector);
-        } catch (CannotInvokePredicateException e) {
-            e.printStackTrace(System.err);
-        }
-        return result;
-    }
-
-
-    public boolean runRepOK(SymSolveVector vector) {
-        boolean result = false;
-        try {
-            result = solver.runRepOK(vector);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
@@ -165,15 +118,6 @@ public class SymSolve {
         } catch (CannotFindPredicateException e) {
             e.printStackTrace();
         }
-    }
-
-
-    /**
-     * @param solutionVector
-     * @return
-     */
-    public String generateStructureCode(int[] solutionVector) {
-        return solver.generateStructureCode(solutionVector);
     }
 
 

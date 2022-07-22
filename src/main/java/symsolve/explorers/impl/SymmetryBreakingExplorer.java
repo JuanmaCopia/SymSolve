@@ -1,6 +1,5 @@
 package symsolve.explorers.impl;
 
-import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 
@@ -20,7 +19,7 @@ public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
             return false;
 
         if (isCurrentFieldPrimitive) {
-            increaseCurrentFieldValue();
+            candidateVector[currentIndex]++;
             return true;
         }
         return setNextReferenceTypeValue();
@@ -28,45 +27,27 @@ public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
 
     @Override
     void backtrack() {
-        resetCurrentFieldValue();
-        setFieldAsNotInitialized(currentIndex);
+        candidateVector[currentIndex] = 0;
+        maxInstances[currentIndex] = -1;
     }
 
     @Override
-    void setUpExplorerState() {
+    void resetExplorerState() {
         for (int i = 0; i < vectorSize; i++) {
-            setIndexAsChanged(i);
-            if (!isIndexFixed(i) && candidateVector[i] > 0) {
-                FieldDomain fieldDomain = stateSpace.getFieldDomain(i);
-                if (!fieldDomain.isPrimitiveType())
-                    initializeField(i, fieldDomain);
-            } else {
-                setFieldAsNotInitialized(i);
-            }
+            changedFields.add(i);
+            maxInstances[i] = -1;
         }
     }
 
     protected boolean setNextReferenceTypeValue() {
-        if (!isFieldInitialized(currentIndex)) {
-            initializeField(currentIndex, currentFieldDomain);
-        }
+        if (maxInstances[currentIndex] == -1)
+            maxInstances[currentIndex] = getMaxInstanceInVector(currentFieldDomain);
+
         if (currentValue <= maxInstances[currentIndex]) {
-            increaseCurrentFieldValue();
+            candidateVector[currentIndex]++;
             return true;
         }
         return false;
-    }
-
-    protected boolean isFieldInitialized(int index) {
-        return maxInstances[index] != -1;
-    }
-
-    protected void setFieldAsNotInitialized(int index) {
-        maxInstances[index] = -1;
-    }
-
-    protected void initializeField(int index, FieldDomain fieldDomain) {
-        maxInstances[index] = getMaxInstanceInVector(fieldDomain);
     }
 
 }

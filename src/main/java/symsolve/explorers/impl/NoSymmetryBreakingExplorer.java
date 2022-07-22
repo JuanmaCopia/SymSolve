@@ -14,13 +14,13 @@ public class NoSymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer
         if (currentValue >= maxFieldDomainValue)
             return false;
 
-        increaseCurrentFieldValue();
+        candidateVector[currentIndex]++;
         return true;
     }
 
     @Override
     protected void backtrack() {
-        resetCurrentFieldValue();
+        candidateVector[currentIndex] = 0;
     }
 
 }

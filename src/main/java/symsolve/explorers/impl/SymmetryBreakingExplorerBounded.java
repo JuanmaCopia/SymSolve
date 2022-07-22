@@ -56,8 +56,8 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
     void backtrack() {
         if (!isCurrentFieldPrimitive)
             removeCurrentValueFromLabelSets();
-        resetCurrentFieldValue();
-        setFieldAsNotInitialized(currentIndex);
+        candidateVector[currentIndex] = 0;
+        maxInstances[currentIndex] = -1;
     }
 
     private boolean isNewValueInBounds(int newValue, Set<Integer> targetLabelSet) {
@@ -80,7 +80,7 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
         while (nextValue < maxFieldDomainValue) {
             nextValue++;
             if (targetLabelSet.contains(nextValue)) {
-                setCurrentFieldValue(nextValue);
+                candidateVector[currentIndex] = nextValue;
                 return true;
             }
         }
@@ -88,14 +88,14 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
     }
 
     private boolean setNextValueForReferenceType(Set<Integer> targetLabelSet) {
-        if (!isFieldInitialized(currentIndex)) {
-            initializeField(currentIndex, currentFieldDomain);
-        }
+        if (maxInstances[currentIndex] == -1)
+            maxInstances[currentIndex] = getMaxInstanceInVector(currentFieldDomain);
+        
         int nextValue = currentValue;
         while (nextValue <= maxInstances[currentIndex] && nextValue < maxFieldDomainValue) {
             nextValue++;
             if (isNewValueInBounds(nextValue, targetLabelSet)) {
-                setCurrentFieldValue(nextValue);
+                candidateVector[currentIndex] = nextValue;
                 return true;
             }
         }
