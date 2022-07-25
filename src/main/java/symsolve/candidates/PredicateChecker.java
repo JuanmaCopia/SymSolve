@@ -10,17 +10,12 @@ import java.lang.reflect.Method;
 
 public class PredicateChecker implements ITester {
 
-    private static final PredicateChecker instance = new PredicateChecker();
     Class<?> rootClass;
     IIntList accessedIndices;
     boolean isInitialized = false;
     boolean traceStarted;
     Method predicate;
-
-
-    public static PredicateChecker getInstance() {
-        return instance;
-    }
+    
 
     public void initialize(Class<?> rootClass, String predicateName, IIntList accessedIndices) throws CannotFindPredicateException {
         this.rootClass = rootClass;

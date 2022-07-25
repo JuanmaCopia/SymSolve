@@ -44,13 +44,13 @@ public class Solver {
         String[] finArgs = params.getFinitizationArgs();
         Method finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
         finitization = Helper.invokeFinMethod(rootClass, finMethod, finArgs);
-
+        predicateChecker = new PredicateChecker();
+        finitization.initialize(predicateChecker);
         stateSpace = finitization.getStateSpace();
         int vectorSize = stateSpace.getTotalNumberOfFields();
         accessedIndices = new IntListAI(vectorSize);
         IIntList changedFields = new IntListAI(vectorSize);
 
-        predicateChecker = PredicateChecker.getInstance();
         predicateChecker.initialize(rootClass, params.getPredicateName(), accessedIndices);
 
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);

@@ -25,23 +25,20 @@ public class ObjSet extends FieldDomain implements IObjSet {
         this.classOfField = classOfField;
         this.includesNull = includesNull;
         this.numOfObjects = numOfObjects;
-        initializeFieldDomain();
     }
 
-    private void initializeFieldDomain() {
-        allocateObjects();
+    public void initializeFieldDomain(PredicateChecker predicateChecker) {
+        allocateObjects(predicateChecker);
         setUpFieldDomain();
         createObjectToIndexMap();
     }
 
-    private void allocateObjects() {
-        ITester tester = PredicateChecker.getInstance();
-
+    private void allocateObjects(PredicateChecker predicateChecker) {
         for (int i = 0; i < numOfObjects; i++) {
             Object obj;
             try {
                 Constructor<?> constructor = classOfField.getConstructor(ITester.class);
-                obj = constructor.newInstance(tester);
+                obj = constructor.newInstance(predicateChecker);
                 objects.add(obj);
             } catch (Exception e) {
                 String msg = "{0}: object of class {1} cannot be created";

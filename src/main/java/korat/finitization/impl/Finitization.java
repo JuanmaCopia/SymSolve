@@ -3,6 +3,7 @@ package korat.finitization.impl;
 import korat.finitization.*;
 import korat.loading.InstrumentingClassLoader;
 import korat.utils.RandomStrings;
+import symsolve.candidates.PredicateChecker;
 
 import java.util.*;
 
@@ -24,7 +25,6 @@ public class Finitization implements IFinitization {
     public Finitization(Class<?> rootClass) {
         this.rootClass = rootClass;
         rootObjectSet = new ObjSet(rootClass, 1, false);
-        rootObject = rootObjectSet.getFirstObject();
         objSets.add(rootObjectSet);
         domainsMap.put(rootClass, new LinkedHashMap<>());
     }
@@ -34,12 +34,14 @@ public class Finitization implements IFinitization {
     }
 
     public StateSpace getStateSpace() {
-        if (!isInitialized)
-            initialize();
+        assert (isInitialized);
         return stateSpace;
     }
 
-    private void initialize() {
+    public void initialize(PredicateChecker predicateChecker) {
+        initializeObjectSets(predicateChecker);
+        rootObject = rootObjectSet.getFirstObject();
+
         addObjectsToVectorDescriptor();
         createStateSpace();
         isInitialized = true;
@@ -57,6 +59,12 @@ public class Finitization implements IFinitization {
             for (Object obj : objectSet.getAllInstances()) {
                 addFieldsToVectorDescriptor(obj);
             }
+        }
+    }
+
+    private void initializeObjectSets(PredicateChecker predicateChecker) {
+        for (ObjSet objectSet : objSets) {
+            objectSet.initializeFieldDomain(predicateChecker);
         }
     }
 

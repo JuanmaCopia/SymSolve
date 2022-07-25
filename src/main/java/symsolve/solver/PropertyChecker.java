@@ -1,4 +1,5 @@
-package symsolve.bounds;
+package symsolve.solver;
+
 
 import korat.finitization.impl.Finitization;
 import korat.finitization.impl.StateSpace;
@@ -10,7 +11,7 @@ import korat.utils.IIntList;
 import korat.utils.IntListAI;
 import symsolve.candidates.CandidateBuilder;
 import symsolve.candidates.PredicateChecker;
-import symsolve.config.BoundCalculatorConfig;
+import symsolve.config.SymSolveConfig;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.VectorStateSpaceExplorerFactory;
 import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
@@ -19,7 +20,7 @@ import symsolve.vector.SymSolveVector;
 
 import java.lang.reflect.Method;
 
-public class BoundCalculator {
+public class PropertyChecker {
 
     StateSpace stateSpace;
     VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
@@ -28,15 +29,16 @@ public class BoundCalculator {
     Class<?> rootClass;
     Finitization finitization;
     PredicateChecker predicateChecker;
+    Method property;
 
 
-    public BoundCalculator(BoundCalculatorConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
+    public PropertyChecker(SymSolveConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
 
         rootClass = Finitization.getClassLoader().loadClass(params.getFullyQualifiedClassName());
 
         String[] finArgs = params.getFinitizationArgs();
-        Method finMethod = symsolve.utils.Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
+        Method finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
         finitization = Helper.invokeFinMethod(rootClass, finMethod, finArgs);
         predicateChecker = new PredicateChecker();
         finitization.initialize(predicateChecker);
@@ -44,7 +46,7 @@ public class BoundCalculator {
         int vectorSize = stateSpace.getTotalNumberOfFields();
         accessedIndices = new IntListAI(vectorSize);
         IIntList changedFields = new IntListAI(vectorSize);
-        
+
         predicateChecker.initialize(rootClass, params.getPredicateName(), accessedIndices);
 
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
@@ -53,17 +55,29 @@ public class BoundCalculator {
         symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(params);
     }
 
-    public Bounds calculateBounds() throws CannotInvokePredicateException {
-        BoundRecorder boundsRecorder = new BoundRecorder(finitization);
-        SymSolveVector initialVector = new SymSolveVector(stateSpace.getTotalNumberOfFields());
+    public boolean checkPropertyForAllValidInstances(SymSolveVector initialVector, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
+        if (property == null)
+            property = Helper.getPredicateMethod(rootClass, propertyMethodName);
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
-            if (predicateChecker.checkPredicate(candidate))
-                boundsRecorder.recordBounds(vector);
+            if (predicateChecker.checkPredicate(candidate)) {
+                if (!checkPropertyForCandidate(candidate))
+                    return false;
+            }
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
-        return boundsRecorder.getBounds();
+        return true;
     }
+
+    private boolean checkPropertyForCandidate(Object candidate) throws CannotInvokePredicateException {
+        assert (candidate != null);
+        try {
+            return (Boolean) property.invoke(candidate, (Object[]) null);
+        } catch (Exception e) {
+            throw new CannotInvokePredicateException(rootClass, property.getName(), e.getMessage(), e);
+        }
+    }
+
 }

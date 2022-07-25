@@ -5,38 +5,25 @@ import korat.finitization.impl.IntSet;
 import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokePredicateException;
-import symsolve.candidates.PredicateChecker;
 import symsolve.config.SolverConfig;
+import symsolve.solver.PropertyChecker;
 import symsolve.solver.Solver;
 import symsolve.vector.SymSolveVector;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * API for the SymSolve tool.
- *
- * @author Juan Manuel Copia
- */
+
 public class SymSolve {
 
     private Solver solver;
+    private PropertyChecker propertyChecker;
 
-    /**
-     * Creates a SymSolve instance that decides satisfiability of partially symbolic
-     * heaps, represented as vectors, for the specified class and bounds. The search
-     * of the state space of vectors is performed using symmetry breaking enabled.
-     *
-     * @param className        fully qualified name of the class.
-     * @param finitizationArgs arguments to be passed to the finitization method.
-     */
-    public SymSolve(String className, String finitizationArgs) {
-        this(new SolverConfig(className, finitizationArgs));
-    }
 
     public SymSolve(SolverConfig config) {
         try {
             solver = new Solver(config);
+            propertyChecker = new PropertyChecker(config);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,6 +74,20 @@ public class SymSolve {
         return null;
     }
 
+    public boolean checkProperty(SymSolveVector vector, String propertyMethodName) {
+        boolean result = false;
+        try {
+            result = propertyChecker.checkPropertyForAllValidInstances(vector, propertyMethodName);
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+            throw new RuntimeException(e);
+        } catch (CannotFindPredicateException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
 
     /**
      * Decides whether a partially symbolic instance represented by a string vector
@@ -104,22 +105,6 @@ public class SymSolve {
         }
         return result;
     }
-
-    /**
-     * Sets the predicate that will determine the satisfiability of vectors during
-     * solver search.
-     *
-     * @param predicateName name of the predicate to be used.
-     */
-    public void setPredicate(String predicateName) {
-        PredicateChecker predicateChecker = PredicateChecker.getInstance();
-        try {
-            predicateChecker.setPredicate(predicateName);
-        } catch (CannotFindPredicateException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     /**
      * Returns the representation format of the vector.
