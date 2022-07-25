@@ -10,10 +10,11 @@ public class SolverConfig extends SymSolveConfig {
     public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, String predicateName, Bounds bounds) {
         this.fullClassName = fullClassName;
         this.finitizationArgs = finitizationArgs.split(",");
-        this.finitizationName = calculateFinitizationName(fullClassName);
         this.symmetryBreakStrategy = symmetryBreakingStrategy;
         this.predicateName = predicateName;
         this.bounds = bounds;
+        finitizationName = calculateFinitizationName(fullClassName);
+        propertyFinitizationName = calculatePropertyFinitizationName(fullClassName);
     }
 
     public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, String predicateName) {

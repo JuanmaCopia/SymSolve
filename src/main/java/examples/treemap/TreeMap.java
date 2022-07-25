@@ -28,6 +28,10 @@ public class TreeMap {
         return f;
     }
 
+    public static IFinitization propertyCheckFinTreeMap(int nodesNum) {
+        return finTreeMap(nodesNum);
+    }
+
     public boolean repOK() {
         if (root == null)
             return true;

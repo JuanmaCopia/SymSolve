@@ -37,22 +37,32 @@ public class PropertyChecker {
 
         rootClass = Finitization.getClassLoader().loadClass(params.getFullyQualifiedClassName());
 
-        String[] finArgs = params.getFinitizationArgs();
-        Method finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
-        finitization = Helper.invokeFinMethod(rootClass, finMethod, finArgs);
+        finitization = getFinitization(params);
         predicateChecker = new PredicateChecker();
         finitization.initialize(predicateChecker);
+
         stateSpace = finitization.getStateSpace();
         int vectorSize = stateSpace.getTotalNumberOfFields();
+
         accessedIndices = new IntListAI(vectorSize);
         IIntList changedFields = new IntListAI(vectorSize);
 
         predicateChecker.initialize(rootClass, params.getPredicateName(), accessedIndices);
-
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
 
         VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(stateSpace, accessedIndices, changedFields);
         symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(params);
+    }
+
+    public Finitization getFinitization(SymSolveConfig params) throws CannotFindFinitizationException, CannotInvokeFinitizationException {
+        String[] finArgs = params.getFinitizationArgs();
+        Method finMethod;
+        try {
+            finMethod = Helper.getFinMethod(rootClass, params.getPropertyCheckFinitizationName(), finArgs);
+        } catch (CannotFindFinitizationException e) {
+            finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
+        }
+        return Helper.invokeFinMethod(rootClass, finMethod, finArgs);
     }
 
     public boolean checkPropertyForAllValidInstances(SymSolveVector initialVector, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
