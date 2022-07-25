@@ -38,6 +38,38 @@ public class TreeMap {
         return isSorted();
     }
 
+    public boolean repOKStructure() {
+        if (root == null)
+            return true;
+        Set<Entry> visited = new HashSet<Entry>();
+        LinkedList<Entry> worklist = new LinkedList<Entry>();
+        visited.add(root);
+        worklist.add(root);
+        if (root.parent != null)
+            return false;
+
+        while (!worklist.isEmpty()) {
+            Entry node = worklist.removeFirst();
+            Entry left = node.left;
+            if (left != null) {
+                if (!visited.add(left))
+                    return false;
+                if (left.parent != node)
+                    return false;
+                worklist.add(left);
+            }
+            Entry right = node.right;
+            if (right != null) {
+                if (!visited.add(right))
+                    return false;
+                if (right.parent != node)
+                    return false;
+                worklist.add(right);
+            }
+        }
+        return visited.size() == size;
+    }
+
     public boolean isBinTreeWithParentReferences() {
         Set<Entry> visited = new HashSet<Entry>();
         LinkedList<Entry> worklist = new LinkedList<Entry>();
@@ -124,6 +156,12 @@ public class TreeMap {
         if (n.right != null)
             return isSorted(n.right, n.key, max);
         return true;
+    }
+
+    public boolean shouldFailProperty() {
+        if (root != null)
+            return root.color == RED;
+        return false;
     }
 
     private class Pair<T, U> {

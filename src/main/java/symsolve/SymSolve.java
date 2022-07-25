@@ -74,6 +74,10 @@ public class SymSolve {
         return null;
     }
 
+    public boolean checkProperty(String vector, String propertyMethodName) {
+        return checkProperty(new SymSolveVector(vector), propertyMethodName);
+    }
+
     public boolean checkProperty(SymSolveVector vector, String propertyMethodName) {
         boolean result = false;
         try {
