@@ -5,7 +5,7 @@ import symsolve.explorers.impl.SymmetryBreakStrategy;
 public abstract class SymSolveConfig {
 
     static final String DEFAULT_PREDICATE_NAME = "repOK";
-    static final SymmetryBreakStrategy DEFAULT_SBREAK_STRATEGY = SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE;
+    static final SymmetryBreakStrategy DEFAULT_SBREAK_STRATEGY = SymmetryBreakStrategy.SYMMETRY_BREAK;
 
     String fullClassName;
     String[] finitizationArgs;

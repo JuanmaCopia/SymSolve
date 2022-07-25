@@ -7,7 +7,7 @@ public class SolverConfig extends SymSolveConfig {
 
     Bounds bounds;
 
-    public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, Bounds bounds, String predicateName) {
+    public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, String predicateName, Bounds bounds) {
         this.fullClassName = fullClassName;
         this.finitizationArgs = finitizationArgs.split(",");
         this.finitizationName = calculateFinitizationName(fullClassName);
@@ -16,16 +16,20 @@ public class SolverConfig extends SymSolveConfig {
         this.bounds = bounds;
     }
 
+    public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, String predicateName) {
+        this(fullClassName, finitizationArgs, symmetryBreakingStrategy, predicateName, null);
+    }
+
     public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, Bounds bounds) {
-        this(fullClassName, finitizationArgs, symmetryBreakingStrategy, bounds, DEFAULT_PREDICATE_NAME);
+        this(fullClassName, finitizationArgs, symmetryBreakingStrategy, DEFAULT_PREDICATE_NAME, bounds);
     }
 
     public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy) {
-        this(fullClassName, finitizationArgs, symmetryBreakingStrategy, null, DEFAULT_PREDICATE_NAME);
+        this(fullClassName, finitizationArgs, symmetryBreakingStrategy, DEFAULT_PREDICATE_NAME, null);
     }
 
     public SolverConfig(String fullClassName, String finitizationArgs) {
-        this(fullClassName, finitizationArgs, DEFAULT_SBREAK_STRATEGY, null, DEFAULT_PREDICATE_NAME);
+        this(fullClassName, finitizationArgs, DEFAULT_SBREAK_STRATEGY, DEFAULT_PREDICATE_NAME, null);
     }
 
     public Bounds getBounds() {

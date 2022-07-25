@@ -12,15 +12,10 @@ import java.util.Set;
 public class SymSolveVector {
 
     public static final int SYMBOLIC = -1;
-
     public static final int NULL = 0;
-
     int size;
-
     int[] concreteVector;
-
     int[] partialVector;
-
     Set<Integer> fixedIndices = new HashSet<Integer>();
 
     /**
