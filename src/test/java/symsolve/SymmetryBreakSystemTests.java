@@ -989,6 +989,9 @@ public class SymmetryBreakSystemTests {
         assertTrue(symSolve.assertProperty("1, -1, -1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, 4, 5, -1, -1, -1, 0, 0, 3, 1, -1, 0, -1, -1, -1", property));
         assertTrue(symSolve.assertProperty("1, -1, -1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, 4, 5, -1, -1, -1, 0, 0, 3, 1, -1, 0, 0, -1, -1", property));
         assertTrue(symSolve.assertProperty("1, -1, -1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, 4, 5, -1, 0, -1, 0, 0, 3, 1, -1, 0, 0, -1, -1", property));
+
+
+        assertTrue(symSolve.assertProperty("1, -1, -1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, 4, 5, -1, 0, -1, 0, 0, 3, 1, -1, 0, 0, -1, -1, -1, -1, -1, -1, -1", property, true));
     }
 
     @Test
