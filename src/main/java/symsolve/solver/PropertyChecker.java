@@ -90,4 +90,8 @@ public class PropertyChecker {
         }
     }
 
+    public StateSpace getStateSpace() {
+        return stateSpace;
+    }
+    
 }

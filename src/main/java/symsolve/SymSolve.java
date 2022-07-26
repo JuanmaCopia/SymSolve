@@ -1,8 +1,6 @@
 package symsolve;
 
 import korat.finitization.impl.CVElem;
-import korat.finitization.impl.IntSet;
-import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokePredicateException;
 import symsolve.config.SolverConfig;
@@ -11,7 +9,6 @@ import symsolve.solver.Solver;
 import symsolve.vector.SymSolveVector;
 
 import java.util.HashMap;
-import java.util.Map;
 
 
 public class SymSolve {
@@ -20,6 +17,11 @@ public class SymSolve {
     private PropertyChecker propertyChecker;
 
 
+    /**
+     * Creates a SymSolve instance according to the provides configuration parameters.
+     *
+     * @param config The configuration parameters.
+     */
     public SymSolve(SolverConfig config) {
         try {
             solver = new Solver(config);
@@ -33,8 +35,8 @@ public class SymSolve {
      * Decides whether a partially symbolic instance represented by a string vector
      * is SAT.
      *
-     * @param vector the vector representing a partially symbolic instance.
-     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     * @param vector The vector representing a partially symbolic instance.
+     * @return True if the symbolic structure is SAT, false if it is UNSAT.
      */
     public boolean isSatisfiable(String vector) {
         return isSatisfiable(new SymSolveVector(vector));
@@ -43,8 +45,8 @@ public class SymSolve {
     /**
      * Decides whether a partially symbolic instance represented by a vector is SAT.
      *
-     * @param vector the vector representing a partially symbolic instance.
-     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     * @param vector The vector representing a partially symbolic instance.
+     * @return True if the symbolic structure is SAT, false if it is UNSAT.
      */
     public boolean isSatisfiable(SymSolveVector vector) {
         boolean result = false;
@@ -60,12 +62,9 @@ public class SymSolve {
     /**
      * Decides whether the symbolic instance represented by a vector is SAT. If it
      * is, returns the vector solution.
-     * public HashMap<String, IntSet> getIntegerFieldsMinMaxMap() {
-     * return this.integerFieldsMinMax;
-     * }
      *
-     * @param vector the vector representing a partially symbolic instance.
-     * @return the solution vector if the symbolic structure is SAT, null if it is
+     * @param vector The vector representing a partially symbolic instance.
+     * @return The solution vector if the symbolic structure is SAT, null if it is
      * UNSAT.
      */
     public int[] solve(SymSolveVector vector) {
@@ -74,11 +73,29 @@ public class SymSolve {
         return null;
     }
 
-    public boolean checkProperty(String vector, String propertyMethodName) {
-        return checkProperty(new SymSolveVector(vector), propertyMethodName);
+    /**
+     * Checks if a property holds for all possible concretizations (within the bounds)
+     * of the symbolic instance represented by a vector represented as a string.
+     *
+     * @param vector             The vector representing a partially symbolic instance.
+     * @param propertyMethodName The name of the boolean routine that checks the property.
+     * @return true if the property holds for all possible concretizations of the symbolic
+     * instance, false otherwise.
+     */
+    public boolean assertProperty(String vector, String propertyMethodName) {
+        return assertProperty(new SymSolveVector(vector), propertyMethodName);
     }
 
-    public boolean checkProperty(SymSolveVector vector, String propertyMethodName) {
+    /**
+     * Checks if a property holds for all possible concretizations (within the bounds)
+     * of the symbolic instance represented by a vector.
+     *
+     * @param vector             The vector representing a partially symbolic instance.
+     * @param propertyMethodName The name of the boolean routine that checks the property.
+     * @return true if the property holds for all possible concretizations of the symbolic
+     * instance, false otherwise.
+     */
+    public boolean assertProperty(SymSolveVector vector, String propertyMethodName) {
         boolean result = false;
         try {
             result = propertyChecker.checkPropertyForAllValidInstances(vector, propertyMethodName);
@@ -97,8 +114,8 @@ public class SymSolve {
      * Decides whether a partially symbolic instance represented by a string vector
      * is SAT according to the hybrid repOK strategy.
      *
-     * @param vector the vector representing a partially symbolic instance.
-     * @return true if the symbolic structure is SAT, false if it is UNSAT.
+     * @param vector The vector representing a partially symbolic instance.
+     * @return True if the symbolic structure is SAT, false if it is UNSAT.
      */
     public boolean isSatAutoHybridRepOK(SymSolveVector vector) {
         boolean result = false;
@@ -111,13 +128,23 @@ public class SymSolve {
     }
 
     /**
-     * Returns the representation format of the vector.
+     * Returns the format of the representation vector.
      *
      * @return A vector describing the types and fields that represent the
      * structure.
      */
     public CVElem[] getVectorFormat() {
         return solver.getStateSpace().getStructureList().clone();
+    }
+
+    /**
+     * Returns the format of the representation vector used to assert properties about the structures.
+     *
+     * @return A vector describing the types and fields that represent the
+     * structure.
+     */
+    public CVElem[] getPropertyCheckerVectorFormat() {
+        return propertyChecker.getStateSpace().getStructureList().clone();
     }
 
     /**
@@ -129,14 +156,5 @@ public class SymSolve {
     public HashMap<String, Integer> getScopes() {
         return solver.getScopes();
     }
-
-    public Map<String, IntSet> getIntegerFieldsMinMaxMap() {
-        return this.solver.getIntegerFieldsMinMaxMap();
-    }
-
-
-    public StateSpace getStateSpace() {
-        return solver.getStateSpace();
-    }
-
+    
 }
