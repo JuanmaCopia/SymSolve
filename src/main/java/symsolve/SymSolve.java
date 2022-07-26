@@ -178,8 +178,11 @@ public class SymSolve {
      * @return A vector describing the types and fields that represent the
      * structure.
      */
-    public CVElem[] getPropertyCheckerVectorFormat() {
-        return specialPropertyChecker.getStateSpace().getStructureList().clone();
+    public CVElem[] getSpecialPropertyCheckerVectorFormat() {
+        if (specialPropertyChecker != null)
+            return specialPropertyChecker.getStateSpace().getStructureList().clone();
+        else
+            return null;
     }
 
     /**
