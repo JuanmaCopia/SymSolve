@@ -57,17 +57,19 @@ public class PropertyChecker {
     public boolean checkPropertyForAllValidInstances(SymSolveVector initialVector, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
         if (property == null)
             property = Helper.getPredicateMethod(rootClass, propertyMethodName);
+        boolean result = false;
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate)) {
+                result = true;
                 if (!checkPropertyForCandidate(candidate))
                     return false;
             }
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
-        return true;
+        return result;
     }
 
     private boolean checkPropertyForCandidate(Object candidate) throws CannotInvokePredicateException {
