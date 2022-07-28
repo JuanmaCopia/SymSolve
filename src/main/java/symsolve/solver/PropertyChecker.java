@@ -29,6 +29,7 @@ public class PropertyChecker {
     Class<?> rootClass;
     Finitization finitization;
     PredicateChecker predicateChecker;
+    Method predicate;
     Method property;
 
 
@@ -47,6 +48,7 @@ public class PropertyChecker {
         accessedIndices = new IntListAI(vectorSize);
         IIntList changedFields = new IntListAI(vectorSize);
 
+        predicate = Helper.getPredicateMethod(rootClass, params.getPredicateName());
         predicateChecker.initialize(rootClass, params.getPredicateName(), accessedIndices);
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
 
@@ -55,24 +57,38 @@ public class PropertyChecker {
     }
 
     public boolean checkPropertyForAllValidInstances(SymSolveVector initialVector, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
-        if (property == null)
-            property = Helper.getPredicateMethod(rootClass, propertyMethodName);
-        boolean result = false;
+        if (!checkPropertyForCandidate(initialVector, propertyMethodName))
+            return false;
+        predicateChecker.setPredicate(predicate);
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate)) {
-                result = true;
-                if (!checkPropertyForCandidate(candidate))
+                if (!invokeProperty(candidate))
                     return false;
             }
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
-        return result;
+        return true;
     }
 
-    private boolean checkPropertyForCandidate(Object candidate) throws CannotInvokePredicateException {
+    public boolean checkPropertyForCandidate(SymSolveVector initialVector, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
+        if (property == null)
+            property = Helper.getPredicateMethod(rootClass, propertyMethodName);
+        predicateChecker.setPredicate(property);
+        symbolicVectorSpaceExplorer.initialize(initialVector);
+        int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
+        while (vector != null) {
+            Object candidate = candidateBuilder.buildCandidate(vector);
+            if (predicateChecker.checkPredicate(candidate))
+                return true;
+            vector = symbolicVectorSpaceExplorer.getNextCandidate();
+        }
+        return false;
+    }
+
+    private boolean invokeProperty(Object candidate) throws CannotInvokePredicateException {
         assert (candidate != null);
         try {
             return (Boolean) property.invoke(candidate, (Object[]) null);

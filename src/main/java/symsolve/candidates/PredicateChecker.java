@@ -15,7 +15,7 @@ public class PredicateChecker implements ITester {
     boolean isInitialized = false;
     boolean traceStarted;
     Method predicate;
-    
+
 
     public void initialize(Class<?> rootClass, String predicateName, IIntList accessedIndices) throws CannotFindPredicateException {
         this.rootClass = rootClass;
@@ -26,6 +26,10 @@ public class PredicateChecker implements ITester {
 
     public void setPredicate(String predicateName) throws CannotFindPredicateException {
         predicate = Helper.getPredicateMethod(rootClass, predicateName);
+    }
+
+    public void setPredicate(Method predicate) throws CannotFindPredicateException {
+        this.predicate = predicate;
     }
 
     public boolean checkPredicate(Object structure) throws CannotInvokePredicateException {
