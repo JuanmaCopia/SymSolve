@@ -59,6 +59,8 @@ public class PropertyChecker {
     public boolean checkPropertyForAllValidInstances(SymSolveVector initialVector, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
         if (!checkPropertyForCandidate(initialVector, propertyMethodName))
             return false;
+        if (property.getName().equals(predicate.getName()))
+            return true;
         predicateChecker.setPredicate(predicate);
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
