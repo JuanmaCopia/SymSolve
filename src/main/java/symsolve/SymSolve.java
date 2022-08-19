@@ -59,6 +59,8 @@ public class SymSolve {
     }
 
     public boolean assertProperty(SymSolveVector input, SymSolveVector output, String propertyMethodName, boolean specialFinitization) {
+        if (input.getSize() != output.getSize())
+            throw new IllegalArgumentException("Input and Output vectors have different size!");
         if (specialFinitization) {
             if (specialPropertyChecker == null)
                 throw new RuntimeException(String.format("Finitization Method: %s not found", config.getPropertyCheckFinitizationName()));
