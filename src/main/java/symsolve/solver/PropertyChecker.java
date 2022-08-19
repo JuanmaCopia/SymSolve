@@ -82,8 +82,12 @@ public class PropertyChecker {
         int[] correspondingOutput = inputVector.clone();
         int[] outputVector = output.getConcreteVector();
         for (Integer index : output.getFixedIndices()) {
-            correspondingOutput[index] = outputVector[index];
-            changedFields.add(index);
+            int inputValue = correspondingOutput[index];
+            int outputValue = outputVector[index];
+            if (inputValue != outputValue) {
+                correspondingOutput[index] = outputValue;
+                changedFields.add(index);
+            }
         }
         return correspondingOutput;
     }
