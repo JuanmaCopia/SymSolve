@@ -69,7 +69,7 @@ public class PropertyChecker {
                 Object outputStructure = candidateBuilder.buildCandidate(correspondingOutput);
                 if (violatesPredicate(predicate, outputStructure))
                     return false;
-                if (violatesPredicate(property, outputStructure))
+                if (!property.getName().equals(predicate.getName()) && violatesPredicate(property, outputStructure))
                     return false;
             }
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
