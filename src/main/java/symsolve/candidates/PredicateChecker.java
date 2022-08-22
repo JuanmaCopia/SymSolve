@@ -24,10 +24,6 @@ public class PredicateChecker implements ITester {
         isInitialized = true;
     }
 
-    public Method getPredicate() {
-        return predicate;
-    }
-
     public void setPredicate(String predicateName) throws CannotFindPredicateException {
         predicate = Helper.getPredicateMethod(rootClass, predicateName);
     }

@@ -75,10 +75,6 @@ public class SymSolveVector {
         return partialVector;
     }
 
-    public int getSize() {
-        return size;
-    }
-
     /**
      * Returns the partial vector representation of this vector. i.e. symbolic
      * values are encoded with -1.

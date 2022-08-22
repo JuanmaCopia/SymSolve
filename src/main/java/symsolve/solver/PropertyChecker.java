@@ -25,13 +25,12 @@ public class PropertyChecker {
     StateSpace stateSpace;
     VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
     CandidateBuilder candidateBuilder;
+    IIntList accessedIndices;
     Class<?> rootClass;
     Finitization finitization;
     PredicateChecker predicateChecker;
     Method predicate;
     Method property;
-    IIntList accessedIndices;
-    IIntList changedFields;
 
 
     public PropertyChecker(SymSolveConfig params, String finitizationName) throws ClassNotFoundException, CannotFindFinitizationException,
@@ -47,52 +46,36 @@ public class PropertyChecker {
         int vectorSize = stateSpace.getTotalNumberOfFields();
 
         accessedIndices = new IntListAI(vectorSize);
-        changedFields = new IntListAI(vectorSize);
+        IIntList changedFields = new IntListAI(vectorSize);
 
+        predicate = Helper.getPredicateMethod(rootClass, params.getPredicateName());
         predicateChecker.initialize(rootClass, params.getPredicateName(), accessedIndices);
-        predicate = predicateChecker.getPredicate();
-
         candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
 
         VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(stateSpace, accessedIndices, changedFields);
         symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(params);
     }
 
-    public boolean checkProperty(SymSolveVector input, SymSolveVector output, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
-        property = Helper.getPredicateMethod(rootClass, propertyMethodName);
-        symbolicVectorSpaceExplorer.initialize(input);
-        int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
-        while (vector != null) {
-            Object candidate = candidateBuilder.buildCandidate(vector);
-            if (predicateChecker.checkPredicate(candidate)) {
-                int[] correspondingOutput = calculateCorrespondingOutput(vector, output);
-                Object outputStructure = candidateBuilder.buildCandidate(correspondingOutput);
-                if (violatesPredicate(predicate, outputStructure))
-                    return false;
-                if (!property.getName().equals(predicate.getName()) && violatesPredicate(property, outputStructure))
-                    return false;
+    public boolean checkPropertyForAllValidInstances(SymSolveVector initialVector, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
+        if (!checkPropertyForCandidate(initialVector, propertyMethodName))
+            return false;
+        if (!property.getName().equals(predicate.getName())) {
+            predicateChecker.setPredicate(predicate);
+            symbolicVectorSpaceExplorer.initialize(initialVector);
+            int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
+            while (vector != null) {
+                Object candidate = candidateBuilder.buildCandidate(vector);
+                if (predicateChecker.checkPredicate(candidate)) {
+                    if (!invokeProperty(candidate))
+                        return false;
+                }
+                vector = symbolicVectorSpaceExplorer.getNextCandidate();
             }
-            vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return true;
     }
 
-    private int[] calculateCorrespondingOutput(int[] inputVector, SymSolveVector output) {
-        changedFields.clear();
-        int[] correspondingOutput = inputVector.clone();
-        int[] outputVector = output.getConcreteVector();
-        for (Integer index : output.getFixedIndices()) {
-            int inputValue = correspondingOutput[index];
-            int outputValue = outputVector[index];
-            if (inputValue != outputValue) {
-                correspondingOutput[index] = outputValue;
-                changedFields.add(index);
-            }
-        }
-        return correspondingOutput;
-    }
-
-/*    public boolean checkPropertyForCandidate(SymSolveVector initialVector, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
+    public boolean checkPropertyForCandidate(SymSolveVector initialVector, String propertyMethodName) throws CannotInvokePredicateException, CannotFindPredicateException {
         if (property == null)
             property = Helper.getPredicateMethod(rootClass, propertyMethodName);
         predicateChecker.setPredicate(property);
@@ -105,17 +88,15 @@ public class PropertyChecker {
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return false;
-    }*/
+    }
 
-    private boolean violatesPredicate(Method predicate, Object candidate) throws CannotInvokePredicateException {
+    private boolean invokeProperty(Object candidate) throws CannotInvokePredicateException {
         assert (candidate != null);
-        boolean predicateEvaluation;
         try {
-            predicateEvaluation = (Boolean) predicate.invoke(candidate, (Object[]) null);
+            return (Boolean) property.invoke(candidate, (Object[]) null);
         } catch (Exception e) {
-            throw new CannotInvokePredicateException(rootClass, predicate.getName(), e.getMessage(), e);
+            throw new CannotInvokePredicateException(rootClass, property.getName(), e.getMessage(), e);
         }
-        return !predicateEvaluation;
     }
 
     public StateSpace getStateSpace() {

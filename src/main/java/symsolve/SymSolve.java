@@ -33,13 +33,18 @@ public class SymSolve {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        initializeSpecialPropertyChecker();
+
+        try {
+            specialPropertyChecker = new PropertyChecker(config, config.getPropertyCheckFinitizationName());
+        } catch (Exception ignored) {
+            specialPropertyChecker = null;
+        }
     }
 
-    private static boolean assertProperty(PropertyChecker propertyChecker, SymSolveVector input, SymSolveVector output, String propertyMethodName) {
+    private static boolean assertProperty(PropertyChecker propertyChecker, SymSolveVector vector, String propertyMethodName) {
         boolean result = false;
         try {
-            result = propertyChecker.checkProperty(input, output, propertyMethodName);
+            result = propertyChecker.checkPropertyForAllValidInstances(vector, propertyMethodName);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
             throw new RuntimeException(e);
@@ -48,25 +53,6 @@ public class SymSolve {
             throw new RuntimeException(e);
         }
         return result;
-    }
-
-    public boolean assertProperty(String vector, String propertyMethodName) {
-        return assertProperty(new SymSolveVector(vector), new SymSolveVector(vector), propertyMethodName, false);
-    }
-
-    public boolean assertProperty(String vector, String propertyMethodName, boolean specialFinitization) {
-        return assertProperty(new SymSolveVector(vector), new SymSolveVector(vector), propertyMethodName, specialFinitization);
-    }
-
-    public boolean assertProperty(SymSolveVector input, SymSolveVector output, String propertyMethodName, boolean specialFinitization) {
-        if (input.getSize() != output.getSize())
-            throw new IllegalArgumentException("Input and Output vectors have different size!");
-        if (specialFinitization) {
-            if (specialPropertyChecker == null)
-                throw new RuntimeException(String.format("Finitization Method: %s not found", config.getPropertyCheckFinitizationName()));
-            return assertProperty(specialPropertyChecker, input, output, propertyMethodName);
-        }
-        return assertProperty(defaultPropertyChecker, input, output, propertyMethodName);
     }
 
     /**
@@ -111,6 +97,53 @@ public class SymSolve {
         return null;
     }
 
+    /**
+     * Checks if a property holds for all possible concretizations (within the bounds)
+     * of the symbolic instance represented by a vector represented as a string.
+     *
+     * @param vector              The vector representing a partially symbolic instance.
+     * @param propertyMethodName  The name of the boolean routine that checks the property.
+     * @param specialFinitization if true the special property check finitization will be used,
+     *                            otherwise the default solving finitization will be used.
+     * @return true if the property holds for all possible concretizations of the symbolic
+     * instance, false otherwise.
+     */
+    public boolean assertProperty(String vector, String propertyMethodName, boolean specialFinitization) {
+        return assertProperty(new SymSolveVector(vector), propertyMethodName, specialFinitization);
+    }
+
+    /**
+     * Checks if a property holds for all possible concretizations (within the bounds)
+     * of the symbolic instance represented by a vector represented as a string.
+     *
+     * @param vector             The vector representing a partially symbolic instance.
+     * @param propertyMethodName The name of the boolean routine that checks the property.
+     * @return true if the property holds for all possible concretizations of the symbolic
+     * instance, false otherwise.
+     */
+    public boolean assertProperty(String vector, String propertyMethodName) {
+        return assertProperty(new SymSolveVector(vector), propertyMethodName, false);
+    }
+
+    /**
+     * Checks if a property holds for all possible concretizations (within the bounds)
+     * of the symbolic instance represented by a vector.
+     *
+     * @param vector              The vector representing a partially symbolic instance.
+     * @param propertyMethodName  The name of the boolean routine that checks the property.
+     * @param specialFinitization if true the special property check finitization will be used,
+     *                            otherwise the default solving finitization will be used.
+     * @return true if the property holds for all possible concretizations of the symbolic
+     * instance, false otherwise.
+     */
+    public boolean assertProperty(SymSolveVector vector, String propertyMethodName, boolean specialFinitization) {
+        if (specialFinitization) {
+            if (specialPropertyChecker == null)
+                throw new RuntimeException(String.format("Finitization Method: %s not found", config.getPropertyCheckFinitizationName()));
+            return assertProperty(specialPropertyChecker, vector, propertyMethodName);
+        }
+        return assertProperty(defaultPropertyChecker, vector, propertyMethodName);
+    }
 
     /**
      * Decides whether a partially symbolic instance represented by a string vector
@@ -160,14 +193,6 @@ public class SymSolve {
      */
     public HashMap<String, Integer> getScopes() {
         return solver.getScopes();
-    }
-
-    private void initializeSpecialPropertyChecker() {
-        try {
-            specialPropertyChecker = new PropertyChecker(config, config.getPropertyCheckFinitizationName());
-        } catch (Exception ignored) {
-            specialPropertyChecker = null;
-        }
     }
 
 }
