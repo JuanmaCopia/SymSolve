@@ -76,4 +76,9 @@ public class Helper {
         return finitize;
     }
 
+    public static Finitization getFinitization(Class<?> rootClass, String finitizationName, String[] finitizationArgs) throws CannotFindFinitizationException, CannotInvokeFinitizationException {
+        Method finMethod = Helper.getFinMethod(rootClass, finitizationName, finitizationArgs);
+        return Helper.invokeFinMethod(rootClass, finMethod, finitizationArgs);
+    }
+
 }

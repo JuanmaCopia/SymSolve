@@ -1,52 +1,87 @@
 package symsolve.explorers.impl;
 
-import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IIntList;
 
-public class ReverseSymmetryBreakingExplorer extends SymmetryBreakingExplorer {
+public class ReverseSymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
+
+    private final boolean[] initializedFields;
+
 
     public ReverseSymmetryBreakingExplorer(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields) {
         super(stateSpace, accessedIndices, changedFields);
+        initializedFields = new boolean[vectorSize];
     }
 
     @Override
-    protected boolean setNextValue(int lastAccessedFieldIndex) {
-        FieldDomain lastAccessedFD = stateSpace.getFieldDomain(lastAccessedFieldIndex);
-        int maxInstanceIndexForFieldDomain = lastAccessedFD.getNumberOfElements() - 1;
-        int currentInstanceIndex = candidateVector[lastAccessedFieldIndex];
+    boolean setNextValue() {
+        if (isCurrentFieldPrimitive)
+            return setNextPrimitiveTypeValue();
 
-        if (lastAccessedFD.isPrimitiveType()) {
-            if (currentInstanceIndex >= maxInstanceIndexForFieldDomain) {
-                return false;
-            }
-            candidateVector[lastAccessedFieldIndex]++;
+        return setNextReferenceTypeValue();
+    }
+
+    @Override
+    void backtrack() {
+        candidateVector[currentIndex] = 0;
+        setCurrentFieldAsNotInitialized();
+    }
+
+    @Override
+    public void resetExplorerState() {
+        for (int i = 0; i < vectorSize; i++) {
+            changedFields.add(i);
+            initializedFields[i] = false;
+        }
+    }
+
+    protected boolean setNextPrimitiveTypeValue() {
+        if (lastPrimitiveValueReached())
+            return false;
+        candidateVector[currentIndex]++;
+        return true;
+    }
+
+    protected boolean setNextReferenceTypeValue() {
+        if (!isCurrentFieldInitialized()) {
+            initializeCurrentField();
+            candidateVector[currentIndex] = getFirstValue();
             return true;
         }
-        // Is a reference field
 
-        if (!initializedFields[lastAccessedFieldIndex]) {
-            initializedFields[lastAccessedFieldIndex] = true;
-            int maxInstanceIndexInVector = getMaxInstanceInVector(lastAccessedFD, currentInstanceIndex);
-            if (maxInstanceIndexInVector >= maxInstanceIndexForFieldDomain) {
-                candidateVector[lastAccessedFieldIndex] = maxInstanceIndexInVector;
-            } else {
-                candidateVector[lastAccessedFieldIndex] = maxInstanceIndexInVector + 1;
-            }
-            return true;
-        }
-
-        if (currentInstanceIndex > 1) {
-            candidateVector[lastAccessedFieldIndex]--;
+        if (!lastReferenceValueReached()) {
+            candidateVector[currentIndex]--;
             return true;
         }
         return false;
     }
 
-    @Override
-    protected void backtrack(int lastAccessedFieldIndex) {
-        candidateVector[lastAccessedFieldIndex] = 0;
-        initializedFields[lastAccessedFieldIndex] = false;
+    private boolean isCurrentFieldInitialized() {
+        return initializedFields[currentIndex];
+    }
+
+    private void initializeCurrentField() {
+        initializedFields[currentIndex] = true;
+    }
+
+    private void setCurrentFieldAsNotInitialized() {
+        initializedFields[currentIndex] = false;
+    }
+
+    private boolean lastReferenceValueReached() {
+        return currentValue <= 1;
+    }
+
+    private boolean lastPrimitiveValueReached() {
+        return currentValue >= maxFieldDomainValue;
+    }
+
+    private int getFirstValue() {
+        int maxIndexInVector = getMaxInstanceInVector(currentFieldDomain);
+        if (maxIndexInVector >= maxFieldDomainValue) {
+            return maxIndexInVector;
+        }
+        return maxIndexInVector + 1;
     }
 
 }

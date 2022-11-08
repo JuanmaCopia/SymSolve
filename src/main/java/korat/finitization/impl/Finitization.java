@@ -3,6 +3,7 @@ package korat.finitization.impl;
 import korat.finitization.*;
 import korat.loading.InstrumentingClassLoader;
 import korat.utils.RandomStrings;
+import symsolve.candidates.PredicateChecker;
 
 import java.util.*;
 
@@ -17,13 +18,14 @@ public class Finitization implements IFinitization {
     private final StateSpace stateSpace = new StateSpace();
     private final Map<String, IntSet> integerFieldsMinMax = new HashMap<>();
     boolean isInitialized = false;
-    ObjSet rootObjSet;
+    ObjSet rootObjectSet;
+    Object rootObject;
 
 
     public Finitization(Class<?> rootClass) {
         this.rootClass = rootClass;
-        rootObjSet = new ObjSet(rootClass, 1, false);
-        objSets.add(rootObjSet);
+        rootObjectSet = new ObjSet(rootClass, 1, false);
+        objSets.add(rootObjectSet);
         domainsMap.put(rootClass, new LinkedHashMap<>());
     }
 
@@ -31,17 +33,15 @@ public class Finitization implements IFinitization {
         return classLoader;
     }
 
-    private String createFieldName(Class<?> cls, String fieldName) {
-        return cls.getSimpleName() + "." + fieldName;
-    }
-
     public StateSpace getStateSpace() {
-        if (!isInitialized)
-            initialize();
+        assert (isInitialized);
         return stateSpace;
     }
 
-    private void initialize() {
+    public void initialize(PredicateChecker predicateChecker) {
+        initializeObjectSets(predicateChecker);
+        rootObject = rootObjectSet.getFirstObject();
+
         addObjectsToVectorDescriptor();
         createStateSpace();
         isInitialized = true;
@@ -49,27 +49,22 @@ public class Finitization implements IFinitization {
 
     private void createStateSpace() {
         stateSpace.setStructureList(vectorDescriptor.toArray(new CVElem[0]));
-        Object rootObject = rootObjSet.getFirstObject();
         stateSpace.setRootObject(rootObject);
+        stateSpace.setRootObjectSet(rootObjectSet);
         stateSpace.initialize();
-    }
-
-    public IFieldDomain getFieldDomain(Class<?> cls, String fieldName) {
-        Map<String, IFieldDomain> fieldsMap = domainsMap.get(cls);
-        if (fieldsMap == null)
-            return null;
-        return fieldsMap.get(fieldName);
-    }
-
-    public Map<String, IntSet> getIntegerFieldsMinMaxMap() {
-        return this.integerFieldsMinMax;
     }
 
     private void addObjectsToVectorDescriptor() {
         for (ObjSet objectSet : objSets) {
-            for (Object obj : objectSet.getObjects()) {
+            for (Object obj : objectSet.getAllInstances()) {
                 addFieldsToVectorDescriptor(obj);
             }
+        }
+    }
+
+    private void initializeObjectSets(PredicateChecker predicateChecker) {
+        for (ObjSet objectSet : objSets) {
+            objectSet.initializeFieldDomain(predicateChecker);
         }
     }
 
@@ -87,8 +82,19 @@ public class Finitization implements IFinitization {
         }
     }
 
+    public IFieldDomain getFieldDomain(Class<?> cls, String fieldName) {
+        Map<String, IFieldDomain> fieldsMap = domainsMap.get(cls);
+        if (fieldsMap == null)
+            return null;
+        return fieldsMap.get(fieldName);
+    }
+
+    public Map<String, IntSet> getIntegerFieldsMinMaxMap() {
+        return integerFieldsMinMax;
+    }
+
     @Override
-    public Class<?> getFinClass() {
+    public Class<?> getRootClass() {
         return rootClass;
     }
 
@@ -211,10 +217,19 @@ public class Finitization implements IFinitization {
         fieldsMap.put(fieldName, fieldDomain);
 
         if (fieldDomain instanceof IntSet) {
-            this.integerFieldsMinMax.put(createFieldName(cls, fieldName), (IntSet) fieldDomain);
+            integerFieldsMinMax.put(createFieldName(cls, fieldName), (IntSet) fieldDomain);
         } else if (fieldDomain instanceof ObjSet) {
             objSets.add((ObjSet) fieldDomain);
         }
+    }
+
+    private String createFieldName(Class<?> cls, String fieldName) {
+        return cls.getSimpleName() + "." + fieldName;
+    }
+
+    @Override
+    public Object getRootObject() {
+        return stateSpace.getRootObject();
     }
 
     public Set<Class<?>> getClasses() {
@@ -228,6 +243,28 @@ public class Finitization implements IFinitization {
 
         Set<String> fieldNames = fieldDomains.keySet();
         return new ArrayList<>(fieldNames);
+    }
+
+    public void includeRootObjectInObjectSet(ObjSet objSet) {
+        objSet.replaceFirstObject(rootObject);
+    }
+
+    public HashMap<String, Integer> getScopes() {
+        HashMap<String, Integer> scopes = new HashMap<>();
+        CVElem[] structureList = stateSpace.getStructureList();
+        for (CVElem cvElem : structureList) {
+            FieldDomain fieldDomain = cvElem.getFieldDomain();
+            if (!fieldDomain.isPrimitiveType()) {
+                String classSimpleName = fieldDomain.getClassOfField().getSimpleName();
+                if (!scopes.containsKey(classSimpleName)) {
+                    int bound = fieldDomain.getNumberOfElements();
+                    if (((ObjSet) fieldDomain).isNullAllowed())
+                        bound--;
+                    scopes.put(classSimpleName, bound);
+                }
+            }
+        }
+        return scopes;
     }
 
 }

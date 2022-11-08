@@ -4,6 +4,7 @@
 *.jar
 
 build/
+output/
 
 .project
 .classpath

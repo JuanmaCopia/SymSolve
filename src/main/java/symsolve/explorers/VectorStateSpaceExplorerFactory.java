@@ -1,9 +1,9 @@
 package symsolve.explorers;
 
-import symsolve.explorers.impl.SymmetryBreakStrategy;
+import symsolve.config.SymSolveConfig;
 
 public interface VectorStateSpaceExplorerFactory {
 
-    public VectorStateSpaceExplorer makeSymoblicVectorExplorer(SymmetryBreakStrategy strategy);
+    VectorStateSpaceExplorer makeSymbolicVectorExplorer(SymSolveConfig config);
 
 }

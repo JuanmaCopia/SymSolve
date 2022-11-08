@@ -18,7 +18,7 @@ public interface IFinitization {
      *
      * @return <code>Class</code> object for root class that is being finitized
      */
-    Class<?> getFinClass();
+    Class<?> getRootClass();
 
 
     /**
@@ -267,4 +267,5 @@ public interface IFinitization {
     void set(Class<?> cls, String fieldName, IFieldDomain fieldDomain);
 
 
+    Object getRootObject();
 }

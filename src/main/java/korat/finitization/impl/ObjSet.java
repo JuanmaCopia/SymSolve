@@ -2,43 +2,43 @@ package korat.finitization.impl;
 
 import korat.finitization.IObjSet;
 import korat.testing.ITester;
-import symsolve.PredicateChecker;
+import symsolve.candidates.PredicateChecker;
 
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class ObjSet extends FieldDomain implements IObjSet {
 
+    private final Map<Object, Integer> objectToIndex = new HashMap<>();
     Class<?> classOfField;
     int numOfObjects;
     Object[] fieldDomainValues;
     List<Object> objects = new LinkedList<>();
     boolean includesNull;
 
-
     public ObjSet(Class<?> classOfField, int numOfObjects, boolean includesNull) {
         super(classOfField);
         this.classOfField = classOfField;
         this.includesNull = includesNull;
         this.numOfObjects = numOfObjects;
-        initializeFieldDomain();
     }
 
-    private void initializeFieldDomain() {
-        allocateObjects();
+    public void initializeFieldDomain(PredicateChecker predicateChecker) {
+        allocateObjects(predicateChecker);
         setUpFieldDomain();
+        createObjectToIndexMap();
     }
 
-    private void allocateObjects() {
-        ITester tester = PredicateChecker.getInstance();
-
+    private void allocateObjects(PredicateChecker predicateChecker) {
         for (int i = 0; i < numOfObjects; i++) {
             Object obj;
             try {
                 Constructor<?> constructor = classOfField.getConstructor(ITester.class);
-                obj = constructor.newInstance(tester);
+                obj = constructor.newInstance(predicateChecker);
                 objects.add(obj);
             } catch (Exception e) {
                 String msg = "{0}: object of class {1} cannot be created";
@@ -60,7 +60,15 @@ public class ObjSet extends FieldDomain implements IObjSet {
         }
     }
 
-    public List<Object> getObjects() {
+    private void createObjectToIndexMap() {
+        for (int i = 0; i < fieldDomainValues.length; i++) {
+            Object obj = fieldDomainValues[i];
+            if (obj != null)
+                objectToIndex.put(obj, i);
+        }
+    }
+
+    public List<Object> getAllInstances() {
         return objects;
     }
 
@@ -69,22 +77,30 @@ public class ObjSet extends FieldDomain implements IObjSet {
         /*return objects.get(index);*/
     }
 
+    public int getIndexInFieldDomain(Object obj) {
+        return objectToIndex.get(obj);
+    }
+
     public Object getFirstObject() {
         if (includesNull)
             return objects.get(1);
         return objects.get(0);
     }
 
-    @Override
-    public Object[] getAllObjects() {
-        assert (false);
-        return objects.toArray();
-    }
 
     @Override
-    public Object[] getObjectsOfClass(Class<?> cls) {
-        assert (false);
-        return objects.toArray();
+    public boolean isNullAllowed() {
+        return includesNull;
+    }
+
+
+    @Override
+    public void replaceFirstObject(Object rootObject) {
+        objects.set(0, rootObject);
+        if (includesNull)
+            fieldDomainValues[1] = rootObject;
+        else
+            fieldDomainValues[0] = rootObject;
     }
 
     @Override
@@ -129,16 +145,6 @@ public class ObjSet extends FieldDomain implements IObjSet {
     @Override
     public boolean isArrayType() {
         return false;
-    }
-
-    @Override
-    public void setNullAllowed(boolean allowed) {
-        assert (false);
-    }
-
-    @Override
-    public boolean isNullAllowed() {
-        return includesNull;
     }
 
 }
