@@ -1,4 +1,4 @@
-package examples.hashmap;
+package symsolve.examples.hashmap;
 
 
 public class Entry {

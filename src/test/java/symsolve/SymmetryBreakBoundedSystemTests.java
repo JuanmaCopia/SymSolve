@@ -12,7 +12,7 @@ public class SymmetryBreakBoundedSystemTests {
 
     @Test
     public void isSatisfiableHashMapTest() {
-        String className = "examples.hashmap.HashMap";
+        String className = "symsolve.examples.hashmap.HashMap";
         String finitizationArgs = "2";
         SymSolveBoundCalculator boundCalculator = new SymSolveBoundCalculator(className, finitizationArgs);
         Bounds bounds = boundCalculator.calculateBounds();
@@ -152,7 +152,7 @@ public class SymmetryBreakBoundedSystemTests {
     @Test
     public void isSatisfiableTreeMapTest() {
 
-        String className = "examples.treemap.TreeMap";
+        String className = "symsolve.examples.treemap.TreeMap";
         String finitizationArgs = "5";
         SymSolveBoundCalculator boundCalculator = new SymSolveBoundCalculator(className, finitizationArgs);
         Bounds bounds = boundCalculator.calculateBounds();
@@ -741,7 +741,7 @@ public class SymmetryBreakBoundedSystemTests {
     @Test
     public void isSatisfiableScheduleTest() {
 
-        String className = "examples.schedule.Schedule";
+        String className = "symsolve.examples.schedule.Schedule";
         String finitizationArgs = "4";
         SymSolveBoundCalculator boundCalculator = new SymSolveBoundCalculator(className, finitizationArgs);
         Bounds bounds = boundCalculator.calculateBounds();

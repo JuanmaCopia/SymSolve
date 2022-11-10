@@ -1,4 +1,4 @@
-package examples.schedule;
+package symsolve.examples.schedule;
 
 public class List {
 

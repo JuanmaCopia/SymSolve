@@ -1,4 +1,4 @@
-package examples.treemap;
+package symsolve.examples.treemap;
 
 public class Entry {
 

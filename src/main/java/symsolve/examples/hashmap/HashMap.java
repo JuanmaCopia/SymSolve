@@ -1,4 +1,4 @@
-package examples.hashmap;
+package symsolve.examples.hashmap;
 
 import korat.finitization.IFinitization;
 import korat.finitization.IObjSet;
