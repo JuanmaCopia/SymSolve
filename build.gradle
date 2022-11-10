@@ -20,7 +20,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 
     // implementation 'commons-cli:commons-cli:1.0'
-    implementation 'javassist:javassist:3.12.1.GA'
+    implementation 'org.javassist:javassist:3.27.0-GA'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.9.0'
