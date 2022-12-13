@@ -2,7 +2,6 @@ package symsolve.solver;
 
 
 import korat.finitization.impl.Finitization;
-import korat.finitization.impl.IntSet;
 import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
@@ -21,8 +20,6 @@ import symsolve.utils.Helper;
 import symsolve.vector.SymSolveVector;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Solver {
 
@@ -91,12 +88,11 @@ public class Solver {
         return false;
     }
 
-    public Map<String, IntSet> getIntegerFieldsMinMaxMap() {
-        return finitization.getIntegerFieldsMinMaxMap();
-    }
-
     public int[] getCandidateVector() {
         return this.symbolicVectorSpaceExplorer.getCandidateVector().clone();
     }
 
+    public Finitization getFinitization() {
+        return finitization;
+    }
 }

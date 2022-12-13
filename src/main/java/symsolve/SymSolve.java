@@ -1,5 +1,7 @@
 package symsolve;
 
+import korat.finitization.IFinitization;
+import korat.finitization.impl.Finitization;
 import korat.testing.impl.CannotInvokePredicateException;
 import symsolve.config.SolverConfig;
 import symsolve.solver.Solver;
@@ -84,6 +86,11 @@ public class SymSolve {
             e.printStackTrace(System.err);
         }
         return result;
+    }
+
+
+    public Finitization getFinitization() {
+        return solver.getFinitization();
     }
 
 }
