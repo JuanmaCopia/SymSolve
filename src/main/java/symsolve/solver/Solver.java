@@ -91,10 +91,6 @@ public class Solver {
         return false;
     }
 
-    public HashMap<String, Integer> getScopes() {
-        return finitization.getScopes();
-    }
-
     public Map<String, IntSet> getIntegerFieldsMinMaxMap() {
         return finitization.getIntegerFieldsMinMaxMap();
     }
@@ -102,15 +98,5 @@ public class Solver {
     public int[] getCandidateVector() {
         return this.symbolicVectorSpaceExplorer.getCandidateVector().clone();
     }
-
-    public StateSpace getStateSpace() {
-        return stateSpace;
-    }
-
-    /*    public boolean runRepOK(SymSolveVector vector) throws CannotInvokePredicateException {
-        symbolicVectorSpaceExplorer.initialize(vector);
-        Object candidate = candidateBuilder.buildCandidate(vector.getConcreteVector());
-        return predicateChecker.checkPredicate(candidate);
-    }*/
 
 }

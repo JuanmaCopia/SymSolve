@@ -74,7 +74,6 @@ public class Finitization implements IFinitization {
         if (fieldsMap != null) {
             for (Map.Entry<String, IFieldDomain> e : fieldsMap.entrySet()) {
                 String fieldName = e.getKey();
-                IFieldDomain fd = e.getValue();
                 FieldDomain fieldDomain = (FieldDomain) e.getValue();
                 CVElem elem = new CVElem(obj, fieldName, fieldDomain, stateSpace);
                 vectorDescriptor.add(elem);
@@ -249,18 +248,18 @@ public class Finitization implements IFinitization {
         objSet.replaceFirstObject(rootObject);
     }
 
-    public HashMap<String, Integer> getScopes() {
+    public HashMap<String, Integer> getDataBounds() {
         HashMap<String, Integer> scopes = new HashMap<>();
         CVElem[] structureList = stateSpace.getStructureList();
         for (CVElem cvElem : structureList) {
             FieldDomain fieldDomain = cvElem.getFieldDomain();
             if (!fieldDomain.isPrimitiveType()) {
-                String classSimpleName = fieldDomain.getClassOfField().getSimpleName();
-                if (!scopes.containsKey(classSimpleName)) {
+                String fullClassName = fieldDomain.getClassOfField().getTypeName();
+                if (!scopes.containsKey(fullClassName)) {
                     int bound = fieldDomain.getNumberOfElements();
                     if (((ObjSet) fieldDomain).isNullAllowed())
                         bound--;
-                    scopes.put(classSimpleName, bound);
+                    scopes.put(fullClassName, bound);
                 }
             }
         }

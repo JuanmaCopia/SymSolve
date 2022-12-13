@@ -1,12 +1,9 @@
 package symsolve;
 
-import korat.finitization.impl.CVElem;
 import korat.testing.impl.CannotInvokePredicateException;
 import symsolve.config.SolverConfig;
 import symsolve.solver.Solver;
 import symsolve.vector.SymSolveVector;
-
-import java.util.HashMap;
 
 
 public class SymSolve {
@@ -87,26 +84,6 @@ public class SymSolve {
             e.printStackTrace(System.err);
         }
         return result;
-    }
-
-    /**
-     * Returns the format of the representation vector.
-     *
-     * @return A vector describing the types and fields that represent the
-     * structure.
-     */
-    public CVElem[] getVectorFormat() {
-        return solver.getStateSpace().getStructureList().clone();
-    }
-
-    /**
-     * Returns a map of class names to the maximum number of allowed objects
-     * (bounds) of that class to construct possible concretizations.
-     *
-     * @return A map of simple class names to maximum number of objects.
-     */
-    public HashMap<String, Integer> getScopes() {
-        return solver.getScopes();
     }
 
 }
