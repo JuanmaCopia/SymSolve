@@ -1,15 +1,15 @@
-# Symkorat
+# SymSolve
 A Satisfiability Solver for Symbolic Structures with Complex Representation Invariants
 
 ## Getting Started
-To use the SymKorat please use Java 8.
+To use the SymSolve please use Java 8.
 
-Clone the repository
+Clone the repository:
 ```
-git clone https://github.com/JuanmaCopia/symkorat
+git clone https://github.com/JuanmaCopia/symsolve
 ```
 
-Build the solver and create the .jar
+Build:
 ```
-ant createJar
+./gradlew build
 ```
