@@ -93,4 +93,8 @@ public class SymSolve {
         return solver.getFinitization();
     }
 
+    public int[] getCurrentSolutionVector() {
+        return solver.getCandidateVector();
+    }
+
 }
