@@ -6,7 +6,7 @@ public interface CandidateVisitor {
 
     void setCurrentOwner(Object currentOwnerObject, int currentOwnerID);
 
-    void setCurrentField(String fieldName, int fieldIndexInVector);
+    void setCurrentField(String clsOfFieldName, String fieldName, int fieldIndexInVector);
 
     void accessedVisitedReferenceField(Object fieldObject, int fieldObjectID);
 

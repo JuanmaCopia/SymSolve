@@ -11,6 +11,8 @@ public class GenericCandidateVisitor implements CandidateVisitor {
     protected String currentOwnerClassName;
     protected int currentOwnerID;
 
+    protected String currentFieldClassName;
+
     protected String currentFieldName;
     protected int currentFieldIndexInVector;
 
@@ -31,7 +33,8 @@ public class GenericCandidateVisitor implements CandidateVisitor {
     }
 
     @Override
-    public void setCurrentField(String fieldName, int fieldIndexInVector) {
+    public void setCurrentField(String clsOfFieldName, String fieldName, int fieldIndexInVector) {
+        currentFieldClassName = clsOfFieldName;
         currentFieldName = fieldName;
         currentFieldIndexInVector = fieldIndexInVector;
     }
