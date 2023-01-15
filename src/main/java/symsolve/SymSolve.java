@@ -88,6 +88,22 @@ public class SymSolve {
         return result;
     }
 
+    /**
+     * Resumes the search in progress.
+     *
+     * @return true if a new solutions has been found, false otherwise.
+     */
+    public boolean searchNextSolution() {
+        boolean result = false;
+
+        try {
+            result = solver.searchNextSolution();
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+        }
+        return result;
+    }
+
 
     public Finitization getFinitization() {
         return solver.getFinitization();

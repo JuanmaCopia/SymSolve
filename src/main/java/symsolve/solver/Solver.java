@@ -31,6 +31,7 @@ public class Solver {
     Class<?> rootClass;
     Finitization finitization;
     PredicateChecker predicateChecker;
+    boolean searchInProgress = false;
 
 
     public Solver(SymSolveConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
@@ -77,6 +78,7 @@ public class Solver {
     public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
         if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(initialVector))
             return false;
+        searchInProgress = true;
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
@@ -85,6 +87,20 @@ public class Solver {
                 return true;
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
+        searchInProgress = false;
+        return false;
+    }
+
+    public boolean searchNextSolution() throws CannotInvokePredicateException {
+        assert (searchInProgress);
+        int[] vector = symbolicVectorSpaceExplorer.getNextCandidate();
+        while (vector != null) {
+            Object candidate = candidateBuilder.buildCandidate(vector);
+            if (predicateChecker.checkPredicate(candidate))
+                return true;
+            vector = symbolicVectorSpaceExplorer.getNextCandidate();
+        }
+        searchInProgress = false;
         return false;
     }
 
