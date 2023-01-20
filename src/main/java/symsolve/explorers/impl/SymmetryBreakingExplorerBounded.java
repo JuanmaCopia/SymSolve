@@ -3,7 +3,6 @@ package symsolve.explorers.impl;
 import korat.finitization.IObjSet;
 import korat.finitization.impl.ObjSet;
 import korat.finitization.impl.StateSpace;
-import korat.utils.IIntList;
 import symsolve.bounds.Bounds;
 import symsolve.bounds.LabelSets;
 import symsolve.bounds.visitors.BoundChecker;
@@ -19,8 +18,8 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
     Bounds bounds;
 
 
-    public SymmetryBreakingExplorerBounded(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields, Bounds bounds) {
-        super(stateSpace, accessedIndices, changedFields);
+    public SymmetryBreakingExplorerBounded(StateSpace stateSpace, Bounds bounds) {
+        super(stateSpace);
         this.bounds = bounds;
         labelSets = new LabelSets(bounds);
         labelSetCalculator = new LabelSetCalculator(stateSpace, bounds);
@@ -90,7 +89,7 @@ public class SymmetryBreakingExplorerBounded extends SymmetryBreakingExplorer {
     private boolean setNextValueForReferenceType(Set<Integer> targetLabelSet) {
         if (maxInstances[currentIndex] == -1)
             maxInstances[currentIndex] = getMaxInstanceInVector(currentFieldDomain);
-        
+
         int nextValue = currentValue;
         while (nextValue <= maxInstances[currentIndex] && nextValue < maxFieldDomainValue) {
             nextValue++;

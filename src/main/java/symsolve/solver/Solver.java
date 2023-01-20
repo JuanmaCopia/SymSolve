@@ -13,9 +13,7 @@ import symsolve.candidates.CandidateBuilder;
 import symsolve.candidates.PredicateChecker;
 import symsolve.config.SymSolveConfig;
 import symsolve.explorers.VectorStateSpaceExplorer;
-import symsolve.explorers.VectorStateSpaceExplorerFactory;
-import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
-import symsolve.utils.CodeGenerator;
+import symsolve.explorers.impl.AbstractVectorStateSpaceExplorer;
 import symsolve.utils.Helper;
 import symsolve.vector.SymSolveVector;
 
@@ -23,10 +21,8 @@ import java.lang.reflect.Method;
 
 public class Solver {
 
-    StateSpace stateSpace;
     VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
     CandidateBuilder candidateBuilder;
-    CodeGenerator codeGenerator;
     IIntList accessedIndices;
     Class<?> rootClass;
     Finitization finitization;
@@ -44,18 +40,17 @@ public class Solver {
         finitization = Helper.invokeFinMethod(rootClass, finMethod, finArgs);
         predicateChecker = new PredicateChecker();
         finitization.initialize(predicateChecker);
-        stateSpace = finitization.getStateSpace();
-        int vectorSize = stateSpace.getTotalNumberOfFields();
-        accessedIndices = new IntListAI(vectorSize);
-        IIntList changedFields = new IntListAI(vectorSize);
+        StateSpace stateSpace = finitization.getStateSpace();
+
+        symbolicVectorSpaceExplorer = AbstractVectorStateSpaceExplorer.makeSymbolicVectorExplorer(params, stateSpace);
+        accessedIndices = symbolicVectorSpaceExplorer.getAccessedIndices();
+
 
         predicateChecker.initialize(rootClass, params.getPredicateName(), accessedIndices);
 
-        candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
-        codeGenerator = new CodeGenerator(stateSpace, rootClass);
+        candidateBuilder = new CandidateBuilder(stateSpace, symbolicVectorSpaceExplorer.getChangedFields());
 
-        VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(stateSpace, accessedIndices, changedFields);
-        symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(params);
+
     }
 
     public boolean runAutoHybridRepok(SymSolveVector vector) throws CannotInvokePredicateException {
@@ -67,8 +62,7 @@ public class Solver {
     }
 
     private boolean areSymbolicFieldsAccessed(SymSolveVector vector) {
-        for (int i = 0; i < accessedIndices.numberOfElements(); i++) {
-            int index = accessedIndices.get(i);
+        for (Integer index: accessedIndices.toArray()) {
             if (vector.isSymbolicIndex(index))
                 return true;
         }
@@ -106,7 +100,11 @@ public class Solver {
     }
 
     public int[] getCandidateVector() {
-        return this.symbolicVectorSpaceExplorer.getCandidateVector().clone();
+        return symbolicVectorSpaceExplorer.getCandidateVector().clone();
+    }
+
+    public IIntList getAccessedIndices() {
+        return symbolicVectorSpaceExplorer.getAccessedIndices();
     }
 
     public Finitization getFinitization() {

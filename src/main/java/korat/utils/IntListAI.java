@@ -49,14 +49,14 @@ public class IntListAI implements IIntList {
     }
 
     public int[] toArray() {
-        int[] ret = new int[numberOfElements()];
-        for (int i = 0; i < numberOfElements(); i++)
-            ret[i] = elems[i];
+        int size = lastElementIndex + 1;
+        int[] ret = new int[size];
+        System.arraycopy(elems, 0, ret, 0, size);
         return ret;
     }
 
     public boolean add(int elem) {
-        if (contains(elem))
+        if (cvelems[elem] == cnt) // if contains the element
             return false;
 
         elems[++lastElementIndex] = elem;
@@ -81,6 +81,7 @@ public class IntListAI implements IIntList {
         lastElementIndex = -1;
     }
 
+/*
     public int get(int idx) {
         return elems[idx];
     }
@@ -89,11 +90,6 @@ public class IntListAI implements IIntList {
         cvelems[idx] = cnt;
         return elems[idx] = elem;
     }
-
-    @Override
-    public int getLength() {
-        return elems.length;
-    }
-
+*/
 
 }

@@ -6,14 +6,11 @@ import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
-import korat.utils.IIntList;
-import korat.utils.IntListAI;
 import symsolve.candidates.CandidateBuilder;
 import symsolve.candidates.PredicateChecker;
 import symsolve.config.BoundCalculatorConfig;
 import symsolve.explorers.VectorStateSpaceExplorer;
-import symsolve.explorers.VectorStateSpaceExplorerFactory;
-import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
+import symsolve.explorers.impl.AbstractVectorStateSpaceExplorer;
 import symsolve.utils.Helper;
 import symsolve.vector.SymSolveVector;
 
@@ -24,7 +21,6 @@ public class BoundCalculator {
     StateSpace stateSpace;
     VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
     CandidateBuilder candidateBuilder;
-    IIntList accessedIndices;
     Class<?> rootClass;
     Finitization finitization;
     PredicateChecker predicateChecker;
@@ -36,21 +32,18 @@ public class BoundCalculator {
         rootClass = Finitization.getClassLoader().loadClass(params.getFullyQualifiedClassName());
 
         String[] finArgs = params.getFinitizationArgs();
-        Method finMethod = symsolve.utils.Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
+        Method finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
         finitization = Helper.invokeFinMethod(rootClass, finMethod, finArgs);
         predicateChecker = new PredicateChecker();
         finitization.initialize(predicateChecker);
         stateSpace = finitization.getStateSpace();
-        int vectorSize = stateSpace.getTotalNumberOfFields();
-        accessedIndices = new IntListAI(vectorSize);
-        IIntList changedFields = new IntListAI(vectorSize);
-        
-        predicateChecker.initialize(rootClass, params.getPredicateName(), accessedIndices);
 
-        candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
+        symbolicVectorSpaceExplorer = AbstractVectorStateSpaceExplorer.makeSymbolicVectorExplorer(params, stateSpace);
 
-        VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(stateSpace, accessedIndices, changedFields);
-        symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(params);
+        predicateChecker.initialize(rootClass, params.getPredicateName(), symbolicVectorSpaceExplorer.getAccessedIndices());
+
+        candidateBuilder = new CandidateBuilder(stateSpace, symbolicVectorSpaceExplorer.getChangedFields());
+
     }
 
     public Bounds calculateBounds() throws CannotInvokePredicateException {
