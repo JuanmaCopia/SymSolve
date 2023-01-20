@@ -1,5 +1,7 @@
 package symsolve.candidates.traversals.visitors;
 
+import korat.finitization.impl.FieldDomain;
+
 public class GenericCandidateVisitor implements CandidateVisitor {
 
     protected Class<?> rootClass;
@@ -11,10 +13,13 @@ public class GenericCandidateVisitor implements CandidateVisitor {
     protected String currentOwnerClassName;
     protected int currentOwnerID;
 
-    protected String currentFieldClassName;
+    //protected String currentFieldClassName;
+    protected FieldDomain currentFieldDomain;
 
     protected String currentFieldName;
     protected int currentFieldIndexInVector;
+
+    protected int currentFieldIndexInFieldDomain;
 
 
     @Override
@@ -33,10 +38,11 @@ public class GenericCandidateVisitor implements CandidateVisitor {
     }
 
     @Override
-    public void setCurrentField(String clsOfFieldName, String fieldName, int fieldIndexInVector) {
-        currentFieldClassName = clsOfFieldName;
-        currentFieldName = fieldName;
-        currentFieldIndexInVector = fieldIndexInVector;
+    public void setCurrentField(FieldDomain domain, String name, int indexInVector, int indexInFieldDomain) {
+        currentFieldDomain = domain;
+        currentFieldName = name;
+        currentFieldIndexInVector = indexInVector;
+        currentFieldIndexInFieldDomain = indexInFieldDomain;
     }
 
     @Override

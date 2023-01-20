@@ -88,9 +88,8 @@ public class BFSCandidateTraversal implements CandidateTraversal {
             CVElem elem = structureList[i];
             FieldDomain fieldDomain = elem.getFieldDomain();
             String fieldName = elem.getFieldName();
-            String clsOfFieldName = fieldDomain.getClassOfField().getName();
 
-            visitor.setCurrentField(clsOfFieldName, fieldName, i);
+            visitor.setCurrentField(fieldDomain, fieldName, i, indexInFieldDomain);
 
             if (fieldDomain.isPrimitiveType()) {
                 handlePrimitiveField(fieldName, indexInFieldDomain);
