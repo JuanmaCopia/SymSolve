@@ -92,7 +92,8 @@ public class Solver {
     }
 
     public boolean searchNextSolution() throws CannotInvokePredicateException {
-        assert (searchInProgress);
+        if (!searchInProgress)
+            return false;
         int[] vector = symbolicVectorSpaceExplorer.getNextCandidate();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
