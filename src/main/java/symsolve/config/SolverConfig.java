@@ -14,7 +14,6 @@ public class SolverConfig extends SymSolveConfig {
         this.predicateName = predicateName;
         this.bounds = bounds;
         finitizationName = calculateFinitizationName(fullClassName);
-        propertyFinitizationName = calculatePropertyFinitizationName(fullClassName);
     }
 
     public SolverConfig(String fullClassName, String finitizationArgs, SymmetryBreakStrategy symmetryBreakingStrategy, String predicateName) {
