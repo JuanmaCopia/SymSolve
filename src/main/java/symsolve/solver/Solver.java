@@ -23,8 +23,6 @@ public class Solver {
 
     VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
     CandidateBuilder candidateBuilder;
-    IIntList accessedIndices;
-    Class<?> rootClass;
     Finitization finitization;
     PredicateChecker predicateChecker;
     boolean searchInProgress = false;
@@ -32,25 +30,14 @@ public class Solver {
 
     public Solver(SymSolveConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
-
-        rootClass = Finitization.getClassLoader().loadClass(params.getFullyQualifiedClassName());
-
-        String[] finArgs = params.getFinitizationArgs();
-        Method finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
-        finitization = Helper.invokeFinMethod(rootClass, finMethod, finArgs);
+        Class<?> rootClass = Helper.loadClass(params.getFullyQualifiedClassName());
+        finitization = Helper.getFinitization(rootClass, params.getFinitizationName(), params.getFinitizationArgs());
         predicateChecker = new PredicateChecker();
         finitization.initialize(predicateChecker);
         StateSpace stateSpace = finitization.getStateSpace();
-
         symbolicVectorSpaceExplorer = AbstractVectorStateSpaceExplorer.makeSymbolicVectorExplorer(params, stateSpace);
-        accessedIndices = symbolicVectorSpaceExplorer.getAccessedIndices();
-
-
-        predicateChecker.initialize(rootClass, params.getPredicateName(), accessedIndices);
-
+        predicateChecker.initialize(rootClass, params.getPredicateName(), symbolicVectorSpaceExplorer.getAccessedIndices());
         candidateBuilder = new CandidateBuilder(stateSpace, symbolicVectorSpaceExplorer.getChangedFields());
-
-
     }
 
     public boolean runAutoHybridRepok(SymSolveVector vector) throws CannotInvokePredicateException {
@@ -62,7 +49,7 @@ public class Solver {
     }
 
     private boolean areSymbolicFieldsAccessed(SymSolveVector vector) {
-        for (Integer index: accessedIndices.toArray()) {
+        for (Integer index: symbolicVectorSpaceExplorer.getAccessedIndices().toArray()) {
             if (vector.isSymbolicIndex(index))
                 return true;
         }

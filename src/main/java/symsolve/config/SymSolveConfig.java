@@ -35,7 +35,7 @@ public abstract class SymSolveConfig {
         return predicateName;
     }
 
-    public SymmetryBreakStrategy getSymmetryBreakStretegy() {
+    public SymmetryBreakStrategy getSymmetryBreakStrategy() {
         return symmetryBreakStrategy;
     }
 

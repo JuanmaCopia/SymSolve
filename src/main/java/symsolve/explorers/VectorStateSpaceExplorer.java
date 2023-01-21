@@ -16,4 +16,6 @@ public interface VectorStateSpaceExplorer {
     int[] getNextCandidate();
 
     IIntList getChangedFields();
+
+    int getVectorSize();
 }

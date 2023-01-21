@@ -14,41 +14,29 @@ import symsolve.explorers.impl.AbstractVectorStateSpaceExplorer;
 import symsolve.utils.Helper;
 import symsolve.vector.SymSolveVector;
 
-import java.lang.reflect.Method;
-
 public class BoundCalculator {
 
-    StateSpace stateSpace;
     VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
     CandidateBuilder candidateBuilder;
-    Class<?> rootClass;
     Finitization finitization;
     PredicateChecker predicateChecker;
 
 
     public BoundCalculator(BoundCalculatorConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
-
-        rootClass = Finitization.getClassLoader().loadClass(params.getFullyQualifiedClassName());
-
-        String[] finArgs = params.getFinitizationArgs();
-        Method finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
-        finitization = Helper.invokeFinMethod(rootClass, finMethod, finArgs);
+        Class<?> rootClass = Helper.loadClass(params.getFullyQualifiedClassName());
+        finitization = Helper.getFinitization(rootClass, params.getFinitizationName(), params.getFinitizationArgs());
         predicateChecker = new PredicateChecker();
         finitization.initialize(predicateChecker);
-        stateSpace = finitization.getStateSpace();
-
+        StateSpace stateSpace = finitization.getStateSpace();
         symbolicVectorSpaceExplorer = AbstractVectorStateSpaceExplorer.makeSymbolicVectorExplorer(params, stateSpace);
-
         predicateChecker.initialize(rootClass, params.getPredicateName(), symbolicVectorSpaceExplorer.getAccessedIndices());
-
         candidateBuilder = new CandidateBuilder(stateSpace, symbolicVectorSpaceExplorer.getChangedFields());
-
     }
 
     public Bounds calculateBounds() throws CannotInvokePredicateException {
         BoundRecorder boundsRecorder = new BoundRecorder(finitization);
-        SymSolveVector initialVector = new SymSolveVector(stateSpace.getTotalNumberOfFields());
+        SymSolveVector initialVector = new SymSolveVector(symbolicVectorSpaceExplorer.getVectorSize());
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {

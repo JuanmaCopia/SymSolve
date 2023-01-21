@@ -48,7 +48,7 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
 
 
     public static VectorStateSpaceExplorer makeSymbolicVectorExplorer(SymSolveConfig config, StateSpace stateSpace) {
-        SymmetryBreakStrategy strategy = config.getSymmetryBreakStretegy();
+        SymmetryBreakStrategy strategy = config.getSymmetryBreakStrategy();
         switch (strategy) {
             case SYMMETRY_BREAK:
                 return new SymmetryBreakingExplorer(stateSpace);
@@ -57,8 +57,7 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
             case NO_SYMMETRY_BREAK:
                 return new NoSymmetryBreakingExplorer(stateSpace);
             case SYMMETRY_BREAK_BOUNDED:
-                SolverConfig solverConf = (SolverConfig) config;
-                return new SymmetryBreakingExplorerBounded(stateSpace, solverConf.getBounds());
+                return new SymmetryBreakingExplorerBounded(stateSpace, ((SolverConfig) config).getBounds());
             default:
                 throw new IllegalArgumentException(strategy.name() + " is not a valid Exploration Strategy ");
         }
@@ -160,6 +159,11 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     @Override
     public IIntList getChangedFields() {
         return changedFields;
+    }
+
+    @Override
+    public int getVectorSize() {
+        return vectorSize;
     }
 
 }
