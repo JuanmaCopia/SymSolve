@@ -1,6 +1,7 @@
-package symsolve;
+package test.systemtests.symsolve;
 
 import org.junit.jupiter.api.Test;
+import symsolve.SymSolve;
 import symsolve.config.SolverConfig;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 

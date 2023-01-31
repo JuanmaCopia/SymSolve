@@ -1,6 +1,7 @@
-package symsolve;
+package test.systemtests.symsolve;
 
 import org.junit.jupiter.api.Test;
+import symsolve.SymSolve;
 import symsolve.config.SolverConfig;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
@@ -8,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SymmetryBreakSystemTests {
-
     @Test
     public void isSatisfiableHashMapTest() {
         SolverConfig config = new SolverConfig("symsolve.examples.hashmap.HashMap", "2", SymmetryBreakStrategy.SYMMETRY_BREAK);
@@ -815,5 +815,5 @@ public class SymmetryBreakSystemTests {
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 0, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
     }
-    
+
 }
