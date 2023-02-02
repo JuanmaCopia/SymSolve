@@ -98,11 +98,11 @@ public class SymSolve {
      *
      * @return the new solution vector if found, null otherwise.
      */
-    public SymSolveSolution getNextSolution(SymSolveVector previousSolutionVector) {
+    public SymSolveSolution getNextSolution(SymSolveSolution previousSolution) {
         SymSolveSolution result = null;
 
         try {
-            result = solver.getNextSolution(previousSolutionVector);
+            result = solver.getNextSolution(previousSolution);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }

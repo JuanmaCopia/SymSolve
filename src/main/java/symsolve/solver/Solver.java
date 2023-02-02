@@ -51,16 +51,16 @@ public class Solver {
         return false;
     }
 
-    public SymSolveSolution startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
-        if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(initialVector))
+    public SymSolveSolution startSearch(SymSolveVector query) throws CannotInvokePredicateException {
+        if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(query))
             return null;
-        symbolicVectorSpaceExplorer.initialize(initialVector);
+        symbolicVectorSpaceExplorer.initialize(query);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate)) {
                 return new SymSolveSolution(
-                        initialVector,
+                        query,
                         symbolicVectorSpaceExplorer.getCandidateVector(),
                         symbolicVectorSpaceExplorer.getAccessedIndices()
                 );
@@ -70,9 +70,10 @@ public class Solver {
         return null;
     }
 
-    public SymSolveSolution getNextSolution(SymSolveVector previousSolutionVector) throws CannotInvokePredicateException {
-        assert (!symbolicVectorSpaceExplorer.canBeDeterminedUnsat(previousSolutionVector));
-        symbolicVectorSpaceExplorer.initialize(previousSolutionVector);
+    public SymSolveSolution getNextSolution(SymSolveSolution previousSolution) throws CannotInvokePredicateException {
+        SymSolveVector query = new SymSolveVector(previousSolution);
+        assert (!symbolicVectorSpaceExplorer.canBeDeterminedUnsat(query));
+        symbolicVectorSpaceExplorer.initialize(query);
 
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         Object candidate = candidateBuilder.buildCandidate(vector);
@@ -83,7 +84,7 @@ public class Solver {
             candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate)) {
                 return new SymSolveSolution(
-                        previousSolutionVector,
+                        query,
                         symbolicVectorSpaceExplorer.getCandidateVector(),
                         symbolicVectorSpaceExplorer.getAccessedIndices()
                 );
@@ -92,7 +93,7 @@ public class Solver {
         }
         return null;
     }
-    
+
     public Finitization getFinitization() {
         return finitization;
     }

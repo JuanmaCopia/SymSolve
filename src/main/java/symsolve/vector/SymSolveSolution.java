@@ -17,6 +17,10 @@ public final class SymSolveSolution {
         this.accessedIndices = accessedIndices.clone();
     }
 
+    public SymSolveVector getQuery() {
+        return query.clone();
+    }
+
     public int[] getSolutionVector() {
         return solutionVector.clone();
     }

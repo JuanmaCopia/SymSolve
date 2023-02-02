@@ -22,8 +22,14 @@ public final class SymSolveVector {
 
     public SymSolveVector(int[] concreteVector, IntListAI fixedIndices) {
         this.length = concreteVector.length;
-        this.concreteVector = concreteVector;
-        this.fixedIndices = fixedIndices;
+        this.concreteVector = concreteVector.clone();
+        this.fixedIndices = fixedIndices.clone();
+    }
+
+    public SymSolveVector(SymSolveSolution solution) {
+        this.concreteVector = solution.getSolutionVector();
+        this.length = concreteVector.length;
+        this.fixedIndices = solution.getQueryFixedIndices();
     }
 
     public SymSolveVector(int vectorLength) {
