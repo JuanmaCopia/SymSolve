@@ -89,15 +89,15 @@ public class SymSolve {
     }
 
     /**
-     * Resumes the search in progress.
+     * Starts the search from a previous solution
      *
-     * @return true if a new solutions has been found, false otherwise.
+     * @return the new solution vector if found, false otherwise.
      */
-    public boolean searchNextSolution() {
-        boolean result = false;
+    public int[] getNextSolution(SymSolveVector previousSolutionVector) {
+        int[] result = null;
 
         try {
-            result = solver.searchNextSolution();
+            result = solver.getNextSolution(previousSolutionVector);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }

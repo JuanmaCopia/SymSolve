@@ -8,7 +8,6 @@ import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
 import korat.utils.IIntList;
-import korat.utils.IntListAI;
 import symsolve.candidates.CandidateBuilder;
 import symsolve.candidates.PredicateChecker;
 import symsolve.config.SymSolveConfig;
@@ -17,16 +16,12 @@ import symsolve.explorers.impl.AbstractVectorStateSpaceExplorer;
 import symsolve.utils.Helper;
 import symsolve.vector.SymSolveVector;
 
-import java.lang.reflect.Method;
-
 public class Solver {
 
     VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
     CandidateBuilder candidateBuilder;
     Finitization finitization;
     PredicateChecker predicateChecker;
-    boolean searchInProgress = false;
-
 
     public Solver(SymSolveConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
@@ -49,7 +44,7 @@ public class Solver {
     }
 
     private boolean areSymbolicFieldsAccessed(SymSolveVector vector) {
-        for (Integer index: symbolicVectorSpaceExplorer.getAccessedIndices().toArray()) {
+        for (Integer index : symbolicVectorSpaceExplorer.getAccessedIndices().toArray()) {
             if (vector.isSymbolicIndex(index))
                 return true;
         }
@@ -59,7 +54,6 @@ public class Solver {
     public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
         if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(initialVector))
             return false;
-        searchInProgress = true;
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
@@ -68,22 +62,25 @@ public class Solver {
                 return true;
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
-        searchInProgress = false;
         return false;
     }
 
-    public boolean searchNextSolution() throws CannotInvokePredicateException {
-        if (!searchInProgress)
-            return false;
-        int[] vector = symbolicVectorSpaceExplorer.getNextCandidate();
+    public int[] getNextSolution(SymSolveVector previousSolutionVector) throws CannotInvokePredicateException {
+        assert (!symbolicVectorSpaceExplorer.canBeDeterminedUnsat(previousSolutionVector));
+        symbolicVectorSpaceExplorer.initialize(previousSolutionVector);
+
+        int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
+        Object candidate = candidateBuilder.buildCandidate(vector);
+        assert (predicateChecker.checkPredicate(candidate));  // Do not remove, checkPredicate call is necessary
+        vector = symbolicVectorSpaceExplorer.getNextCandidate();
+
         while (vector != null) {
-            Object candidate = candidateBuilder.buildCandidate(vector);
+            candidate = candidateBuilder.buildCandidate(vector);
             if (predicateChecker.checkPredicate(candidate))
-                return true;
+                return vector;
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
-        searchInProgress = false;
-        return false;
+        return null;
     }
 
     public int[] getCandidateVector() {

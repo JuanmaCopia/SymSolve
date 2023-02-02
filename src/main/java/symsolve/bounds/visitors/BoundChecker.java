@@ -1,6 +1,7 @@
 package symsolve.bounds.visitors;
 
 import korat.finitization.impl.StateSpace;
+import korat.utils.IntListAI;
 import symsolve.bounds.Bounds;
 import symsolve.bounds.LabelSets;
 import symsolve.candidates.traversals.BFSCandidateTraversal;
@@ -15,7 +16,7 @@ public class BoundChecker extends GenericCandidateVisitor {
 
     LabelSets labelSets;
     StateSpace stateSpace;
-    Set<Integer> fixedIndices;
+    IntListAI fixedIndices;
     boolean hasFieldOutOfBounds = false;
 
 

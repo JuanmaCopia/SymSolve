@@ -12,7 +12,6 @@ import symsolve.vector.SymSolveVector;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpaceExplorer {
 
@@ -112,10 +111,10 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
             changedFields.add(i);
     }
 
-    private void calculateMaxFixedInstancePerReferenceFieldDomain(Set<Integer> fixedInd) {
+    private void calculateMaxFixedInstancePerReferenceFieldDomain(IntListAI fixedInd) {
         maxFixedInstancePerReferenceFieldDomain.clear();
         fixedIndices.clear();
-        for (Integer fixedIndex : fixedInd) {
+        for (Integer fixedIndex : fixedInd.toArray()) {
             fixedIndices.add(fixedIndex);
             FieldDomain fieldDomain = stateSpace.getFieldDomain(fixedIndex);
             if (!fieldDomain.isPrimitiveType()) {
@@ -131,7 +130,7 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
         Integer maxInstance = this.maxFixedInstancePerReferenceFieldDomain.get(fieldDomain);
         if (maxInstance == null)
             maxInstance = 0;
-        for (Integer index: accessedIndices.toArray()) {
+        for (Integer index : accessedIndices.toArray()) {
             if (!this.fixedIndices.contains(index) && stateSpace.getFieldDomain(index) == fieldDomain) {
                 int value = candidateVector[index];
                 if (value > maxInstance)
