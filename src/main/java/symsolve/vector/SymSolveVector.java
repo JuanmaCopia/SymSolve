@@ -92,6 +92,10 @@ public class SymSolveVector {
         return new IntListAI(fixedIndices);
     }
 
+    public SymSolveVector clone() {
+        return new SymSolveVector(concreteVector.clone(), fixedIndices.clone());
+    }
+
     public boolean isSymbolicIndex(int index) {
         return !fixedIndices.contains(index);
     }
