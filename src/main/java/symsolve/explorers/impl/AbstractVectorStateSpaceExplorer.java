@@ -42,7 +42,6 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
         vectorSize = stateSpace.getTotalNumberOfFields();
         accessedIndices = new IntListAI(vectorSize);
         changedFields = new IntListAI(vectorSize);
-        fixedIndices = new IntListAI(vectorSize);
     }
 
 
@@ -96,14 +95,15 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     @Override
     public void initialize(SymSolveVector vector) {
         setCandidateVector(vector);
-        calculateMaxFixedInstancePerReferenceFieldDomain(vector.getFixedIndices());
+        calculateMaxFixedInstancePerReferenceFieldDomain();
         resetExplorerState();
     }
 
     private void setCandidateVector(SymSolveVector vector) {
-        this.candidateVector = vector.getConcreteVector();
-        if (vectorSize != this.candidateVector.length)
+        if (vectorSize != vector.getLength())
             throw new IllegalArgumentException(String.format("Wrong vector size! Expected: %d, but got: %d", vectorSize, this.candidateVector.length));
+        candidateVector = vector.getConcreteVector();
+        fixedIndices = vector.getFixedIndices();
     }
 
     void resetExplorerState() {
@@ -111,11 +111,9 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
             changedFields.add(i);
     }
 
-    private void calculateMaxFixedInstancePerReferenceFieldDomain(IntListAI fixedInd) {
+    private void calculateMaxFixedInstancePerReferenceFieldDomain() {
         maxFixedInstancePerReferenceFieldDomain.clear();
-        fixedIndices.clear();
-        for (Integer fixedIndex : fixedInd.toArray()) {
-            fixedIndices.add(fixedIndex);
+        for (Integer fixedIndex : fixedIndices.toArray()) {
             FieldDomain fieldDomain = stateSpace.getFieldDomain(fixedIndex);
             if (!fieldDomain.isPrimitiveType()) {
                 int value = candidateVector[fixedIndex];

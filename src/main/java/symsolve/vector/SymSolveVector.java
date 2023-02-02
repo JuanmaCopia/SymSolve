@@ -15,7 +15,7 @@ public class SymSolveVector {
     public static final int SYMBOLIC = -1;
     public static final int NULL = 0;
 
-    int size;
+    int length;
     int[] concreteVector;
     IntListAI fixedIndices;
 
@@ -28,13 +28,13 @@ public class SymSolveVector {
      * @param fixedIndices   The set of Fixed indices in this vector.
      */
     public SymSolveVector(int[] concreteVector, IntListAI fixedIndices) {
-        this.size = concreteVector.length;
+        this.length = concreteVector.length;
         this.concreteVector = concreteVector;
         this.fixedIndices = fixedIndices;
     }
 
     public SymSolveVector(int vectorSize) {
-        this.size = vectorSize;
+        this.length = vectorSize;
         this.concreteVector = new int[vectorSize];
         this.fixedIndices = new IntListAI(vectorSize);
     }
@@ -49,11 +49,11 @@ public class SymSolveVector {
     public SymSolveVector(String vector) {
         String[] vectorValues = vector.split(",");
 
-        size = vectorValues.length;
-        concreteVector = new int[size];
-        fixedIndices = new IntListAI(size);
+        length = vectorValues.length;
+        concreteVector = new int[length];
+        fixedIndices = new IntListAI(length);
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < length; i++) {
             int elem = Integer.parseInt(vectorValues[i].trim());
             if (elem == SymSolveVector.SYMBOLIC) {
                 concreteVector[i] = SymSolveVector.NULL;
@@ -64,8 +64,8 @@ public class SymSolveVector {
         }
     }
 
-    public int size() {
-        return size;
+    public int getLength() {
+        return length;
     }
 
 
@@ -97,8 +97,8 @@ public class SymSolveVector {
     }
 
     public int[] createPartialVector() {
-        int[] partialVector = new int[size];
-        for (int i = 0; i < size; i++) {
+        int[] partialVector = new int[length];
+        for (int i = 0; i < length; i++) {
             if (this.fixedIndices.contains(i))
                 partialVector[i] = concreteVector[i];
             else
