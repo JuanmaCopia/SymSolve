@@ -2,9 +2,9 @@ package symsolve;
 
 import korat.finitization.impl.Finitization;
 import korat.testing.impl.CannotInvokePredicateException;
-import korat.utils.IIntList;
 import symsolve.config.SolverConfig;
 import symsolve.solver.Solver;
+import symsolve.vector.SymSolveSolution;
 import symsolve.vector.SymSolveVector;
 
 
@@ -50,7 +50,7 @@ public class SymSolve {
         boolean result = false;
 
         try {
-            result = solver.startSearch(vector);
+            result = solver.startSearch(vector) != null;
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
@@ -59,16 +59,21 @@ public class SymSolve {
 
     /**
      * Decides whether the symbolic instance represented by a vector is SAT. If it
-     * is, returns the vector solution.
+     * is, returns the solution.
      *
      * @param vector The vector representing a partially symbolic instance.
      * @return The solution vector if the symbolic structure is SAT, null if it is
      * UNSAT.
      */
-    public int[] solve(SymSolveVector vector) {
-        if (isSatisfiable(vector))
-            return solver.getCandidateVector();
-        return null;
+    public SymSolveSolution solve(SymSolveVector vector) {
+        SymSolveSolution solution = null;
+
+        try {
+            solution = solver.startSearch(vector);
+        } catch (CannotInvokePredicateException e) {
+            e.printStackTrace(System.err);
+        }
+        return solution;
     }
 
     /**
@@ -91,10 +96,10 @@ public class SymSolve {
     /**
      * Starts the search from a previous solution
      *
-     * @return the new solution vector if found, false otherwise.
+     * @return the new solution vector if found, null otherwise.
      */
-    public int[] getNextSolution(SymSolveVector previousSolutionVector) {
-        int[] result = null;
+    public SymSolveSolution getNextSolution(SymSolveVector previousSolutionVector) {
+        SymSolveSolution result = null;
 
         try {
             result = solver.getNextSolution(previousSolutionVector);
@@ -107,14 +112,6 @@ public class SymSolve {
 
     public Finitization getFinitization() {
         return solver.getFinitization();
-    }
-
-    public int[] getCurrentSolutionVector() {
-        return solver.getCandidateVector();
-    }
-
-    public IIntList getAccessedIndices() {
-        return solver.getAccessedIndices();
     }
 
 }

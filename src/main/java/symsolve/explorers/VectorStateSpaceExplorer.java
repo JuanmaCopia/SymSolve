@@ -1,6 +1,6 @@
 package symsolve.explorers;
 
-import korat.utils.IIntList;
+import korat.utils.IntListAI;
 import symsolve.vector.SymSolveVector;
 
 public interface VectorStateSpaceExplorer {
@@ -9,13 +9,16 @@ public interface VectorStateSpaceExplorer {
 
     int[] getCandidateVector();
 
-    IIntList getAccessedIndices();
 
     void initialize(SymSolveVector vector);
 
     int[] getNextCandidate();
 
-    IIntList getChangedFields();
+    IntListAI getAccessedIndices();
+
+    IntListAI getChangedFields();
+
+    IntListAI getFixedIndices();
 
     int getVectorSize();
 }

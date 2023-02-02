@@ -10,42 +10,28 @@ import java.util.Arrays;
  *
  * @author Juan Manuel Copia
  */
-public class SymSolveVector {
+public final class SymSolveVector {
 
     public static final int SYMBOLIC = -1;
     public static final int NULL = 0;
 
-    int length;
-    int[] concreteVector;
-    IntListAI fixedIndices;
+    private final int length;
+    private final int[] concreteVector;
+    private final IntListAI fixedIndices;
 
-    /**
-     * Creates a vector a SymKoratVector instance holding the vector
-     * representations.
-     *
-     * @param concreteVector The concrete vector representation (Symbolic fields
-     *                       represented with 0).
-     * @param fixedIndices   The set of Fixed indices in this vector.
-     */
+
     public SymSolveVector(int[] concreteVector, IntListAI fixedIndices) {
         this.length = concreteVector.length;
         this.concreteVector = concreteVector;
         this.fixedIndices = fixedIndices;
     }
 
-    public SymSolveVector(int vectorSize) {
-        this.length = vectorSize;
-        this.concreteVector = new int[vectorSize];
-        this.fixedIndices = new IntListAI(vectorSize);
+    public SymSolveVector(int vectorLength) {
+        this.length = vectorLength;
+        this.concreteVector = new int[vectorLength];
+        this.fixedIndices = new IntListAI(vectorLength);
     }
 
-    /**
-     * Creates a vector a SymKoratVector instance by calculating the different
-     * vector representations from a string partial representation (symbolic fields
-     * represented by -1).
-     *
-     * @param vector the string representation of the partial vector.
-     */
     public SymSolveVector(String vector) {
         String[] vectorValues = vector.split(",");
 
@@ -64,40 +50,20 @@ public class SymSolveVector {
         }
     }
 
+    public boolean isSymbolicIndex(int index) {
+        return !fixedIndices.contains(index);
+    }
+
     public int getLength() {
         return length;
     }
 
-
-    /**
-     * Returns the concrete vector representation of this vector. i.e. symbolic
-     * values are encoded with 0.
-     *
-     * @return A clone of the concrete vector representation.
-     */
     public int[] getConcreteVector() {
         return concreteVector.clone();
     }
 
-    public void setConcreteVector(int[] newConcreteVector) {
-        concreteVector = newConcreteVector;
-    }
-
-    /**
-     * Returns the set of Fixed indices in this vector.
-     *
-     * @return A clone of the fixed indices of this vector.
-     */
     public IntListAI getFixedIndices() {
-        return new IntListAI(fixedIndices);
-    }
-
-    public SymSolveVector clone() {
-        return new SymSolveVector(concreteVector.clone(), fixedIndices.clone());
-    }
-
-    public boolean isSymbolicIndex(int index) {
-        return !fixedIndices.contains(index);
+        return fixedIndices.clone();
     }
 
     public int[] createPartialVector() {
@@ -109,6 +75,11 @@ public class SymSolveVector {
                 partialVector[i] = SYMBOLIC;
         }
         return partialVector;
+    }
+
+    @Override
+    public SymSolveVector clone() {
+        return new SymSolveVector(concreteVector.clone(), fixedIndices.clone());
     }
 
     @Override

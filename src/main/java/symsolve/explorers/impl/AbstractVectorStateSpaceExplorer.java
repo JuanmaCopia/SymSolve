@@ -3,7 +3,6 @@ package symsolve.explorers.impl;
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
-import korat.utils.IIntList;
 import korat.utils.IntListAI;
 import symsolve.config.SolverConfig;
 import symsolve.config.SymSolveConfig;
@@ -20,9 +19,9 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     protected int[] candidateVector;
     protected int vectorSize;
 
-    protected IIntList accessedIndices;
-    protected IIntList changedFields;
-    protected IIntList fixedIndices;
+    protected IntListAI accessedIndices;
+    protected IntListAI changedFields;
+    protected IntListAI fixedIndices;
 
     protected int currentIndex;
     protected int currentValue;
@@ -149,13 +148,18 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     }
 
     @Override
-    public IIntList getAccessedIndices() {
+    public IntListAI getAccessedIndices() {
         return accessedIndices;
     }
 
     @Override
-    public IIntList getChangedFields() {
+    public IntListAI getChangedFields() {
         return changedFields;
+    }
+
+    @Override
+    public IntListAI getFixedIndices() {
+        return fixedIndices;
     }
 
     @Override

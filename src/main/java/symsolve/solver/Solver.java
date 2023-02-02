@@ -7,13 +7,13 @@ import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
-import korat.utils.IIntList;
 import symsolve.candidates.CandidateBuilder;
 import symsolve.candidates.PredicateChecker;
 import symsolve.config.SymSolveConfig;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.explorers.impl.AbstractVectorStateSpaceExplorer;
 import symsolve.utils.Helper;
+import symsolve.vector.SymSolveSolution;
 import symsolve.vector.SymSolveVector;
 
 public class Solver {
@@ -51,21 +51,26 @@ public class Solver {
         return false;
     }
 
-    public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
+    public SymSolveSolution startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
         if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(initialVector))
-            return false;
+            return null;
         symbolicVectorSpaceExplorer.initialize(initialVector);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
-            if (predicateChecker.checkPredicate(candidate))
-                return true;
+            if (predicateChecker.checkPredicate(candidate)) {
+                return new SymSolveSolution(
+                        initialVector,
+                        symbolicVectorSpaceExplorer.getCandidateVector(),
+                        symbolicVectorSpaceExplorer.getAccessedIndices()
+                );
+            }
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
-        return false;
+        return null;
     }
 
-    public int[] getNextSolution(SymSolveVector previousSolutionVector) throws CannotInvokePredicateException {
+    public SymSolveSolution getNextSolution(SymSolveVector previousSolutionVector) throws CannotInvokePredicateException {
         assert (!symbolicVectorSpaceExplorer.canBeDeterminedUnsat(previousSolutionVector));
         symbolicVectorSpaceExplorer.initialize(previousSolutionVector);
 
@@ -76,21 +81,18 @@ public class Solver {
 
         while (vector != null) {
             candidate = candidateBuilder.buildCandidate(vector);
-            if (predicateChecker.checkPredicate(candidate))
-                return vector;
+            if (predicateChecker.checkPredicate(candidate)) {
+                return new SymSolveSolution(
+                        previousSolutionVector,
+                        symbolicVectorSpaceExplorer.getCandidateVector(),
+                        symbolicVectorSpaceExplorer.getAccessedIndices()
+                );
+            }
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
         return null;
     }
-
-    public int[] getCandidateVector() {
-        return symbolicVectorSpaceExplorer.getCandidateVector().clone();
-    }
-
-    public IIntList getAccessedIndices() {
-        return symbolicVectorSpaceExplorer.getAccessedIndices();
-    }
-
+    
     public Finitization getFinitization() {
         return finitization;
     }
