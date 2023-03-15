@@ -62,7 +62,8 @@ public class Solver {
                 return new SymSolveSolution(
                         query,
                         symbolicVectorSpaceExplorer.getCandidateVector(),
-                        symbolicVectorSpaceExplorer.getAccessedIndices()
+                        symbolicVectorSpaceExplorer.getAccessedIndices(),
+                        candidate
                 );
             }
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
@@ -86,7 +87,8 @@ public class Solver {
                 return new SymSolveSolution(
                         query,
                         symbolicVectorSpaceExplorer.getCandidateVector(),
-                        symbolicVectorSpaceExplorer.getAccessedIndices()
+                        symbolicVectorSpaceExplorer.getAccessedIndices(),
+                        candidate
                 );
             }
             vector = symbolicVectorSpaceExplorer.getNextCandidate();

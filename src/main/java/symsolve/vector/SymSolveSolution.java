@@ -9,12 +9,14 @@ public final class SymSolveSolution {
     private final SymSolveVector query;
     private final int[] solutionVector;
     private final IntListAI accessedIndices;
+    private final Object rootObject;
 
 
-    public SymSolveSolution(SymSolveVector query, int[] solutionVector, IntListAI accessedIndices) {
+    public SymSolveSolution(SymSolveVector query, int[] solutionVector, IntListAI accessedIndices, Object rootObject) {
         this.query = query.clone();
         this.solutionVector = solutionVector.clone();
         this.accessedIndices = accessedIndices.clone();
+        this.rootObject = rootObject;
     }
 
     public SymSolveVector getQuery() {
@@ -31,6 +33,10 @@ public final class SymSolveSolution {
 
     public IntListAI getAccessedIndices() {
         return accessedIndices.clone();
+    }
+
+    public Object getBuildedSolution() {
+        return rootObject;
     }
 
 }
