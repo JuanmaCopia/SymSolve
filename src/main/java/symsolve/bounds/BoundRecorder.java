@@ -37,25 +37,22 @@ public class BoundRecorder extends GenericCandidateVisitor {
     }
 
     @Override
-    public void accessedVisitedReferenceField(Object fieldObject, int fieldObjectID) {
-        accessedNewReferenceField(fieldObject, fieldObjectID);
+    public void accessedVisitedReferenceField(Object fieldObject, BFSCandidateTraversal.ObjectInfo fieldObjectInfo) {
+        accessedNewReferenceField(fieldObject, fieldObjectInfo);
     }
 
     @Override
-    public void accessedNullReferenceField(int fieldObjectID) {
-        accessedNewReferenceField(null, fieldObjectID);
-    }
-
-    @Override
-    public void accessedNewReferenceField(Object fieldObject, int fieldObjectID) {
+    public void accessedNullReferenceField() {
         ClassBound classBound = classBoundMap.get(currentOwnerClassName);
         assert (classBound != null);
-        classBound.addBound(currentFieldName, currentOwnerID, fieldObjectID);
+        classBound.addBound(currentFieldName, currentOwnerID, 0);
     }
 
     @Override
-    public void accessedPrimitiveField(int fieldObjectID) {
-        accessedNewReferenceField(null, fieldObjectID);
+    public void accessedNewReferenceField(Object fieldObject, BFSCandidateTraversal.ObjectInfo fieldObjectInfo) {
+        ClassBound classBound = classBoundMap.get(currentOwnerClassName);
+        assert (classBound != null);
+        classBound.addBound(currentFieldName, currentOwnerID, fieldObjectInfo.id + 1);
     }
 
     public Bounds getBounds() {

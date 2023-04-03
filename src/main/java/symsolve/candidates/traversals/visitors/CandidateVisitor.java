@@ -1,20 +1,21 @@
 package symsolve.candidates.traversals.visitors;
 
 import korat.finitization.impl.FieldDomain;
+import symsolve.candidates.traversals.BFSCandidateTraversal;
 
 public interface CandidateVisitor {
 
-    void setRoot(Object rootObject, int rootID);
+    void setRoot(Object rootObject, BFSCandidateTraversal.ObjectInfo rootInfo);
 
-    void setCurrentOwner(Object currentOwnerObject, int currentOwnerID);
+    void setCurrentOwner(Object currentOwnerObject, BFSCandidateTraversal.ObjectInfo currentOwnerInfo);
 
     void setCurrentField(FieldDomain domain, String name, int indexInVector, int indexInFieldDomain);
 
-    void accessedVisitedReferenceField(Object fieldObject, int fieldObjectID);
+    void accessedVisitedReferenceField(Object fieldObject, BFSCandidateTraversal.ObjectInfo fieldObjectInfo);
 
-    void accessedNullReferenceField(int fieldObjectID);
+    void accessedNullReferenceField();
 
-    void accessedNewReferenceField(Object fieldObject, int fieldObjectID);
+    void accessedNewReferenceField(Object fieldObject, BFSCandidateTraversal.ObjectInfo fieldObjectInfo);
 
     void accessedPrimitiveField(int fieldObjectID);
 

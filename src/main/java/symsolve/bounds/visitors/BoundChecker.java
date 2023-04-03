@@ -26,14 +26,14 @@ public class BoundChecker extends GenericCandidateVisitor {
     }
 
     @Override
-    public void setRoot(Object rootObject, int rootID) {
+    public void setRoot(Object rootObject, BFSCandidateTraversal.ObjectInfo rootInfo) {
         Set<Integer> rootLabelSet = new HashSet<>();
         rootLabelSet.add(rootID);
         labelSets.put(rootObject, rootLabelSet);
     }
 
     @Override
-    public void accessedNewReferenceField(Object fieldObject, int fieldObjectID) {
+    public void accessedNewReferenceField(Object fieldObject, BFSCandidateTraversal.ObjectInfo fieldObjectInfo) {
         Set<Integer> targetLabelSet = labelSets.calculateTargetLabelSet(currentOwnerObject, currentFieldName);
         if (targetLabelSet.isEmpty() && fixedIndices.contains(currentFieldIndexInVector))
             hasFieldOutOfBounds = true;
@@ -42,7 +42,7 @@ public class BoundChecker extends GenericCandidateVisitor {
     }
 
     @Override
-    public void accessedVisitedReferenceField(Object fieldObject, int fieldObjectID) {
+    public void accessedVisitedReferenceField(Object fieldObject, BFSCandidateTraversal.ObjectInfo fieldObjectInfo) {
         if (fixedIndices.contains(currentFieldIndexInVector)) {
             Set<Integer> targetLabelSet = labelSets.calculateTargetLabelSet(currentOwnerObject, currentFieldName);
             if (targetLabelSet.isEmpty()) {

@@ -7,14 +7,25 @@ import korat.finitization.impl.StateSpace;
 import symsolve.candidates.traversals.visitors.CandidateVisitor;
 
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 public class BFSCandidateTraversal implements CandidateTraversal {
+    public static class ObjectInfo {
+        public int id;
+        public Class<?> type;
+        public String chainRef;
+        
+        public ObjectInfo(int id, Class<?> type, String chainRef) {
+            this.id = id;
+            this.type = type;
+            this.chainRef = chainRef;
+        }
+    }
+
 
     Map<Class<?>, Integer> maxIdMap = new HashMap<>();
-    Map<Object, Integer> idMap = new IdentityHashMap<>();
+    HashMap<Object, ObjectInfo> idMap = new HashMap<>();
     LinkedList<Object> queue = new LinkedList<>();
 
     StateSpace stateSpace;
@@ -22,6 +33,8 @@ public class BFSCandidateTraversal implements CandidateTraversal {
     Object rootObject;
     int[] traversedVector;
     CandidateVisitor visitor;
+
+    ObjectInfo currentOwnerInfo;
 
 
     public BFSCandidateTraversal(StateSpace stateSpace) {
@@ -50,8 +63,11 @@ public class BFSCandidateTraversal implements CandidateTraversal {
         idMap.clear();
         queue.clear();
 
-        maxIdMap.put(rootObject.getClass(), 0);
-        idMap.put(rootObject, 0);
+        Class<?> rootClass = rootObject.getClass();
+        ObjectInfo rootInfo = new ObjectInfo(0, rootClass, rootClass.getSimpleName() + "_0");
+        idMap.put(rootObject, rootInfo);
+        maxIdMap.put(rootClass, 0);
+
         queue.add(rootObject);
     }
 
@@ -64,11 +80,8 @@ public class BFSCandidateTraversal implements CandidateTraversal {
     }
 
     protected void handleNode(Object node) {
-        int currentNodeID = idMap.get(node);
-        if (node != rootObject)
-            visitor.setCurrentOwner(node, currentNodeID + 1);
-        else
-            visitor.setCurrentOwner(node, currentNodeID);
+        currentOwnerInfo = idMap.get(node);
+        visitor.setCurrentOwner(node, currentOwnerInfo);
     }
 
     protected Object getNextNode() {
@@ -115,12 +128,11 @@ public class BFSCandidateTraversal implements CandidateTraversal {
     }
 
     protected void handleNullReferenceField(String fieldName, int indexInFieldDomain) {
-        visitor.accessedNullReferenceField(indexInFieldDomain);
+        visitor.accessedNullReferenceField();
     }
 
     protected void handleAlreadyVisitedReferenceField(String fieldName, Object fieldObject) {
-        int fieldObjectID = idMap.get(fieldObject) + 1;
-        visitor.accessedVisitedReferenceField(fieldObject, fieldObjectID);
+        visitor.accessedVisitedReferenceField(fieldObject, idMap.get(fieldObject));
     }
 
     protected void handleNewReferenceField(String fieldName, Object fieldObject) {
@@ -129,10 +141,11 @@ public class BFSCandidateTraversal implements CandidateTraversal {
         if (maxIdMap.containsKey(clsOfField))
             fieldObjectID = maxIdMap.get(clsOfField) + 1;
         maxIdMap.put(clsOfField, fieldObjectID);
-        idMap.put(fieldObject, fieldObjectID);
+        String refChain = currentOwnerInfo.chainRef + "." + fieldName;
+        ObjectInfo objectInfo = new ObjectInfo(fieldObjectID, clsOfField, refChain);
+        idMap.put(fieldObject, objectInfo);
 
-        fieldObjectID = fieldObjectID + 1;
-        visitor.accessedNewReferenceField(fieldObject, fieldObjectID);
+        visitor.accessedNewReferenceField(fieldObject, objectInfo);
 
         addNodeToQueue(fieldObject);
     }

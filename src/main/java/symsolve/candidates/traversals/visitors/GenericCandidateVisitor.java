@@ -1,6 +1,7 @@
 package symsolve.candidates.traversals.visitors;
 
 import korat.finitization.impl.FieldDomain;
+import symsolve.candidates.traversals.BFSCandidateTraversal;
 
 public class GenericCandidateVisitor implements CandidateVisitor {
 
@@ -23,18 +24,18 @@ public class GenericCandidateVisitor implements CandidateVisitor {
 
 
     @Override
-    public void setRoot(Object rootObject, int rootID) {
+    public void setRoot(Object rootObject, BFSCandidateTraversal.ObjectInfo rootInfo) {
         this.rootObject = rootObject;
         rootClass = rootObject.getClass();
-        this.rootID = rootID;
+        this.rootID = rootInfo.id;
     }
 
     @Override
-    public void setCurrentOwner(Object currentOwnerObject, int currentOwnerID) {
+    public void setCurrentOwner(Object currentOwnerObject, BFSCandidateTraversal.ObjectInfo currentOwnerInfo) {
         currentOwnerClass = currentOwnerObject.getClass();
         currentOwnerClassName = currentOwnerClass.getName();
         this.currentOwnerObject = currentOwnerObject;
-        this.currentOwnerID = currentOwnerID;
+        this.currentOwnerID = currentOwnerInfo.id;
     }
 
     @Override
@@ -46,15 +47,15 @@ public class GenericCandidateVisitor implements CandidateVisitor {
     }
 
     @Override
-    public void accessedVisitedReferenceField(Object fieldObject, int fieldObjectID) {
+    public void accessedVisitedReferenceField(Object fieldObject, BFSCandidateTraversal.ObjectInfo fieldObjectInfo) {
     }
 
     @Override
-    public void accessedNullReferenceField(int fieldObjectID) {
+    public void accessedNullReferenceField() {
     }
 
     @Override
-    public void accessedNewReferenceField(Object fieldObject, int fieldObjectID) {
+    public void accessedNewReferenceField(Object fieldObject, BFSCandidateTraversal.ObjectInfo fieldObjectInfo) {
     }
 
     @Override
