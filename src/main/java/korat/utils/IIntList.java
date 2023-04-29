@@ -52,7 +52,7 @@ public interface IIntList {
      * Number of elements in the list can be obtained by invoking
      * <code>numberOfElements()</code>.
      */
-    int get(int index);
+    //int get(int index);
 
     /**
      * Sets i-th element of the list to value <code>elem</code>. This
@@ -64,7 +64,6 @@ public interface IIntList {
      * Number of elements in the list can be obtained by invoking
      * <code>numberOfElements()</code>.
      */
-    int set(int index, int elem);
+    //int set(int index, int elem);
 
-    int getLength();
 }

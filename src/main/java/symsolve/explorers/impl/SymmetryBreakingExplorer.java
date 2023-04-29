@@ -8,8 +8,8 @@ public class SymmetryBreakingExplorer extends AbstractVectorStateSpaceExplorer {
     protected int[] maxInstances;
 
 
-    public SymmetryBreakingExplorer(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields) {
-        super(stateSpace, accessedIndices, changedFields);
+    public SymmetryBreakingExplorer(StateSpace stateSpace) {
+        super(stateSpace);
         maxInstances = new int[vectorSize];
     }
 

@@ -3,14 +3,14 @@ package symsolve.explorers.impl;
 import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
-import korat.utils.IIntList;
 import korat.utils.IntListAI;
+import symsolve.config.SolverConfig;
+import symsolve.config.SymSolveConfig;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.vector.SymSolveVector;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpaceExplorer {
 
@@ -19,9 +19,9 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     protected int[] candidateVector;
     protected int vectorSize;
 
-    protected IIntList accessedIndices;
-    protected IIntList changedFields;
-    protected IIntList fixedIndices;
+    protected IntListAI accessedIndices;
+    protected IntListAI changedFields;
+    protected IntListAI fixedIndices;
 
     protected int currentIndex;
     protected int currentValue;
@@ -36,12 +36,28 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     protected Map<FieldDomain, Integer> maxFixedInstancePerReferenceFieldDomain = new IdentityHashMap<>();
 
 
-    public AbstractVectorStateSpaceExplorer(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields) {
+    public AbstractVectorStateSpaceExplorer(StateSpace stateSpace) {
         this.stateSpace = stateSpace;
-        this.accessedIndices = accessedIndices;
-        this.changedFields = changedFields;
-        vectorSize = accessedIndices.getLength();
-        fixedIndices = new IntListAI(vectorSize);
+        vectorSize = stateSpace.getTotalNumberOfFields();
+        accessedIndices = new IntListAI(vectorSize);
+        changedFields = new IntListAI(vectorSize);
+    }
+
+
+    public static VectorStateSpaceExplorer makeSymbolicVectorExplorer(SymSolveConfig config, StateSpace stateSpace) {
+        SymmetryBreakStrategy strategy = config.getSymmetryBreakStrategy();
+        switch (strategy) {
+            case SYMMETRY_BREAK:
+                return new SymmetryBreakingExplorer(stateSpace);
+            case SYMMETRY_BREAK_REVERSE:
+                return new ReverseSymmetryBreakingExplorer(stateSpace);
+            case NO_SYMMETRY_BREAK:
+                return new NoSymmetryBreakingExplorer(stateSpace);
+            case SYMMETRY_BREAK_BOUNDED:
+                return new SymmetryBreakingExplorerBounded(stateSpace, ((SolverConfig) config).getBounds());
+            default:
+                throw new IllegalArgumentException(strategy.name() + " is not a valid Exploration Strategy ");
+        }
     }
 
     @Override
@@ -78,14 +94,15 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
     @Override
     public void initialize(SymSolveVector vector) {
         setCandidateVector(vector);
-        calculateMaxFixedInstancePerReferenceFieldDomain(vector.getFixedIndices());
+        calculateMaxFixedInstancePerReferenceFieldDomain();
         resetExplorerState();
     }
 
     private void setCandidateVector(SymSolveVector vector) {
-        this.candidateVector = vector.getConcreteVector();
-        if (vectorSize != this.candidateVector.length)
+        if (vectorSize != vector.getLength())
             throw new IllegalArgumentException(String.format("Wrong vector size! Expected: %d, but got: %d", vectorSize, this.candidateVector.length));
+        candidateVector = vector.getConcreteVector();
+        fixedIndices = vector.getFixedIndices();
     }
 
     void resetExplorerState() {
@@ -93,11 +110,9 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
             changedFields.add(i);
     }
 
-    private void calculateMaxFixedInstancePerReferenceFieldDomain(Set<Integer> fixedInd) {
+    private void calculateMaxFixedInstancePerReferenceFieldDomain() {
         maxFixedInstancePerReferenceFieldDomain.clear();
-        fixedIndices.clear();
-        for (Integer fixedIndex : fixedInd) {
-            fixedIndices.add(fixedIndex);
+        for (Integer fixedIndex : fixedIndices.toArray()) {
             FieldDomain fieldDomain = stateSpace.getFieldDomain(fixedIndex);
             if (!fieldDomain.isPrimitiveType()) {
                 int value = candidateVector[fixedIndex];
@@ -112,8 +127,7 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
         Integer maxInstance = this.maxFixedInstancePerReferenceFieldDomain.get(fieldDomain);
         if (maxInstance == null)
             maxInstance = 0;
-        for (int i = 0; i < accessedIndices.numberOfElements(); i++) {
-            int index = accessedIndices.get(i);
+        for (Integer index : accessedIndices.toArray()) {
             if (!this.fixedIndices.contains(index) && stateSpace.getFieldDomain(index) == fieldDomain) {
                 int value = candidateVector[index];
                 if (value > maxInstance)
@@ -133,5 +147,24 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
         return candidateVector;
     }
 
+    @Override
+    public IntListAI getAccessedIndices() {
+        return accessedIndices;
+    }
+
+    @Override
+    public IntListAI getChangedFields() {
+        return changedFields;
+    }
+
+    @Override
+    public IntListAI getFixedIndices() {
+        return fixedIndices;
+    }
+
+    @Override
+    public int getVectorSize() {
+        return vectorSize;
+    }
 
 }

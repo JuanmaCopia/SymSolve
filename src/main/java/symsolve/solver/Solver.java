@@ -7,54 +7,32 @@ import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
 import korat.testing.impl.CannotInvokePredicateException;
-import korat.utils.IIntList;
-import korat.utils.IntListAI;
 import symsolve.candidates.CandidateBuilder;
 import symsolve.candidates.PredicateChecker;
 import symsolve.config.SymSolveConfig;
 import symsolve.explorers.VectorStateSpaceExplorer;
-import symsolve.explorers.VectorStateSpaceExplorerFactory;
-import symsolve.explorers.impl.SymbolicVectorExplorerFactory;
-import symsolve.utils.CodeGenerator;
+import symsolve.explorers.impl.AbstractVectorStateSpaceExplorer;
 import symsolve.utils.Helper;
+import symsolve.vector.SymSolveSolution;
 import symsolve.vector.SymSolveVector;
-
-import java.lang.reflect.Method;
 
 public class Solver {
 
-    StateSpace stateSpace;
     VectorStateSpaceExplorer symbolicVectorSpaceExplorer;
     CandidateBuilder candidateBuilder;
-    CodeGenerator codeGenerator;
-    IIntList accessedIndices;
-    Class<?> rootClass;
     Finitization finitization;
     PredicateChecker predicateChecker;
 
-
     public Solver(SymSolveConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
-
-        rootClass = Finitization.getClassLoader().loadClass(params.getFullyQualifiedClassName());
-
-        String[] finArgs = params.getFinitizationArgs();
-        Method finMethod = Helper.getFinMethod(rootClass, params.getFinitizationName(), finArgs);
-        finitization = Helper.invokeFinMethod(rootClass, finMethod, finArgs);
+        Class<?> rootClass = Helper.loadClass(params.getFullyQualifiedClassName());
+        finitization = Helper.getFinitization(rootClass, params.getFinitizationName(), params.getFinitizationArgs());
         predicateChecker = new PredicateChecker();
         finitization.initialize(predicateChecker);
-        stateSpace = finitization.getStateSpace();
-        int vectorSize = stateSpace.getTotalNumberOfFields();
-        accessedIndices = new IntListAI(vectorSize);
-        IIntList changedFields = new IntListAI(vectorSize);
-
-        predicateChecker.initialize(rootClass, params.getPredicateName(), accessedIndices);
-
-        candidateBuilder = new CandidateBuilder(stateSpace, changedFields);
-        codeGenerator = new CodeGenerator(stateSpace, rootClass);
-
-        VectorStateSpaceExplorerFactory heapExplorerFactory = new SymbolicVectorExplorerFactory(stateSpace, accessedIndices, changedFields);
-        symbolicVectorSpaceExplorer = heapExplorerFactory.makeSymbolicVectorExplorer(params);
+        StateSpace stateSpace = finitization.getStateSpace();
+        symbolicVectorSpaceExplorer = AbstractVectorStateSpaceExplorer.makeSymbolicVectorExplorer(params, stateSpace);
+        predicateChecker.initialize(rootClass, params.getPredicateName(), symbolicVectorSpaceExplorer.getAccessedIndices());
+        candidateBuilder = new CandidateBuilder(stateSpace, symbolicVectorSpaceExplorer.getChangedFields());
     }
 
     public boolean runAutoHybridRepok(SymSolveVector vector) throws CannotInvokePredicateException {
@@ -66,30 +44,56 @@ public class Solver {
     }
 
     private boolean areSymbolicFieldsAccessed(SymSolveVector vector) {
-        for (int i = 0; i < accessedIndices.numberOfElements(); i++) {
-            int index = accessedIndices.get(i);
+        for (Integer index : symbolicVectorSpaceExplorer.getAccessedIndices().toArray()) {
             if (vector.isSymbolicIndex(index))
                 return true;
         }
         return false;
     }
 
-    public boolean startSearch(SymSolveVector initialVector) throws CannotInvokePredicateException {
-        if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(initialVector))
-            return false;
-        symbolicVectorSpaceExplorer.initialize(initialVector);
+    public SymSolveSolution startSearch(SymSolveVector query) throws CannotInvokePredicateException {
+        if (symbolicVectorSpaceExplorer.canBeDeterminedUnsat(query))
+            return null;
+        symbolicVectorSpaceExplorer.initialize(query);
         int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
-            if (predicateChecker.checkPredicate(candidate))
-                return true;
+            if (predicateChecker.checkPredicate(candidate)) {
+                return new SymSolveSolution(
+                        query,
+                        symbolicVectorSpaceExplorer.getCandidateVector(),
+                        symbolicVectorSpaceExplorer.getAccessedIndices(),
+                        candidate
+                );
+            }
             vector = symbolicVectorSpaceExplorer.getNextCandidate();
         }
-        return false;
+        return null;
     }
 
-    public int[] getCandidateVector() {
-        return this.symbolicVectorSpaceExplorer.getCandidateVector().clone();
+    public SymSolveSolution getNextSolution(SymSolveSolution previousSolution) throws CannotInvokePredicateException {
+        SymSolveVector query = new SymSolveVector(previousSolution);
+        assert (!symbolicVectorSpaceExplorer.canBeDeterminedUnsat(query));
+        symbolicVectorSpaceExplorer.initialize(query);
+
+        int[] vector = symbolicVectorSpaceExplorer.getCandidateVector();
+        Object candidate = candidateBuilder.buildCandidate(vector);
+        assert (predicateChecker.checkPredicate(candidate));  // Do not remove, checkPredicate call is necessary
+        vector = symbolicVectorSpaceExplorer.getNextCandidate();
+
+        while (vector != null) {
+            candidate = candidateBuilder.buildCandidate(vector);
+            if (predicateChecker.checkPredicate(candidate)) {
+                return new SymSolveSolution(
+                        query,
+                        symbolicVectorSpaceExplorer.getCandidateVector(),
+                        symbolicVectorSpaceExplorer.getAccessedIndices(),
+                        candidate
+                );
+            }
+            vector = symbolicVectorSpaceExplorer.getNextCandidate();
+        }
+        return null;
     }
 
     public Finitization getFinitization() {

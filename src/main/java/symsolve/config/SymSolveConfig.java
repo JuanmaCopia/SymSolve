@@ -10,7 +10,6 @@ public abstract class SymSolveConfig {
     String fullClassName;
     String[] finitizationArgs;
     String finitizationName;
-    String propertyFinitizationName;
     String predicateName;
     SymmetryBreakStrategy symmetryBreakStrategy;
 
@@ -23,10 +22,6 @@ public abstract class SymSolveConfig {
         return finitizationName;
     }
 
-    public String getPropertyCheckFinitizationName() {
-        return propertyFinitizationName;
-    }
-
     public String getFullyQualifiedClassName() {
         return fullClassName;
     }
@@ -35,7 +30,7 @@ public abstract class SymSolveConfig {
         return predicateName;
     }
 
-    public SymmetryBreakStrategy getSymmetryBreakStretegy() {
+    public SymmetryBreakStrategy getSymmetryBreakStrategy() {
         return symmetryBreakStrategy;
     }
 
@@ -44,8 +39,4 @@ public abstract class SymSolveConfig {
         return "fin" + cs[cs.length - 1];
     }
 
-    protected String calculatePropertyFinitizationName(String fullClassName) {
-        String[] cs = fullClassName.split("\\.");
-        return "propertyCheckFin" + cs[cs.length - 1];
-    }
 }

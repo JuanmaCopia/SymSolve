@@ -23,14 +23,14 @@ public class LabelSetCalculator extends GenericCandidateVisitor {
     }
 
     @Override
-    public void setRoot(Object rootObject, int rootID) {
+    public void setRoot(Object rootObject, BFSCandidateTraversal.ObjectInfo rootInfo) {
         Set<Integer> rootLabelSet = new HashSet<>();
-        rootLabelSet.add(rootID);
+        rootLabelSet.add(rootInfo.id);
         labelSets.put(rootObject, rootLabelSet);
     }
 
     @Override
-    public void accessedNewReferenceField(Object fieldObject, int fieldObjectID) {
+    public void accessedNewReferenceField(Object fieldObject, BFSCandidateTraversal.ObjectInfo fieldObjectInfo) {
         Set<Integer> targetLabelSet = labelSets.calculateTargetLabelSet(currentOwnerObject, currentFieldName);
         labelSets.put(fieldObject, targetLabelSet);
     }

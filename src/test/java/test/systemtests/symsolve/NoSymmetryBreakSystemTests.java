@@ -1,17 +1,18 @@
-package symsolve;
+package test.systemtests.symsolve;
 
 import org.junit.jupiter.api.Test;
+import symsolve.SymSolve;
 import symsolve.config.SolverConfig;
 import symsolve.explorers.impl.SymmetryBreakStrategy;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SymmetryBreakReverseSystemTests {
+public class NoSymmetryBreakSystemTests {
 
     @Test
     public void isSatisfiableHashMapTest() {
-        SolverConfig config = new SolverConfig("symsolve.examples.hashmap.HashMap", "2", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        SolverConfig config = new SolverConfig("symsolve.examples.hashmap.HashMap", "2", SymmetryBreakStrategy.NO_SYMMETRY_BREAK);
         SymSolve symSolve = new SymSolve(config);
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
@@ -147,7 +148,7 @@ public class SymmetryBreakReverseSystemTests {
     @Test
     public void isSatisfiableTreeMapTest() {
         String className = "symsolve.examples.treemap.TreeMap";
-        SolverConfig config = new SolverConfig(className, "5", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        SolverConfig config = new SolverConfig(className, "5", SymmetryBreakStrategy.NO_SYMMETRY_BREAK);
         SymSolve symSolve = new SymSolve(config);
         assertTrue(symSolve.isSatisfiable("0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
@@ -731,7 +732,7 @@ public class SymmetryBreakReverseSystemTests {
     @Test
     public void isSatisfiableScheduleTest() {
         String className = "symsolve.examples.schedule.Schedule";
-        SolverConfig config = new SolverConfig(className, "4", SymmetryBreakStrategy.SYMMETRY_BREAK_REVERSE);
+        SolverConfig config = new SolverConfig(className, "4", SymmetryBreakStrategy.NO_SYMMETRY_BREAK);
         SymSolve symSolve = new SymSolve(config);
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertTrue(symSolve.isSatisfiable("-1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
@@ -815,5 +816,4 @@ public class SymmetryBreakReverseSystemTests {
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 0, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
         assertFalse(symSolve.isSatisfiable("-1, -1, -1, -1, 1, 2, 3, -1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1"));
     }
-
 }
