@@ -39,4 +39,18 @@ public final class SymSolveSolution {
         return rootObject;
     }
 
+
+    public int[] getUniqueIdentifier() {
+        int[] queryPartialVector = query.createPartialVector();
+        return getUniqueIdentifier(queryPartialVector, solutionVector);
+    }
+
+    public static int[] getUniqueIdentifier(int[] a1, int[] a2) {
+        int[] identifier = new int[a1.length + a2.length + 1];
+        System.arraycopy(a1, 0, identifier, 0, a1.length);
+        System.arraycopy(a2, 0, identifier, a1.length + 1, a2.length);
+        identifier[a1.length] = -999;
+        return identifier;
+    }
+
 }
