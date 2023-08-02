@@ -4,7 +4,6 @@ import korat.finitization.impl.CVElem;
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;
 import korat.utils.IntListAI;
-import symsolve.config.SolverConfig;
 import symsolve.config.SymSolveConfig;
 import symsolve.explorers.VectorStateSpaceExplorer;
 import symsolve.vector.SymSolveVector;
@@ -53,8 +52,6 @@ public abstract class AbstractVectorStateSpaceExplorer implements VectorStateSpa
                 return new ReverseSymmetryBreakingExplorer(stateSpace);
             case NO_SYMMETRY_BREAK:
                 return new NoSymmetryBreakingExplorer(stateSpace);
-            case SYMMETRY_BREAK_BOUNDED:
-                return new SymmetryBreakingExplorerBounded(stateSpace, ((SolverConfig) config).getBounds());
             default:
                 throw new IllegalArgumentException(strategy.name() + " is not a valid Exploration Strategy ");
         }

@@ -7,8 +7,6 @@ import java.util.Arrays;
 
 /**
  * Class that holds the representations of partially symbolic vectors.
- *
- * @author Juan Manuel Copia
  */
 public final class SymSolveVector {
 
