@@ -18,16 +18,24 @@ public class List {
         return first;
     }
 
-    public void setFirst(Job newFirst) {
-        first = newFirst;
-    }
-
     public Job getLast() {
         return last;
     }
 
+    public void setFirst(Job newFirst) {
+        first = newFirst;
+    }
+
     public void setLast(Job newLast) {
         last = newLast;
+    }
+
+    public int getMemCount() {
+        return mem_count;
+    }
+
+    public void setMemCount(int newCount) {
+        mem_count = newCount;
     }
 
     public String toString() {
@@ -42,13 +50,5 @@ public class List {
         }
         buf.append('}');
         return buf.toString();
-    }
-
-    public int getMemCount() {
-        return mem_count;
-    }
-
-    public void setMemCount(int newCount) {
-        mem_count = newCount;
     }
 }

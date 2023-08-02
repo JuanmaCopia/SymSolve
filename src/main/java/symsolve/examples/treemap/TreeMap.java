@@ -1,22 +1,48 @@
+/*
+ * @(#)TreeMap.java	1.56 03/01/23
+ *
+ * Copyright 2003 Sun Microsystems, Inc. All rights reserved.
+ * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ */
+
 package symsolve.examples.treemap;
 
 import korat.finitization.IFinitization;
 import korat.finitization.IObjSet;
-import korat.finitization.impl.Finitization;
+import korat.finitization.impl.FinitizationFactory;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+
 public class TreeMap {
+    public transient Entry root = null;
+    public transient int size = 0;
 
     public static final boolean RED = false;
     public static final boolean BLACK = true;
-    public Entry root;
-    public int size = 0;
+
+    public TreeMap() {
+
+    }
+
+    public static class Entry {
+
+        public int key;
+        public Object value;
+        public Entry left = null;
+        public Entry right = null;
+        public Entry parent;
+        public boolean color = TreeMap.BLACK;
+
+        public Entry() {
+        }
+
+    }
 
     public static IFinitization finTreeMap(int nodesNum) {
-        IFinitization f = new Finitization(TreeMap.class);
+        IFinitization f = FinitizationFactory.create(TreeMap.class);
         IObjSet nodes = f.createObjSet(Entry.class, nodesNum, true);
         f.set(TreeMap.class, "root", nodes);
         f.set(TreeMap.class, "size", f.createIntSet(0, nodesNum));
@@ -28,59 +54,24 @@ public class TreeMap {
         return f;
     }
 
-    public static IFinitization propertyCheckFinTreeMap(int nodesNum) {
-        return finTreeMap(nodesNum + 1);
-    }
-
     public boolean repOK() {
-        if (root == null)
-            return true;
         if (!isBinTreeWithParentReferences())
             return false;
-        if (!isWellColored())
-            return false;
-        return isSorted();
-    }
-
-    public boolean repOKStructure() {
-        if (root == null)
-            return true;
-        Set<Entry> visited = new HashSet<Entry>();
-        LinkedList<Entry> worklist = new LinkedList<Entry>();
-        visited.add(root);
-        worklist.add(root);
-        if (root.parent != null)
-            return false;
-
-        while (!worklist.isEmpty()) {
-            Entry node = worklist.removeFirst();
-            Entry left = node.left;
-            if (left != null) {
-                if (!visited.add(left))
-                    return false;
-                if (left.parent != node)
-                    return false;
-                worklist.add(left);
-            }
-            Entry right = node.right;
-            if (right != null) {
-                if (!visited.add(right))
-                    return false;
-                if (right.parent != node)
-                    return false;
-                worklist.add(right);
-            }
-        }
-        return visited.size() == size;
+        return isWellColored();
     }
 
     public boolean isBinTreeWithParentReferences() {
-        Set<Entry> visited = new HashSet<Entry>();
-        LinkedList<Entry> worklist = new LinkedList<Entry>();
-        visited.add(root);
-        worklist.add(root);
+        Set<Entry> visited = new HashSet<>();
+
+        if (root == null)
+            return size == 0;
         if (root.parent != null)
             return false;
+
+        LinkedList<Entry> worklist = new LinkedList<Entry>();
+        if (!visited.add(root))
+            return false;
+        worklist.add(root);
 
         while (!worklist.isEmpty()) {
             Entry node = worklist.removeFirst();
@@ -105,6 +96,8 @@ public class TreeMap {
     }
 
     public boolean isWellColored() {
+        if (root == null)
+            return true;
         if (root.color != BLACK)
             return false;
         LinkedList<Entry> worklist = new LinkedList<Entry>();
@@ -146,7 +139,10 @@ public class TreeMap {
         return true;
     }
 
-    private boolean isSorted() {
+/*
+    public boolean isSorted() {
+        if (root == null)
+            return true;
         return isSorted(root, null, null);
     }
 
@@ -158,19 +154,15 @@ public class TreeMap {
             if (!isSorted(n.left, min, n.key))
                 return false;
         if (n.right != null)
-            return isSorted(n.right, n.key, max);
+            if (!isSorted(n.right, n.key, max))
+                return false;
         return true;
     }
-
-    public boolean shouldFailProperty() {
-        if (root != null)
-            return root.color == RED;
-        return false;
-    }
+*/
 
     private class Pair<T, U> {
-        private final T a;
-        private final U b;
+        private T a;
+        private U b;
 
         public Pair(T a, U b) {
             this.a = a;
