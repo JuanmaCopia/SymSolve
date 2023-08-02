@@ -36,3 +36,12 @@ To decide whether a symbolic instance is satisfiable, `SymSolve` requires an imp
 ## How to use it
 
 `SymSolve` can be used through its API, by importing the generated Jar File. The API implementation can be found in `src/main/java/symsolve/SymSolve.java`. Also, in the tests one can find how the API can be used. Check for example: `src/test/java/test/systemtests/symsolve/SymmetryBreakSystemTests.java`.
+
+## Limitations
+
+As SymSolve is a prototype, there are some limitations:
+
+- Currently, SymSolve does not support arrays.
+- The fields defined inside the finitization method should be declared in the same order that are declared in the class.
+- The name of the finitization method must be `fin<CLASS_NAME>` for the method to be found.
+- By default, the name of the repOK should be `repOK`, but a different name can be specified when calling SymSolve's constructor.
