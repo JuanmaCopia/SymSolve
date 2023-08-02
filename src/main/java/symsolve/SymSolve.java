@@ -7,12 +7,18 @@ import symsolve.solver.Solver;
 import symsolve.vector.SymSolveSolution;
 import symsolve.vector.SymSolveVector;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class SymSolve {
 
 
     SolverConfig config;
     private Solver solver;
+
+    private final Map<int[], SymSolveSolution> cache = new HashMap<>();
+    private final Map<int[], SymSolveSolution> nextSolutionCache = new HashMap<>();
 
 
     /**
@@ -47,14 +53,22 @@ public class SymSolve {
      * @return True if the symbolic structure is SAT, false if it is UNSAT.
      */
     public boolean isSatisfiable(SymSolveVector vector) {
-        boolean result = false;
+        SymSolveSolution solution = null;
+
+        int[] query = vector.createPartialVector();
+        if (cache.containsKey(query)) {
+            solution = cache.get(query);
+            return solution != null;
+        }
 
         try {
-            result = solver.startSearch(vector) != null;
+            solution = solver.startSearch(vector);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
-        return result;
+
+        cache.put(query, solution);
+        return solution != null;
     }
 
     /**
@@ -66,13 +80,19 @@ public class SymSolve {
      * UNSAT.
      */
     public SymSolveSolution solve(SymSolveVector vector) {
-        SymSolveSolution solution = null;
+        int[] query = vector.createPartialVector();
+        if (cache.containsKey(query)) {
+            return cache.get(query);
+        }
 
+        SymSolveSolution solution = null;
         try {
             solution = solver.startSearch(vector);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
+
+        cache.put(query, solution);
         return solution;
     }
 
@@ -99,13 +119,19 @@ public class SymSolve {
      * @return the new solution vector if found, null otherwise.
      */
     public SymSolveSolution getNextSolution(SymSolveSolution previousSolution) {
-        SymSolveSolution result = null;
+        int[] query = previousSolution.getUniqueIdentifier();
+        if (nextSolutionCache.containsKey(query)) {
+            return nextSolutionCache.get(query);
+        }
 
+        SymSolveSolution result = null;
         try {
             result = solver.getNextSolution(previousSolution);
         } catch (CannotInvokePredicateException e) {
             e.printStackTrace(System.err);
         }
+
+        nextSolutionCache.put(query, result);
         return result;
     }
 
