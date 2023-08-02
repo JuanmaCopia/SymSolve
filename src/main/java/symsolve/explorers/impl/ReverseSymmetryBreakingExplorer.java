@@ -8,8 +8,8 @@ public class ReverseSymmetryBreakingExplorer extends AbstractVectorStateSpaceExp
     private final boolean[] initializedFields;
 
 
-    public ReverseSymmetryBreakingExplorer(StateSpace stateSpace, IIntList accessedIndices, IIntList changedFields) {
-        super(stateSpace, accessedIndices, changedFields);
+    public ReverseSymmetryBreakingExplorer(StateSpace stateSpace) {
+        super(stateSpace);
         initializedFields = new boolean[vectorSize];
     }
 

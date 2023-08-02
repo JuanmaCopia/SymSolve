@@ -17,6 +17,7 @@ public class Finitization implements IFinitization {
     private final List<CVElem> vectorDescriptor = new ArrayList<>();
     private final StateSpace stateSpace = new StateSpace();
     private final Map<String, IntSet> integerFieldsMinMax = new HashMap<>();
+    private final Set<String> trackedFields = new HashSet<>();
     boolean isInitialized = false;
     ObjSet rootObjectSet;
     Object rootObject;
@@ -74,7 +75,6 @@ public class Finitization implements IFinitization {
         if (fieldsMap != null) {
             for (Map.Entry<String, IFieldDomain> e : fieldsMap.entrySet()) {
                 String fieldName = e.getKey();
-                IFieldDomain fd = e.getValue();
                 FieldDomain fieldDomain = (FieldDomain) e.getValue();
                 CVElem elem = new CVElem(obj, fieldName, fieldDomain, stateSpace);
                 vectorDescriptor.add(elem);
@@ -209,6 +209,9 @@ public class Finitization implements IFinitization {
     }
 
     public void set(Class<?> cls, String fieldName, IFieldDomain fieldDomain) {
+        String fieldSignature = createFieldSignature(cls, fieldName);
+        trackedFields.add(fieldSignature);
+
         if (!domainsMap.containsKey(cls))
             domainsMap.put(cls, new LinkedHashMap<>());
 
@@ -249,22 +252,34 @@ public class Finitization implements IFinitization {
         objSet.replaceFirstObject(rootObject);
     }
 
-    public HashMap<String, Integer> getScopes() {
+    public HashMap<String, Integer> getDataBounds() {
         HashMap<String, Integer> scopes = new HashMap<>();
         CVElem[] structureList = stateSpace.getStructureList();
         for (CVElem cvElem : structureList) {
             FieldDomain fieldDomain = cvElem.getFieldDomain();
             if (!fieldDomain.isPrimitiveType()) {
-                String classSimpleName = fieldDomain.getClassOfField().getSimpleName();
-                if (!scopes.containsKey(classSimpleName)) {
+                String fullClassName = fieldDomain.getClassOfField().getTypeName();
+                if (!scopes.containsKey(fullClassName)) {
                     int bound = fieldDomain.getNumberOfElements();
                     if (((ObjSet) fieldDomain).isNullAllowed())
                         bound--;
-                    scopes.put(classSimpleName, bound);
+                    scopes.put(fullClassName, bound);
                 }
             }
         }
         return scopes;
+    }
+
+    public String createFieldSignature(Class<?> ownerClass, String fieldName) {
+        return String.format("%s %s", ownerClass.getName(), fieldName);
+    }
+
+    public String createFieldSignature(String ownerClassName, String fieldName) {
+        return String.format("%s %s", ownerClassName, fieldName);
+    }
+
+    public boolean isFieldTracked(String ownerClassName, String fieldName) {
+        return trackedFields.contains(createFieldSignature(ownerClassName, fieldName));
     }
 
 }

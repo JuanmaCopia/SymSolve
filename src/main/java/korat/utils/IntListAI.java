@@ -1,40 +1,32 @@
 package korat.utils;
 
-/**
- * List of integers with stack policy
- * <p>
- * Different mechanism for checking if the field index is already contained in
- * the accessed field list. This implementation should work faster than
- * IntListBS, which uses java.util.BitSet to check for presence of value inside
- * the list.
- *
- * @author Sasa Misailovic <sasa.misailovic@gmail.com>
- */
 public class IntListAI implements IIntList {
 
-    protected int[] elems;
-
-    protected int lastElementIndex = -1;
-
+    int[] elems;
     int[] cvelems;
-
+    int lastElementIndex = -1;
     int cnt;
+    int maxSize;
 
-    public IntListAI(int candidateVectorSize) {
-        elems = new int[candidateVectorSize];
-        cvelems = new int[candidateVectorSize];
+    public IntListAI(int size) {
+        maxSize = size;
+        elems = new int[maxSize];
+        cvelems = new int[maxSize];
         cnt = 1;
     }
 
-    public String toString() {
-        StringBuffer sb = new StringBuffer("[");
-        int size = numberOfElements();
-        for (int i = 0; i < size - 1; i++)
-            sb.append(elems[i]).append(", ");
-        sb.append(elems[size - 1]).append("]");
-
-        return sb.toString();
+    public IntListAI(IntListAI other) {
+        maxSize = other.maxSize;
+        elems = other.elems.clone();
+        cvelems = other.cvelems.clone();
+        cnt = other.cnt;
+        lastElementIndex = other.lastElementIndex;
     }
+
+    public int getMaxSize() {
+        return maxSize;
+    }
+
 
     public int numberOfElements() {
         return lastElementIndex + 1;
@@ -49,14 +41,14 @@ public class IntListAI implements IIntList {
     }
 
     public int[] toArray() {
-        int[] ret = new int[numberOfElements()];
-        for (int i = 0; i < numberOfElements(); i++)
-            ret[i] = elems[i];
+        int size = lastElementIndex + 1;
+        int[] ret = new int[size];
+        System.arraycopy(elems, 0, ret, 0, size);
         return ret;
     }
 
     public boolean add(int elem) {
-        if (contains(elem))
+        if (cvelems[elem] == cnt) // if contains the element
             return false;
 
         elems[++lastElementIndex] = elem;
@@ -81,19 +73,18 @@ public class IntListAI implements IIntList {
         lastElementIndex = -1;
     }
 
-    public int get(int idx) {
-        return elems[idx];
+    public IntListAI clone() {
+        return new IntListAI(this);
     }
 
-    public int set(int idx, int elem) {
-        cvelems[idx] = cnt;
-        return elems[idx] = elem;
-    }
+    public String toString() {
+        StringBuffer sb = new StringBuffer("[");
+        int size = numberOfElements();
+        for (int i = 0; i < size - 1; i++)
+            sb.append(elems[i]).append(", ");
+        sb.append(elems[size - 1]).append("]");
 
-    @Override
-    public int getLength() {
-        return elems.length;
+        return sb.toString();
     }
-
 
 }
