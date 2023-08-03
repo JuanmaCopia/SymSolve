@@ -9,25 +9,25 @@ public class Job {
 
     public int priority;
 
-    public Job() {
-    }
-
     public Job(int newNum) {
         next = null;
         prev = null;
         val = newNum;
     }
 
+    public Job() {
+    }
+
     public Job getNext() {
         return next;
     }
 
-    public void setNext(Job newNext) {
-        next = newNext;
-    }
-
     public Job getPrev() {
         return prev;
+    }
+
+    public void setNext(Job newNext) {
+        next = newNext;
     }
 
     public void setPrev(Job newPrev) {
@@ -38,12 +38,12 @@ public class Job {
         return val;
     }
 
-    public void setVal(int newVal) {
-        val = newVal;
-    }
-
     public int getPriority() {
         return priority;
+    }
+
+    public void setVal(int newVal) {
+        val = newVal;
     }
 
     public void setPriority(int newPriority) {
