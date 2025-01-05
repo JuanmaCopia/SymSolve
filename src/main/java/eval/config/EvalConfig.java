@@ -1,13 +1,15 @@
 package eval.config;
 
-public class KoratGenConfig {
+public class EvalConfig {
 
     static final String DEFAULT_PREDICATE_NAME = "repOK";
+    static final String DEFAULT_GROUND_TRUTH_PREDICATE_NAME = "repOK";
 
     String fullClassName;
     String[] finitizationArgs;
     String finitizationName;
-    String predicateName;
+    String evaluatedPredicateName;
+    String groundTruthPredicateName;
 
 
     public String[] getFinitizationArgs() {
@@ -22,8 +24,12 @@ public class KoratGenConfig {
         return fullClassName;
     }
 
-    public String getPredicateName() {
-        return predicateName;
+    public String getEvaluatedPredicateName() {
+        return evaluatedPredicateName;
+    }
+
+    public String getGroundTruthPredicateName() {
+        return groundTruthPredicateName;
     }
 
     protected String calculateFinitizationName(String fullClassName) {
@@ -31,15 +37,16 @@ public class KoratGenConfig {
         return "fin" + cs[cs.length - 1];
     }
 
-    public KoratGenConfig(String fullClassName, String finitizationArgs, String predicateName) {
+    public EvalConfig(String fullClassName, String finitizationArgs, String predicateName, String groundTruthPredicateName) {
         this.fullClassName = fullClassName;
+        this.evaluatedPredicateName = predicateName;
+        this.groundTruthPredicateName = groundTruthPredicateName;
         this.finitizationArgs = finitizationArgs.split(",");
-        this.predicateName = predicateName;
         this.finitizationName = calculateFinitizationName(fullClassName);
     }
 
-    public KoratGenConfig(String fullClassName, String finitizationArgs) {
-        this(fullClassName, finitizationArgs, DEFAULT_PREDICATE_NAME);
+    public EvalConfig(String fullClassName, String finitizationArgs) {
+        this(fullClassName, finitizationArgs, DEFAULT_PREDICATE_NAME, DEFAULT_GROUND_TRUTH_PREDICATE_NAME);
     }
 
 }

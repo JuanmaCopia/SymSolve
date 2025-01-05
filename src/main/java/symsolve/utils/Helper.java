@@ -57,7 +57,8 @@ public class Helper {
         try {
             return testClass.getMethod(predicateName, (Class[]) null);
         } catch (Exception e) {
-            throw new CannotFindPredicateException(testClass, predicateName, e);
+            String message = "Cannot find predicate " + predicateName + " in class " + testClass.getName();
+            throw new CannotFindPredicateException(testClass, predicateName, message, e);
         }
     }
 

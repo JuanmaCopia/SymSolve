@@ -1,35 +1,38 @@
 package eval;
 
-import eval.config.KoratGenConfig;
-import eval.explorers.KoratGenerator;
+import eval.config.EvalConfig;
+import eval.explorers.Evaluator;
+import eval.results.Results;
 
 
 public class PredicateEvaluator {
 
-    KoratGenConfig config;
-    private KoratGenerator generator;
+    EvalConfig config;
+    private Evaluator evaluator;
 
     /**
      * Creates a SymSolve instance according to the provides configuration parameters.
      *
      * @param config The configuration parameters.
      */
-    public PredicateEvaluator(KoratGenConfig config) {
+    public PredicateEvaluator(EvalConfig config) {
         this.config = config;
         try {
-            generator = new KoratGenerator(config);
+            evaluator = new Evaluator(config);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void generateStructures() {
+    public Results evaluatePredicate() {
         //System.out.println("start search");
+        Results results = null;
         try {
-            generator.startSearch();
+            results = evaluator.startSearch();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return results;
     }
 
 

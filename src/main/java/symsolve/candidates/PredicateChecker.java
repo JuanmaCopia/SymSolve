@@ -44,6 +44,15 @@ public class PredicateChecker implements ITester {
         }
     }
 
+    public boolean callPredicate(Object structure) throws CannotInvokePredicateException {
+        assert (predicate != null);
+        try {
+            return (Boolean) predicate.invoke(structure, (Object[]) null);
+        } catch (Exception e) {
+            throw new CannotInvokePredicateException(rootClass, predicate.getName(), e.getMessage(), e);
+        }
+    }
+
     @Override
     public void startFieldTrace() {
         traceStarted = true;
