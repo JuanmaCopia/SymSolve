@@ -1,7 +1,7 @@
-package brute.explorers;
+package eval.explorers;
 
 
-import brute.config.BruteConfig;
+import eval.config.KoratGenConfig;
 import korat.finitization.impl.Finitization;
 import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindFinitizationException;
@@ -13,14 +13,14 @@ import symsolve.candidates.PredicateChecker;
 import symsolve.utils.Helper;
 import symsolve.vector.SymSolveSolution;
 
-public class BruteGenerator {
+public class KoratGenerator {
 
     CandidateBuilder candidateBuilder;
     Finitization finitization;
     PredicateChecker predicateChecker;
     BoundedExhaustiveExplorer explorer;
 
-    public BruteGenerator(BruteConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
+    public KoratGenerator(KoratGenConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
         Class<?> rootClass = Helper.loadClass(params.getFullyQualifiedClassName());
         finitization = Helper.getFinitization(rootClass, params.getFinitizationName(), params.getFinitizationArgs());

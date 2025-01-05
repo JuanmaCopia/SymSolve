@@ -4,7 +4,6 @@ import korat.finitization.IFloatSet;
 
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
- * 
  */
 public class FloatSet extends PrimitiveTypeSet implements IFloatSet {
 
@@ -22,8 +21,7 @@ public class FloatSet extends PrimitiveTypeSet implements IFloatSet {
     }
 
     public void addFloat(float f) {
-        Float ff = new Float(f);
-        primitives.add(ff);
+        primitives.add(f);
     }
 
     public void addRange(float min, float diff, float max) {

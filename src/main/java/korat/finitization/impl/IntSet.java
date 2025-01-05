@@ -48,7 +48,7 @@ public class IntSet extends PrimitiveTypeSet implements IIntSet {
     }
 
     public void removeInt(int i) {
-        primitives.remove(new Integer(i));
+        primitives.remove(i);
     }
 
     public int getInt(int index) {

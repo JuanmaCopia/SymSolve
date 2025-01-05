@@ -1,4 +1,4 @@
-package brute.explorers;
+package eval.explorers;
 
 import korat.finitization.impl.FieldDomain;
 import korat.finitization.impl.StateSpace;

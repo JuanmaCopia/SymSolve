@@ -4,7 +4,6 @@ import korat.finitization.IDoubleSet;
 
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
- * 
  */
 public class DoubleSet extends PrimitiveTypeSet implements IDoubleSet {
 
@@ -22,8 +21,7 @@ public class DoubleSet extends PrimitiveTypeSet implements IDoubleSet {
     }
 
     public void addDouble(double d) {
-        Double dd = new Double(d);
-        primitives.add(dd);
+        primitives.add(d);
     }
 
     public void addRange(double min, double diff, double max) {

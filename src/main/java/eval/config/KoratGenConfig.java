@@ -1,6 +1,6 @@
-package brute.config;
+package eval.config;
 
-public class BruteConfig {
+public class KoratGenConfig {
 
     static final String DEFAULT_PREDICATE_NAME = "repOK";
 
@@ -31,14 +31,14 @@ public class BruteConfig {
         return "fin" + cs[cs.length - 1];
     }
 
-    public BruteConfig(String fullClassName, String finitizationArgs, String predicateName) {
+    public KoratGenConfig(String fullClassName, String finitizationArgs, String predicateName) {
         this.fullClassName = fullClassName;
         this.finitizationArgs = finitizationArgs.split(",");
         this.predicateName = predicateName;
         this.finitizationName = calculateFinitizationName(fullClassName);
     }
 
-    public BruteConfig(String fullClassName, String finitizationArgs) {
+    public KoratGenConfig(String fullClassName, String finitizationArgs) {
         this(fullClassName, finitizationArgs, DEFAULT_PREDICATE_NAME);
     }
 

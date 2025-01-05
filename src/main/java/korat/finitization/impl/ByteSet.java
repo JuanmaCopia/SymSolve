@@ -4,7 +4,6 @@ import korat.finitization.IByteSet;
 
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
- * 
  */
 public class ByteSet extends PrimitiveTypeSet implements IByteSet {
 
@@ -31,15 +30,14 @@ public class ByteSet extends PrimitiveTypeSet implements IByteSet {
 
         byte b = min;
         while (b < max) {
-            primitives.add(new Byte(b));
+            primitives.add(b);
             b += diff;
         }
-        primitives.add(new Byte(max));
+        primitives.add(max);
     }
 
     public void removeByte(byte b) {
-        Byte bb = new Byte(b);
-        primitives.remove(bb);
+        primitives.remove(b);
     }
 
     public byte getByte(int index) {

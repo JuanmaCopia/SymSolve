@@ -1,23 +1,23 @@
-package brute;
+package eval;
 
-import brute.config.BruteConfig;
-import brute.explorers.BruteGenerator;
+import eval.config.KoratGenConfig;
+import eval.explorers.KoratGenerator;
 
 
-public class Brute {
+public class PredicateEvaluator {
 
-    BruteConfig config;
-    private BruteGenerator generator;
+    KoratGenConfig config;
+    private KoratGenerator generator;
 
     /**
      * Creates a SymSolve instance according to the provides configuration parameters.
      *
      * @param config The configuration parameters.
      */
-    public Brute(BruteConfig config) {
+    public PredicateEvaluator(KoratGenConfig config) {
         this.config = config;
         try {
-            generator = new BruteGenerator(config);
+            generator = new KoratGenerator(config);
         } catch (Exception e) {
             e.printStackTrace();
         }

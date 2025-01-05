@@ -4,7 +4,6 @@ import korat.finitization.ILongSet;
 
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
- * 
  */
 public class LongSet extends PrimitiveTypeSet implements ILongSet {
 
@@ -22,6 +21,7 @@ public class LongSet extends PrimitiveTypeSet implements ILongSet {
     }
 
     public void addLong(long l) {
+
         primitives.add(l);
     }
 

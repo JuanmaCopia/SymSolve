@@ -4,7 +4,6 @@ import korat.finitization.IShortSet;
 
 /**
  * @author Aleksandar Milicevic <aca.milicevic@gmail.com>
- * 
  */
 public class ShortSet extends PrimitiveTypeSet implements IShortSet {
 
@@ -22,8 +21,7 @@ public class ShortSet extends PrimitiveTypeSet implements IShortSet {
     }
 
     public void addShort(short s) {
-        Short ss = new Short(s);
-        primitives.add(ss);
+        primitives.add(s);
     }
 
     public void addRange(short min, short diff, short max) {
@@ -35,7 +33,7 @@ public class ShortSet extends PrimitiveTypeSet implements IShortSet {
             primitives.add(s);
             s += diff;
         }
-        primitives.add(new Short(max));
+        primitives.add(max);
     }
 
     public void removeShort(short s) {
