@@ -12,7 +12,7 @@ public class GeneratorTests {
         String className = "symsolve.examples.treemap.TreeMap";
         EvalConfig config = new EvalConfig(className, "2");
         Generator predicateEvaluator = new Generator(config);
-        predicateEvaluator.generateStructures();
+        predicateEvaluator.generateAllStructures();
     }
 
 }
