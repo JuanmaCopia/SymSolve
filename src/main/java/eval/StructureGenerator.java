@@ -2,12 +2,12 @@ package eval;
 
 import eval.config.EvalConfig;
 import eval.explorers.KoratGeneratorIterator;
-import eval.util.Pair;
+import eval.util.CandidateResult;
 
 import java.util.Iterator;
 
 
-public class Generator implements Iterator<Pair<Object, Boolean>> {
+public class StructureGenerator implements Iterator<CandidateResult> {
 
     EvalConfig config;
     private KoratGeneratorIterator generator;
@@ -17,7 +17,7 @@ public class Generator implements Iterator<Pair<Object, Boolean>> {
      *
      * @param config The configuration parameters.
      */
-    public Generator(EvalConfig config) {
+    public StructureGenerator(EvalConfig config) {
         this.config = config;
         try {
             generator = new KoratGeneratorIterator(config);
@@ -41,7 +41,8 @@ public class Generator implements Iterator<Pair<Object, Boolean>> {
     }
 
     @Override
-    public Pair<Object, Boolean> next() {
+    public CandidateResult next() {
         return generator.next();
     }
+
 }

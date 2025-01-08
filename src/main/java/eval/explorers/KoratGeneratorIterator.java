@@ -2,7 +2,7 @@ package eval.explorers;
 
 
 import eval.config.EvalConfig;
-import eval.util.Pair;
+import eval.util.CandidateResult;
 import korat.finitization.impl.Finitization;
 import korat.finitization.impl.StateSpace;
 import korat.testing.impl.CannotFindFinitizationException;
@@ -16,7 +16,7 @@ import symsolve.utils.Helper;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class KoratGeneratorIterator implements Iterator<Pair<Object, Boolean>> {
+public class KoratGeneratorIterator implements Iterator<CandidateResult> {
 
     CandidateBuilder candidateBuilder;
     Finitization finitization;
@@ -46,16 +46,17 @@ public class KoratGeneratorIterator implements Iterator<Pair<Object, Boolean>> {
     }
 
     @Override
-    public Pair<Object, Boolean> next() {
+    public CandidateResult next() {
         Object candidate = candidateBuilder.buildCandidate(candidateVector);
-        boolean result = false;
+        boolean verdict = false;
         try {
-            result = predicateChecker.checkPredicate(candidate);
+            verdict = predicateChecker.checkPredicate(candidate);
         } catch (CannotInvokePredicateException e) {
             throw new RuntimeException(e);
         }
+        CandidateResult resultCandidate = new CandidateResult(candidate, getCandidateVector(), verdict);
         candidateVector = explorer.getNextCandidate();
-        return new Pair<>(candidate, result);
+        return resultCandidate;
     }
 
     public void startSearch() throws CannotInvokePredicateException {
@@ -63,12 +64,16 @@ public class KoratGeneratorIterator implements Iterator<Pair<Object, Boolean>> {
             Object candidate = candidateBuilder.buildCandidate(candidateVector);
             if (predicateChecker.checkPredicate(candidate)) {
                 // valid
-                System.out.println("valid: " + Arrays.toString(explorer.getCandidateVector()));
+                //System.out.println("valid: " + Arrays.toString(explorer.getCandidateVector()));
             } else {
                 // invalid
-                System.out.println("invalid: " + Arrays.toString(explorer.getCandidateVector()));
+                //System.out.println("invalid: " + Arrays.toString(explorer.getCandidateVector()));
             }
             candidateVector = explorer.getNextCandidate();
         }
+    }
+
+    public int[] getCandidateVector() {
+        return Arrays.copyOf(candidateVector, candidateVector.length);
     }
 }
