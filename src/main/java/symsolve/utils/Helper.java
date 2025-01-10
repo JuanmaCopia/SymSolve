@@ -1,11 +1,11 @@
 package symsolve.utils;
 
+import java.lang.reflect.Method;
+
 import korat.finitization.impl.Finitization;
 import korat.testing.impl.CannotFindFinitizationException;
 import korat.testing.impl.CannotFindPredicateException;
 import korat.testing.impl.CannotInvokeFinitizationException;
-
-import java.lang.reflect.Method;
 
 public class Helper {
 
@@ -62,6 +62,25 @@ public class Helper {
         }
     }
 
+    /**
+     * Load the method with the given name from the given class
+     *
+     * @param clazz      the class
+     * @param methodName the name of the method
+     * @return the method
+     */
+    public static Method loadMethod(Class<?> clazz, String methodName) {
+        try {
+            Method[] methods = clazz.getMethods();
+            for (Method m : methods) {
+                if (m.getName().equals(methodName))
+                    return m;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 
     public static Method getFinMethod(Class<?> cls, String finName, String[] finArgs) throws CannotFindFinitizationException {
         Method finitize = null;

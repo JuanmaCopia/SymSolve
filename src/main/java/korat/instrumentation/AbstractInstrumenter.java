@@ -65,6 +65,36 @@ abstract class AbstractInstrumenter implements IInstrumenter {
         return data;
     }
 
+    @Override
+    public byte[] getNonInstrumentedBytecode(String className) throws ClassNotFoundException {
+        byte[] data = null;
+        try {
+
+            CtClass clz = cp.get(className);
+            clz.stopPruning(true); // for JUnit regression tests
+
+            if (clz.isFrozen()) {
+                clz.defrost();
+            }
+
+            data = clz.toBytecode();
+
+/*            if (ConfigManager.getInstance().dumpBytecodes) {
+                korat.utils.BytecodeDumper.getInstance().dumpAndEatExceptions(data,
+                    clz.getName(), true);
+            }*/
+
+        } catch (CannotCompileException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (NotFoundException e) {
+            throw new ClassNotFoundException("class " + className
+                    + " doesn't exist!", e);
+        }
+        return data;
+    }
+
     protected abstract void instrument(CtClass clz)
             throws CannotCompileException, NotFoundException, IOException;
 

@@ -2,14 +2,14 @@ package eval.config;
 
 public class EvalConfig {
 
-    static final String DEFAULT_PREDICATE_NAME = "repOK";
-    static final String DEFAULT_GROUND_TRUTH_PREDICATE_NAME = "repOK";
-
-    String fullClassName;
+    String subjectClassName;
     String[] finitizationArgs;
     String finitizationName;
+    String predicateClassName;
     String evaluatedPredicateName;
     String groundTruthPredicateName;
+
+    public boolean validClassValidStructures;
 
 
     public String[] getFinitizationArgs() {
@@ -20,8 +20,12 @@ public class EvalConfig {
         return finitizationName;
     }
 
-    public String getFullyQualifiedClassName() {
-        return fullClassName;
+    public String getSubjectClassName() {
+        return subjectClassName;
+    }
+
+    public String getPredicateClassName() {
+        return predicateClassName;
     }
 
     public String getEvaluatedPredicateName() {
@@ -37,16 +41,13 @@ public class EvalConfig {
         return "fin" + cs[cs.length - 1];
     }
 
-    public EvalConfig(String fullClassName, String finitizationArgs, String predicateName, String groundTruthPredicateName) {
-        this.fullClassName = fullClassName;
+    public EvalConfig(String subjectClassName, String predicateClassName, String finitizationArgs, String predicateName, String groundTruthPredicateName, boolean validClassValidStructures) {
+        this.subjectClassName = subjectClassName;
         this.evaluatedPredicateName = predicateName;
         this.groundTruthPredicateName = groundTruthPredicateName;
         this.finitizationArgs = finitizationArgs.split(",");
-        this.finitizationName = calculateFinitizationName(fullClassName);
+        this.finitizationName = calculateFinitizationName(subjectClassName);
+        this.predicateClassName = predicateClassName;
+        this.validClassValidStructures = validClassValidStructures;
     }
-
-    public EvalConfig(String fullClassName, String finitizationArgs) {
-        this(fullClassName, finitizationArgs, DEFAULT_PREDICATE_NAME, DEFAULT_GROUND_TRUTH_PREDICATE_NAME);
-    }
-
 }

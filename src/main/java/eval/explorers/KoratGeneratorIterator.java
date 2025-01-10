@@ -27,13 +27,13 @@ public class KoratGeneratorIterator implements Iterator<CandidateResult> {
 
     public KoratGeneratorIterator(EvalConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
-        Class<?> rootClass = Helper.loadClass(params.getFullyQualifiedClassName());
+        Class<?> rootClass = Helper.loadClass(params.getSubjectClassName());
         finitization = Helper.getFinitization(rootClass, params.getFinitizationName(), params.getFinitizationArgs());
         predicateChecker = new PredicateChecker();
         finitization.initialize(predicateChecker);
         StateSpace stateSpace = finitization.getStateSpace();
         explorer = new BoundedExhaustiveExplorer(stateSpace);
-        predicateChecker.initialize(rootClass, params.getEvaluatedPredicateName(), explorer.getAccessedIndices());
+        predicateChecker.initialize(rootClass, params.getGroundTruthPredicateName(), explorer.getAccessedIndices());
         candidateBuilder = new CandidateBuilder(stateSpace, explorer.getChangedFields());
 
         // Initialize the candidate vector

@@ -28,7 +28,7 @@ public class PredicateEvaluator {
         //System.out.println("start search");
         Results results = null;
         try {
-            results = evaluator.startSearch();
+            results = evaluator.startEvaluation();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -6,9 +6,7 @@ import korat.loading.filter.FilterManager;
 import korat.loading.filter.IComparingFilter;
 
 /**
- * 
  * @author Sasa Misailovic <sasa.misailovic@gmail.com>
- *
  */
 public class InstrumentingClassLoader extends ClassLoader {
 
@@ -17,7 +15,7 @@ public class InstrumentingClassLoader extends ClassLoader {
     private IInstrumenter instrumenter;
 
     private IComparingFilter comparingFilter;
-    
+
     private static final boolean DEBUG = false;
 
     public InstrumentingClassLoader() {
@@ -35,7 +33,7 @@ public class InstrumentingClassLoader extends ClassLoader {
             throws ClassNotFoundException {
 
         // find the class if it was already loaded
-    	Class<?> c = findLoadedClass(className);
+        Class<?> c = findLoadedClass(className);
 
         if (c == null) { // class was not found in local table
 
@@ -45,24 +43,29 @@ public class InstrumentingClassLoader extends ClassLoader {
             if (pass) {
 
                 // instrument and load class
-                byte data[] = instrumenter.getBytecode(className);
+                byte data[] = null;
+                if (className.contains("Predicate")) {
+                    data = instrumenter.getNonInstrumentedBytecode(className);
+                } else {
+                    data = instrumenter.getBytecode(className);
+                }
                 c = defineClass(className, data, 0, data.length);
-                
+
             } else {
-                
+
                 // load class using default loader
                 c = getParent().loadClass(className);
                 if (DEBUG)
                     System.out.println("X " + className);
                 return c;
-                
+
             }
 
             if (c == null)
                 throw new ClassNotFoundException(className);
-             
+
             if (DEBUG)
-                System.out.println((pass? "* " : "  ") + "Loaded class: " + c.getCanonicalName());
+                System.out.println((pass ? "* " : "  ") + "Loaded class: " + c.getCanonicalName());
         }
 
         // if resolution is required, do it
@@ -70,7 +73,7 @@ public class InstrumentingClassLoader extends ClassLoader {
             resolveClass(c);
 
         return c;
-        
+
     }
 
     public IComparingFilter getComparingFilter() {

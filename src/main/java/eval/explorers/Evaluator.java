@@ -2,6 +2,7 @@ package eval.explorers;
 
 
 import eval.config.EvalConfig;
+import eval.executor.PredicateExecutor;
 import eval.results.Results;
 import korat.finitization.impl.Finitization;
 import korat.finitization.impl.StateSpace;
@@ -18,44 +19,68 @@ public class Evaluator {
     CandidateBuilder candidateBuilder;
     Finitization finitization;
     PredicateChecker groundTruthChecker;
-    PredicateChecker evaluatedPredicateChecker;
+    PredicateExecutor evaluatedPredicateExecutor;
     BoundedExhaustiveExplorer explorer;
+
+    boolean validClassValidStructures;
 
     public Evaluator(EvalConfig params) throws ClassNotFoundException, CannotFindFinitizationException,
             CannotInvokeFinitizationException, CannotFindPredicateException {
-        Class<?> rootClass = Helper.loadClass(params.getFullyQualifiedClassName());
+        Class<?> rootClass = Helper.loadClass(params.getSubjectClassName());
+
         finitization = Helper.getFinitization(rootClass, params.getFinitizationName(), params.getFinitizationArgs());
+
         groundTruthChecker = new PredicateChecker();
         finitization.initialize(groundTruthChecker);
+
         StateSpace stateSpace = finitization.getStateSpace();
         explorer = new BoundedExhaustiveExplorer(stateSpace);
         groundTruthChecker.initialize(rootClass, params.getGroundTruthPredicateName(), explorer.getAccessedIndices());
-        evaluatedPredicateChecker = new PredicateChecker();
-        evaluatedPredicateChecker.initialize(rootClass, params.getEvaluatedPredicateName(), explorer.getAccessedIndices());
+
+        evaluatedPredicateExecutor = new PredicateExecutor();
+        Class<?> predicateClass = Helper.loadClass(params.getPredicateClassName());
+        evaluatedPredicateExecutor.initialize(predicateClass, params.getEvaluatedPredicateName());
+
         candidateBuilder = new CandidateBuilder(stateSpace, explorer.getChangedFields());
+
+        validClassValidStructures = params.validClassValidStructures;
     }
 
-    public Results startSearch() throws CannotInvokePredicateException {
+    public Results startEvaluation() throws CannotInvokePredicateException {
         Results results = new Results();
         int[] vector = explorer.getCandidateVector();
         while (vector != null) {
             Object candidate = candidateBuilder.buildCandidate(vector);
             if (groundTruthChecker.checkPredicate(candidate)) {
                 // valid
-                if (evaluatedPredicateChecker.callPredicate(candidate)) {
-                    results.incrementTruePositives();
+                if (validClassValidStructures) {
+                    if (evaluatedPredicateExecutor.executePredicate(candidate)) {
+                        results.incrementTruePositives();
+                    } else {
+                        results.incrementFalseNegatives();
+                    }
                 } else {
-                    results.incrementFalseNegatives();
+                    if (evaluatedPredicateExecutor.executePredicate(candidate)) {
+                        results.incrementTrueNegatives();
+                    } else {
+                        results.incrementFalsePositives();
+                    }
                 }
-                //System.out.println("valid: " + Arrays.toString(explorer.getCandidateVector()));
             } else {
                 // invalid
-                if (evaluatedPredicateChecker.callPredicate(candidate)) {
-                    results.incrementFalsePositives();
+                if (validClassValidStructures) {
+                    if (evaluatedPredicateExecutor.executePredicate(candidate)) {
+                        results.incrementFalsePositives();
+                    } else {
+                        results.incrementTrueNegatives();
+                    }
                 } else {
-                    results.incrementTrueNegatives();
+                    if (evaluatedPredicateExecutor.executePredicate(candidate)) {
+                        results.incrementFalseNegatives();
+                    } else {
+                        results.incrementTruePositives();
+                    }
                 }
-                //System.out.println("invalid: " + Arrays.toString(explorer.getCandidateVector()));
             }
             vector = explorer.getNextCandidate();
         }

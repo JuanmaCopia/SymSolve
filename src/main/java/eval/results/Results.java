@@ -2,67 +2,85 @@ package eval.results;
 
 public class Results {
 
-    int truePositives = 0;
-    int falsePositives = 0;
-    int trueNegatives = 0;
-    int falseNegatives = 0;
+    long TP = 0;
+    long FP = 0;
+    long TN = 0;
+    long FN = 0;
 
     public void incrementTruePositives() {
-        truePositives++;
+        TP++;
     }
 
     public void incrementFalsePositives() {
-        falsePositives++;
+        FP++;
     }
 
     public void incrementTrueNegatives() {
-        trueNegatives++;
+        TN++;
     }
 
     public void incrementFalseNegatives() {
-        falseNegatives++;
+        FN++;
     }
 
-    public int getTruePositives() {
-        return truePositives;
+    public long getTruePositives() {
+        return TP;
     }
 
-    public int getFalsePositives() {
-        return falsePositives;
+    public long getFalsePositives() {
+        return FP;
     }
 
-    public int getTrueNegatives() {
-        return trueNegatives;
+    public long getTrueNegatives() {
+        return TN;
     }
 
-    public int getFalseNegatives() {
-        return falseNegatives;
+    public long getFalseNegatives() {
+        return FN;
     }
 
     public Double getPrecision() {
-        return (double) truePositives / (truePositives + falsePositives);
+        return (double) TP / (TP + FP);
     }
 
     public Double getRecall() {
-        return (double) truePositives / (truePositives + falseNegatives);
+        return (double) TP / (TP + FN);
     }
 
     public Double getAccuracy() {
-        return (double) (truePositives + trueNegatives) / (truePositives + trueNegatives + falsePositives + falseNegatives);
+        return (double) (TP + TN) / (TP + TN + FP + FN);
     }
 
     public Double getF1Score() {
         return 2 * (getPrecision() * getRecall()) / (getPrecision() + getRecall());
     }
 
+    public Double getSpecificity() {
+        return (double) TN / (TN + FP);
+    }
+
+    public Double getBalancedAccuracy() {
+        return (getRecall() + getSpecificity()) / 2;
+    }
+
+    public Double getMCC() {
+        long numerator = (TP * TN) - (FP * FN);  // Correct formula
+        double denominator = Math.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN));
+        return numerator / denominator;
+    }
+
+
     public void printResults() {
-        System.out.println("True Positives: " + truePositives);
-        System.out.println("False Positives: " + falsePositives);
-        System.out.println("True Negatives: " + trueNegatives);
-        System.out.println("False Negatives: " + falseNegatives);
+        System.out.println("True Positives: " + TP);
+        System.out.println("False Positives: " + FP);
+        System.out.println("True Negatives: " + TN);
+        System.out.println("False Negatives: " + FN);
         System.out.println("Precision: " + getPrecision());
         System.out.println("Recall: " + getRecall());
         System.out.println("F1 Score: " + getF1Score());
         System.out.println("Accuracy: " + getAccuracy());
+        //System.out.println("Specificity: " + getSpecificity());
+        System.out.println("Balanced Accuracy: " + getBalancedAccuracy());
+        System.out.println("MCC: " + getMCC());
     }
 }
